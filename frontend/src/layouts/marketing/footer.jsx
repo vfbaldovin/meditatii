@@ -120,7 +120,7 @@ export const Footer = (props) => (
                   },
                 }}
               >
-                Devias Kit <span>PRO</span>
+                Meditații anunțuri
               </Box>
             </Stack>
             <Typography

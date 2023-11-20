@@ -5,31 +5,29 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
-const platformOptions = ['Web', 'Node.js', 'Python', 'C#'];
 
 export const CourseSearch = () => {
   return (
-    <Card>
+    <Card sx={{ borderRadius: '7px', width: '100%', maxWidth: '50rem'}}>
       <Stack
         alignItems="center"
         direction="row"
         flexWrap="wrap"
-        gap={3}
-        sx={{ p: 3 }}
+        gap={0}
+        sx={{ p: 0 }}
       >
         <Box sx={{ flexGrow: 1 }}>
           <TextField
             defaultValue=""
             fullWidth
-            label="Search"
+            placeholder="Ce ți-ar plăcea să înveți?"
             name="query"
-            placeholder="Title or description"
+            variant="outlined"
+            InputProps={{
+              style: { borderTopRightRadius: 0, borderBottomRightRadius: 0 },
+            }}
           />
         </Box>
-
-
 
         <Button
           size="large"
@@ -39,8 +37,17 @@ export const CourseSearch = () => {
             </SvgIcon>
           }
           variant="contained"
+          sx={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            borderTopRightRadius: '5px',
+            borderBottomRightRadius: '5px',
+            boxShadow: 'none',
+            height: '100%',
+            lineHeight: '31px',
+          }}
         >
-          Search
+          Caută
         </Button>
       </Stack>
     </Card>

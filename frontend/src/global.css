@@ -28,3 +28,18 @@
 
 /* Remove if mapbox is not used */
 @import '~mapbox-gl/dist/mapbox-gl.css';
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 2px;
+  background-color: currentColor;
+  width: 2px;
+  height: 1em;
+  animation: blink 1s step-start 0s infinite;
+}

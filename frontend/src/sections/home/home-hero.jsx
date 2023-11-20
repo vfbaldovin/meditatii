@@ -14,9 +14,72 @@ import { RouterLink } from 'src/components/router-link';
 import { paths } from 'src/paths';
 
 import { HomeCodeSamples } from './home-code-samples';
+import React, { useState, useEffect } from 'react';
+import Chip from "@mui/material/Chip";
+import {TrendingUp} from "@mui/icons-material";
+import Link from "@mui/material/Link";
+import ArrowLeftIcon from "@untitled-ui/icons-react/build/esm/ArrowLeft";
 
 export const HomeHero = () => {
   const theme = useTheme();
+  const [subject, setSubject] = useState('Engleză');
+  const subjects = ['Limba engleză', 'Matematică', 'Limba franceză', 'Informatică', 'Biologie', 'Chimie', 'Limba română', 'Fizică'];
+  const popularItems = ['Item1', 'Item2', 'Item3'];
+
+  const cursorStyle = {
+    display: 'inline-block',
+    marginLeft: '2px',
+    backgroundColor: 'currentColor',
+    width: '3px',
+    height: '1em',
+    animation: 'blink 1s step-start 0s infinite',
+  };
+
+  // Define the keyframes for the blink animation within the component
+  const keyframesStyle = `
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+  `;
+
+  useEffect(() => {
+    let currentSubjectIndex = 0;
+    let currentCharacterIndex = 0;
+    let direction = 'forward';
+    let isMounted = true;
+
+    const updateSubject = () => {
+      setTimeout(() => {
+        if (!isMounted) return;
+
+        if (direction === 'forward') {
+          currentCharacterIndex++;
+          if (currentCharacterIndex > subjects[currentSubjectIndex].length) {
+            direction = 'backward';
+            setTimeout(updateSubject, 2000); // Wait before deleting
+            return;
+          }
+        } else {
+          currentCharacterIndex--;
+          if (currentCharacterIndex === 0) {
+            direction = 'forward';
+            currentSubjectIndex = (currentSubjectIndex + 1) % subjects.length;
+          }
+        }
+
+        setSubject(subjects[currentSubjectIndex].slice(0, currentCharacterIndex));
+        updateSubject();
+      }, direction === 'forward' ? 100 : 50); // Typing speed and deleting speed
+    };
+
+    updateSubject();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <Box
@@ -28,33 +91,60 @@ export const HomeHero = () => {
       }}
     >
       <Container maxWidth="lg">
-        <CourseSearch />
 
-        <Box maxWidth="sm">
+
+        <Box maxWidth="lg">
           <Typography
-            variant="h1"
-            sx={{ mb: 2 }}
+            variant="h2"
+            sx={{ mb: 1, textAlign: 'center'}}
           >
-            Let us worry about the&nbsp;
-            <Typography
-              component="span"
-              color="primary.main"
-              variant="inherit"
-            >
-              User Experience
-            </Typography>
-            , you focus on Developing.
+            Învață sau oferă pregătire la&nbsp;
           </Typography>
           <Typography
-            color="text.secondary"
+            color="primary.main"
+            variant="h1"
+            sx={{ mb: 3, textAlign: 'center'}}
+          >
+            {subject} <span style={cursorStyle} />
+          </Typography>
+          <Box mb={3} display='flex' justifyContent='center' alignItems='center'>
+            <CourseSearch />
+          </Box>
+
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            mb={3}
             sx={{
-              fontSize: 20,
-              fontWeight: 500,
+              flexWrap: 'wrap',
+              gap: 1, // creates a gap between items on wrap
+              '& > *': { // applies the style to all direct children
+                marginBottom: '8px', // or use theme.spacing(1) for theme-consistent spacing
+              },
             }}
           >
-            A professional kit that comes with ready-to-use MUI components developed with one common
-            goal in mind, help you build faster & beautiful applications.
-          </Typography>
+            <SvgIcon sx={{ mr: 1 }}>
+              <TrendingUp />
+            </SvgIcon>
+            <Typography
+              color="text.secondary"
+              sx={{
+                fontSize: 18,
+                fontWeight: 'bold',
+              }}
+            >
+              Populare:
+            </Typography>
+
+            {subjects.map((item) => (
+              <Chip
+                label={item}
+                key={item}
+              />
+            ))}
+          </Stack>
+
           <Stack
             alignItems="center"
             direction="row"

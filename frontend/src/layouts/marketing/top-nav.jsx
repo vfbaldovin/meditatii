@@ -1,10 +1,9 @@
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import Menu01Icon from '@untitled-ui/icons-react/build/esm/Menu01';
 import { alpha } from '@mui/system/colorManipulator';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
@@ -13,13 +12,13 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { Logo } from 'src/components/logo';
 import { RouterLink } from 'src/components/router-link';
-import { version } from 'src/config';
 import { usePathname } from 'src/hooks/use-pathname';
 import { useWindowScroll } from 'src/hooks/use-window-scroll';
 import { paths } from 'src/paths';
 
 import { PagesPopover } from './pages-popover';
 import { TopNavItem } from './top-nav-item';
+import {User03} from "@untitled-ui/icons-react";
 
 const items = [
   {
@@ -133,14 +132,11 @@ export const TopNav = (props) => {
                     },
                   }}
                 >
-                  Devias Kit <span>PRO</span>
+                  Meditații anunțuri
                 </Box>
               )}
             </Stack>
-            <Chip
-              label={`v${version}`}
-              size="small"
-            />
+
           </Stack>
           {mdUp && (
             <Stack
@@ -201,8 +197,32 @@ export const TopNav = (props) => {
               href="https://mui.com/store/items/devias-kit-pro"
               target="_blank"
               variant="contained"
+              sx={(theme) =>
+                theme.palette.mode === 'light'
+                  ? {
+                    border: '1px solid black',
+                    backgroundColor: 'neutral.50',
+                    color: 'neutral.900',
+                    '&:hover': {
+                      backgroundColor: 'neutral.200',
+                    },
+                  }
+                  : {
+                    border: '1px solid white',
+                    backgroundColor: 'neutral.900',
+                    color: 'neutral.50',
+                    '&:hover': {
+                      backgroundColor: 'neutral.700',
+                    },
+                  }
+              }
+              startIcon={
+                <SvgIcon fontSize="small">
+                  <User03/>
+                </SvgIcon>
+              }
             >
-              Purchase Now
+              Autentificare
             </Button>
             {!mdUp && (
               <IconButton onClick={onMobileNavOpen}>

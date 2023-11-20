@@ -46,7 +46,7 @@ export const HomeCta = () => (
           target="_blank"
           variant="contained"
         >
-          Purchase Now
+          Autentificare
         </Button>
       </Stack>
     </Container>
