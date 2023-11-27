@@ -22,15 +22,15 @@ import {User03} from "@untitled-ui/icons-react";
 
 const items = [
   {
-    title: 'Components',
+    title: 'Comunitate',
     path: paths.components.index,
   },
   {
-    title: 'Pages',
+    title: 'E-learning',
     popover: <PagesPopover />,
   },
   {
-    title: 'Docs',
+    title: 'Cum funcționează?',
     path: paths.docs,
     external: true,
   },

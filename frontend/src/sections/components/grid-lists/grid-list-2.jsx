@@ -1,4 +1,4 @@
-import { formatDistanceToNowStrict, subHours, subMinutes } from 'date-fns';
+import {formatDistanceToNowStrict, parseISO, subHours, subMinutes} from 'date-fns';
 import numeral from 'numeral';
 import HeartIcon from '@untitled-ui/icons-react/build/esm/Heart';
 import Users01Icon from '@untitled-ui/icons-react/build/esm/Users01';
@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography';
 
 const now = new Date();
 
-const projects = [
+const project = [
   {
     id: '5e8dcef8f95685ce21f16f3d',
     author: {
@@ -39,55 +39,12 @@ const projects = [
     title: 'Mella Full Screen Slider',
     type: 'Full-Time',
     updatedAt: subMinutes(now, 24).getTime(),
-  },
-  {
-    id: '5e8dcf076c50b9d8e756a5a2',
-    author: {
-      id: '5e887d0b3d090c1b8f162003',
-      avatar: '/assets/avatars/avatar-omar-darboe.png',
-      name: 'Omar Darobe',
-    },
-    budget: 4205.0,
-    caption:
-      "We're looking for experienced Developers and Product Designers to come aboard and help us build succesful businesses through software.",
-    currency: '$',
-    isLiked: true,
-    likes: 12,
-    location: 'Europe',
-    image: '/assets/covers/business-1-4x4-small.png',
-    rating: 4.5,
-    membersCount: 3,
-    title: 'Overview Design',
-    type: 'Full-Time',
-    updatedAt: subHours(now, 1).getTime(),
-  },
-  {
-    id: '5e8dcf105a6732b3ed82cf7a',
-    author: {
-      id: '5e88792be2d4cfb4bf0971d9',
-      avatar: '/assets/avatars/avatar-siegbert-gottfried.png',
-      name: 'Siegbert Gottfried',
-    },
-    budget: 2394.0,
-    caption:
-      "We're looking for experienced Developers and Product Designers to come aboard and help us build succesful businesses through software.",
-    currency: '$',
-    isLiked: true,
-    likes: 18,
-    location: 'Europe',
-    image: '/assets/covers/minimal-2-4x4-small.png',
-    rating: 4.7,
-    membersCount: 8,
-    title: 'Ten80 Web Design',
-    type: 'Full-Time',
-    updatedAt: subHours(now, 16).getTime(),
-  },
-];
+  }]
 
-export const GridList2 = () => (
+export const GridList2 = ({ projects }) => (
   <Box
     sx={{
-      backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.100'),
+      backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50'),
       p: 3,
     }}
   >
@@ -96,36 +53,42 @@ export const GridList2 = () => (
       spacing={3}
     >
       {projects.map((project) => {
-        const updatedAgo = formatDistanceToNowStrict(project.updatedAt);
-        const budget = numeral(project.budget).format(`${project.currency}0,0.00`);
+        const updatedAgo = formatDistanceToNowStrict(parseISO(project.createdDate), { addSuffix: true });        const budget = numeral(project.budget).format(`${project.currency}0,0.00`);
 
         return (
           <Grid
             key={project.id}
             xs={12}
             md={4}
+            sx={{
+              boxShadow: 'unset'
+            }}
           >
-            <Card>
-              <Box sx={{ p: 2 }}>
-                <CardMedia
-                  image={project.image}
-                  sx={{
-                    backgroundColor: 'neutral.50',
-                    height: 200,
-                  }}
-                />
+            <Card
+              sx={{
+                boxShadow: 'unset'
+            }}
+            >
+              <Box sx={{ p: 2, boxShadow: 'unset' }}>
+
                 <Box
                   sx={{
                     alignItems: 'center',
                     display: 'flex',
                     mt: 2,
+                    boxShadow: 'unset'
                   }}
                 >
-                  <Avatar src={project.author.avatar} />
-                  <Box sx={{ ml: 2 }}>
+                  <Avatar src={project.tutorImage} />
+                  <Box sx={{ ml: 2, boxShadow: 'unset' }}>
                     <Link
                       color="text.primary"
                       variant="h6"
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}
                     >
                       {project.title}
                     </Link>
@@ -138,7 +101,7 @@ export const GridList2 = () => (
                         color="text.primary"
                         variant="subtitle2"
                       >
-                        {project.author.name}
+                        {project.tutorName}
                       </Link>{' '}
                       | Updated {updatedAgo} ago
                     </Typography>
@@ -149,13 +112,16 @@ export const GridList2 = () => (
                 sx={{
                   pb: 2,
                   px: 3,
+                  maxHeight: '10rem',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
                 <Typography
                   color="text.secondary"
                   variant="body2"
                 >
-                  {project.caption}
+                  {project.description}
                 </Typography>
               </Box>
               <Box
@@ -171,12 +137,11 @@ export const GridList2 = () => (
                   spacing={3}
                 >
                   <div>
-                    <Typography variant="subtitle2">{budget}</Typography>
+                    <Typography variant="subtitle2">{project.price} lei / oră</Typography>
                     <Typography
                       color="text.secondary"
                       variant="body2"
                     >
-                      Budget
                     </Typography>
                   </div>
                   <div>

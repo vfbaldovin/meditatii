@@ -17,14 +17,17 @@ import { HomeCodeSamples } from './home-code-samples';
 import React, { useState, useEffect } from 'react';
 import Chip from "@mui/material/Chip";
 import {TrendingUp} from "@mui/icons-material";
-import Link from "@mui/material/Link";
-import ArrowLeftIcon from "@untitled-ui/icons-react/build/esm/ArrowLeft";
+import {GridList2} from "../components/grid-lists/grid-list-2";
+import axios from "axios";
 
 export const HomeHero = () => {
   const theme = useTheme();
   const [subject, setSubject] = useState('Engleză');
-  const subjects = ['Limba engleză', 'Matematică', 'Limba franceză', 'Informatică', 'Biologie', 'Chimie', 'Limba română', 'Fizică'];
-  const popularItems = ['Item1', 'Item2', 'Item3'];
+  const subjects = ['Limba engleză', 'Matematică', 'Limba franceză', 'Informatică', 'Biologie', 'Limba germană','Chimie', 'Limba română', 'Fizică'];
+  const [projects, setProjects] = useState([]);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(200);
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const cursorStyle = {
     display: 'inline-block',
@@ -35,16 +38,26 @@ export const HomeHero = () => {
     animation: 'blink 1s step-start 0s infinite',
   };
 
-  // Define the keyframes for the blink animation within the component
-  const keyframesStyle = `
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
-  `;
 
   useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        // Adjust the URL to your actual endpoint
+        const response = await axios.get(`${apiBaseUrl}/announcements/paginated?page=${page}&size=${size}`);
+        const announcements = response.data.content; // Assuming your data has a 'content' key with the announcements
+        const announcementWithImages = await Promise.all(announcements.map(async (announcement) => {
+          const imageResponse = await axios.get(`${apiBaseUrl}/user/${announcement.tutorId}/profile-image`, { responseType: 'blob' });
+          const imageUrl = URL.createObjectURL(imageResponse.data);
+          return { ...announcement, tutorImage: imageUrl };
+        }));
+        setProjects(announcementWithImages);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+
+    fetchProjects();
+
     let currentSubjectIndex = 0;
     let currentCharacterIndex = 0;
     let direction = 'forward';
@@ -79,7 +92,7 @@ export const HomeHero = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [apiBaseUrl, page, size]);
 
   return (
     <Box
@@ -102,7 +115,7 @@ export const HomeHero = () => {
           </Typography>
           <Typography
             color="primary.main"
-            variant="h1"
+            variant="h2"
             sx={{ mb: 3, textAlign: 'center'}}
           >
             {subject} <span style={cursorStyle} />
@@ -124,7 +137,7 @@ export const HomeHero = () => {
               },
             }}
           >
-            <SvgIcon sx={{ mr: 1 }}>
+            <SvgIcon sx={{marginBottom: 'unset'}}>
               <TrendingUp />
             </SvgIcon>
             <Typography
@@ -132,9 +145,9 @@ export const HomeHero = () => {
               sx={{
                 fontSize: 18,
                 fontWeight: 'bold',
+                marginLeft: 0
               }}
-            >
-              Populare:
+            >Populare:
             </Typography>
 
             {subjects.map((item) => (
@@ -144,6 +157,8 @@ export const HomeHero = () => {
               />
             ))}
           </Stack>
+
+
 
           <Stack
             alignItems="center"
@@ -172,6 +187,13 @@ export const HomeHero = () => {
               based on (70+ reviews)
             </Typography>
           </Stack>
+
+            <Container maxWidth="lg">
+              <Stack spacing={8}>
+
+                <GridList2 projects={projects} />
+              </Stack>
+            </Container>
           <Stack
             alignItems="center"
             direction="row"
