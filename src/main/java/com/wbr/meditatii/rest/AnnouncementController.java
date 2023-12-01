@@ -7,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/announcements")
+@RequestMapping("/announcement")
 public class AnnouncementController {
 
     private final AnnouncementService announcementService;
@@ -55,8 +56,9 @@ public class AnnouncementController {
     @GetMapping("/paginated")
     public ResponseEntity<Page<AnnouncementCard>> getAllAnnouncementsPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<AnnouncementCard> announcementPage = announcementService.findAllPaginated(page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam @Nullable Long subjectId) {
+        Page<AnnouncementCard> announcementPage = announcementService.findAllPaginated(page, size, subjectId);
         return ResponseEntity.ok(announcementPage);
     }
 }

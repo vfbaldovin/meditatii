@@ -14,6 +14,8 @@ public class AnnouncementCard {
     private LocalDateTime createdDate;
     private Integer price;
     private Boolean promoted;
+    private String city;
+    private String subject;
     private Long tutorId;
     private String tutorName;
 }

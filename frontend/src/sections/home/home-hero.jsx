@@ -7,91 +7,120 @@ import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
+import {useTheme} from '@mui/material/styles';
 import {CourseSearch} from 'src/sections/dashboard/academy/course-search';
 
-import { RouterLink } from 'src/components/router-link';
-import { paths } from 'src/paths';
+import {RouterLink} from 'src/components/router-link';
+import {paths} from 'src/paths';
 
-import { HomeCodeSamples } from './home-code-samples';
-import React, { useState, useEffect } from 'react';
+import {HomeCodeSamples} from './home-code-samples';
+import React, { useState, useEffect, useCallback } from 'react';
 import Chip from "@mui/material/Chip";
 import {TrendingUp} from "@mui/icons-material";
 import {GridList2} from "../components/grid-lists/grid-list-2";
 import axios from "axios";
+import CircularProgress from '@mui/material/CircularProgress';
+import {GridListPlaceholder} from "../components/grid-lists/grid-list-placeholder";
+import TablePagination from "@mui/material/TablePagination";
+import TypingEffect from "./TypingEffect";
+import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
+import Slider from "react-slick";
+
 
 export const HomeHero = () => {
   const theme = useTheme();
-  const [subject, setSubject] = useState('Engleză');
-  const subjects = ['Limba engleză', 'Matematică', 'Limba franceză', 'Informatică', 'Biologie', 'Limba germană','Chimie', 'Limba română', 'Fizică'];
-  const [projects, setProjects] = useState([]);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(200);
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-  const cursorStyle = {
-    display: 'inline-block',
-    marginLeft: '2px',
-    backgroundColor: 'currentColor',
-    width: '3px',
-    height: '1em',
-    animation: 'blink 1s step-start 0s infinite',
+  const subjects = {
+    'Limba engleză': 30,
+    'Matematică': 8,
+    'Limba franceză': 32,
+    'Informatică': 6,
+    'Biologie': 18,
+    'Limba germană': 33,
+    'Chimie': 2,
+    'Limbă și literatură română': 24,
+    'Fizică': 5
   };
 
+  const subjectNames = Object.keys(subjects);
+
+  const [projects, setProjects] = useState([]);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(100);
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [searchText, setSearchText] = useState('');
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleSearchTextUpdate = (selectedValue) => {
+    if (selectedValue !== searchText) {
+      setSearchText(selectedValue);
+    }
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChipClick = useCallback((subjectName) => {
+    const subjectId = subjects[subjectName];
+    if (subjectId && subjectName !== searchText) {
+      setSearchText(subjectName);
+      handleSubjectSelect(subjectId);
+    }
+  });
+
+  async function enhanceAnnouncementsWithImages(announcements) {
+    return await Promise.all(announcements.map(async (announcement) => {
+      try {
+        const imageResponse = await axios.get(`${apiBaseUrl}/user/${announcement.tutorId}/profile-image`, {responseType: 'blob'});
+        const imageUrl = URL.createObjectURL(imageResponse.data);
+        return {...announcement, tutorImage: imageUrl};
+      } catch (error) {
+        console.error('Error fetching tutor image:', error);
+        return {...announcement, tutorImage: null};
+      }
+    }));
+  }
+
+  const handleSubjectSelect = async (subjectId) => {
+    if (subjects[searchText] === subjectId) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`${apiBaseUrl}/announcement/paginated?subjectId=${subjectId}`);
+      const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
+      setProjects(announcementWithImages);
+      setTotalItems(response.data.totalElements);
+
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
+      setIsLoading(true);
       try {
-        // Adjust the URL to your actual endpoint
-        const response = await axios.get(`${apiBaseUrl}/announcements/paginated?page=${page}&size=${size}`);
-        const announcements = response.data.content; // Assuming your data has a 'content' key with the announcements
-        const announcementWithImages = await Promise.all(announcements.map(async (announcement) => {
-          const imageResponse = await axios.get(`${apiBaseUrl}/user/${announcement.tutorId}/profile-image`, { responseType: 'blob' });
-          const imageUrl = URL.createObjectURL(imageResponse.data);
-          return { ...announcement, tutorImage: imageUrl };
-        }));
+        const response = await axios.get(`${apiBaseUrl}/announcement/paginated?page=${page}&size=${size}`);
+        const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
         setProjects(announcementWithImages);
+        setTotalItems(response.data.totalElements);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
+      setIsLoading(false);
     };
 
     fetchProjects();
 
-    let currentSubjectIndex = 0;
-    let currentCharacterIndex = 0;
-    let direction = 'forward';
-    let isMounted = true;
-
-    const updateSubject = () => {
-      setTimeout(() => {
-        if (!isMounted) return;
-
-        if (direction === 'forward') {
-          currentCharacterIndex++;
-          if (currentCharacterIndex > subjects[currentSubjectIndex].length) {
-            direction = 'backward';
-            setTimeout(updateSubject, 2000); // Wait before deleting
-            return;
-          }
-        } else {
-          currentCharacterIndex--;
-          if (currentCharacterIndex === 0) {
-            direction = 'forward';
-            currentSubjectIndex = (currentSubjectIndex + 1) % subjects.length;
-          }
-        }
-
-        setSubject(subjects[currentSubjectIndex].slice(0, currentCharacterIndex));
-        updateSubject();
-      }, direction === 'forward' ? 100 : 50); // Typing speed and deleting speed
-    };
-
-    updateSubject();
-
-    return () => {
-      isMounted = false;
-    };
   }, [apiBaseUrl, page, size]);
 
   return (
@@ -105,23 +134,21 @@ export const HomeHero = () => {
     >
       <Container maxWidth="lg">
 
-
         <Box maxWidth="lg">
           <Typography
             variant="h2"
-            sx={{ mb: 1, textAlign: 'center'}}
+            sx={{ mb: 1, mt:1, textAlign: 'center'}}
           >
             Învață sau oferă pregătire la&nbsp;
           </Typography>
-          <Typography
-            color="primary.main"
-            variant="h2"
-            sx={{ mb: 3, textAlign: 'center'}}
-          >
-            {subject} <span style={cursorStyle} />
-          </Typography>
+
+          <TypingEffect subjectNames={subjectNames}/>
+
           <Box mb={3} display='flex' justifyContent='center' alignItems='center'>
-            <CourseSearch />
+            <CourseSearch
+              onUpdateSearchText={handleSearchTextUpdate}
+              onSubjectSelect={handleSubjectSelect}
+              searchTextDefault={searchText}/>
           </Box>
 
           <Stack
@@ -131,9 +158,9 @@ export const HomeHero = () => {
             mb={3}
             sx={{
               flexWrap: 'wrap',
-              gap: 1, // creates a gap between items on wrap
-              '& > *': { // applies the style to all direct children
-                marginBottom: '8px', // or use theme.spacing(1) for theme-consistent spacing
+              gap: 1,
+              '& > *': {
+                marginBottom: '8px',
               },
             }}
           >
@@ -150,48 +177,82 @@ export const HomeHero = () => {
             >Populare:
             </Typography>
 
-            {subjects.map((item) => (
+            {subjectNames.map((subjectName) => (
               <Chip
-                label={item}
-                key={item}
+                label={subjectName}
+                key={subjectName}
+                onClick={() => handleChipClick(subjectName)}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'grey.400', // Adjust this color as needed
+                  },
+                }}
               />
             ))}
           </Stack>
 
+          {searchText && ( // Conditional rendering based on searchText
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              mb={3}
+              sx={{
+                flexWrap: 'wrap',
+                gap: 1,
+                '& > *': {
+                  marginBottom: '8px',
+                },
+              }}
+            >
+              <SvgIcon sx={{marginBottom: 'unset'}}>
+                <SearchMdIcon />
+              </SvgIcon>
+              <Typography
+                color="text.secondary"
+                sx={{
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                  marginLeft: 0
+                }}
+              >
+                Termeni:
+              </Typography>
+              <Chip label={searchText} />
+
+            </Stack>
+          )}
 
 
-          <Stack
-            alignItems="center"
-            direction="row"
-            flexWrap="wrap"
-            spacing={1}
-            sx={{ my: 3 }}
-          >
-            <Rating
-              readOnly
-              value={4.7}
-              precision={0.1}
-              max={5}
-            />
-            <Typography
-              color="text.primary"
-              variant="caption"
-              sx={{ fontWeight: 700 }}
-            >
-              4.7/5
-            </Typography>
-            <Typography
-              color="text.secondary"
-              variant="caption"
-            >
-              based on (70+ reviews)
-            </Typography>
-          </Stack>
 
             <Container maxWidth="lg">
               <Stack spacing={8}>
 
-                <GridList2 projects={projects} />
+                {isLoading ? (
+                  <Box sx={{ position: 'relative', height: '100%' }}>
+                    <GridListPlaceholder listLength={size}/>
+                    <Box sx={{
+                      position: 'fixed',
+                      top: '57.5%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }}>
+                      <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }}/>
+                    </Box>
+                  </Box>
+                ) : (
+                  <GridList2 projects={projects} />
+                )}
+
+                <TablePagination
+                  component="div"
+                  count={totalItems}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={size}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+
               </Stack>
             </Container>
           <Stack
@@ -228,6 +289,33 @@ export const HomeHero = () => {
             >
               Live Demo
             </Button>
+            <Stack
+              alignItems="center"
+              direction="row"
+              flexWrap="wrap"
+              spacing={1}
+              sx={{ my: 3 }}
+            >
+              <Rating
+                readOnly
+                value={4.7}
+                precision={0.1}
+                max={5}
+              />
+              <Typography
+                color="text.primary"
+                variant="caption"
+                sx={{ fontWeight: 700 }}
+              >
+                4.7/5
+              </Typography>
+              <Typography
+                color="text.secondary"
+                variant="caption"
+              >
+                based on (70+ reviews)
+              </Typography>
+            </Stack>
             <Button
               color="inherit"
               component={RouterLink}

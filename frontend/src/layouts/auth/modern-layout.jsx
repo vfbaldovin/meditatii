@@ -135,7 +135,7 @@ export const Layout = (props) => {
               <Box
                 sx={{
                   color: 'text.primary',
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'ProximaNova', sans-serif",
                   fontSize: 14,
                   fontWeight: 800,
                   letterSpacing: '0.3px',

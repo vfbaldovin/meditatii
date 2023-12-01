@@ -55,3 +55,6 @@ ALTER TABLE `meditatii`.`user`
 
 use meditatii;
 RENAME TABLE `anunt` TO `announcement`;
+
+
+

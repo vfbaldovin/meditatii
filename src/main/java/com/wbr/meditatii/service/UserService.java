@@ -39,13 +39,7 @@ public class UserService {
         User user = findById(id);
 
         if (user.getImage() == null || user.getImage().length == 0) {
-            try {
-                Resource defaultImageResource = new ClassPathResource("/static/img/user-default.jpg");
-                return StreamUtils.copyToByteArray(defaultImageResource.getInputStream());
-            } catch (IOException e) {
-                log.error("Unable to fetch /static/img/user-default.jpg", new AppException("Error default image"));
-                throw new AppException("Error default image");
-            }
+            return null;
         }
 
         try {
@@ -59,6 +53,16 @@ public class UserService {
             throw new AppException("Unable building avatar");
         }
 
+    }
+
+    private byte[] getDefaultAvatar() {
+        try {
+            Resource defaultImageResource = new ClassPathResource("/static/img/user-default.jpg");
+            return StreamUtils.copyToByteArray(defaultImageResource.getInputStream());
+        } catch (IOException e) {
+            log.error("Unable to fetch /static/img/user-default.jpg", new AppException("Error default image"));
+            throw new AppException("Error default image");
+        }
     }
 
 }

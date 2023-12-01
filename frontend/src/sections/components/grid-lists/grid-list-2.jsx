@@ -1,236 +1,174 @@
-import {formatDistanceToNowStrict, parseISO, subHours, subMinutes} from 'date-fns';
+import {formatDistanceToNowStrict, parseISO} from 'date-fns';
 import numeral from 'numeral';
-import HeartIcon from '@untitled-ui/icons-react/build/esm/Heart';
-import Users01Icon from '@untitled-ui/icons-react/build/esm/Users01';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
-import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Unstable_Grid2';
-import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
-import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
-import SvgIcon from '@mui/material/SvgIcon';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import {useNavigate} from "react-router";
 
-const now = new Date();
+export const GridList2 = ({projects}) => {
 
-const project = [
-  {
-    id: '5e8dcef8f95685ce21f16f3d',
-    author: {
-      id: '5e887b7602bdbc4dbb234b27',
-      avatar: '/assets/avatars/avatar-jie-yan-song.png',
-      name: 'Jie Yan Song',
-    },
-    budget: 6125.0,
-    caption:
-      "We're looking for experienced Developers and Product Designers to come aboard and help us build succesful businesses through software.",
-    currency: '$',
-    isLiked: true,
-    likes: 7,
-    location: 'Europe',
-    image: '/assets/covers/abstract-2-4x4-small.png',
-    rating: 5,
-    membersCount: 2,
-    title: 'Mella Full Screen Slider',
-    type: 'Full-Time',
-    updatedAt: subMinutes(now, 24).getTime(),
-  }]
+  const PromotedChip = () => {
+    return (
 
-export const GridList2 = ({ projects }) => (
-  <Box
-    sx={{
-      backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50'),
-      p: 3,
-    }}
-  >
-    <Grid
-      container
-      spacing={3}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 20,
+          right: 20,
+          color: 'white',
+          fontWeight: 'bold',
+          backgroundColor: 'primary.main',
+          borderRadius: '50%', // Make the box circular
+          width: '2rem',      // Set a specific width
+          height: '2rem',     // Set a specific height to match the width
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', // Nice, subtle boxShadow
+          opacity: 0.9,
+        }}
+      >
+        <svg width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+             viewBox="0 0 47.94 47.94" xmlSpace="preserve">
+        <path fill="white" d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
+          c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
+          c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685
+          c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528
+          c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956
+          C22.602,0.567,25.338,0.567,26.285,2.486z"/>
+        </svg>
+      </Box>
+    );
+  };
+
+  const navigate = useNavigate();
+
+  const handleCardClick = (id) => {
+    navigate(`/announcement/${id}`);
+  };
+  return (
+    <Box
+      sx={{
+        // backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50'),
+        p: 3,
+      }}
     >
-      {projects.map((project) => {
-        const updatedAgo = formatDistanceToNowStrict(parseISO(project.createdDate), { addSuffix: true });        const budget = numeral(project.budget).format(`${project.currency}0,0.00`);
+      <Grid
+        container
+        spacing={3}
+      >
+        {projects.map((announcement) => {
+          const updatedAgo = formatDistanceToNowStrict(parseISO(announcement.createdDate), {addSuffix: true});
 
-        return (
-          <Grid
-            key={project.id}
-            xs={12}
-            md={4}
-            sx={{
-              boxShadow: 'unset'
-            }}
-          >
-            <Card
-              sx={{
-                boxShadow: 'unset'
-            }}
+          return (
+            <Grid
+              key={announcement.id}
+              xs={12}
+              md={12}
             >
-              <Box sx={{ p: 2, boxShadow: 'unset' }}>
+              <Card
+                onClick={() => handleCardClick(announcement.id)}
+                sx={{
+                  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  position: 'relative',
 
-                <Box
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    mt: 2,
-                    boxShadow: 'unset'
-                  }}
-                >
-                  <Avatar src={project.tutorImage} />
-                  <Box sx={{ ml: 2, boxShadow: 'unset' }}>
-                    <Link
-                      color="text.primary"
-                      variant="h6"
-                      sx={{
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {project.title}
-                    </Link>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                    >
-                      by{' '}
+                  border:  (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
+                  '&:hover': {
+                    border: (theme) => (theme.palette.mode === 'light' ? '1px solid black' : '1px solid whitesmoke'),
+                    borderRadius: '20px',
+                  },
+                }}
+              >
+                {announcement.promoted && <PromotedChip />}
+                <Box sx={{p: 2, boxShadow: 'unset', padding: '8px 16px 16px'}}>
+
+                  <Box
+                    sx={{
+                      alignItems: 'center',
+                      display: 'flex',
+                      mt: 2
+                    }}
+                  >
+                    <Avatar src={announcement.tutorImage}/>
+                    <Box sx={{ml: 2, boxShadow: 'unset'}}>
                       <Link
                         color="text.primary"
-                        variant="subtitle2"
-                      >
-                        {project.tutorName}
-                      </Link>{' '}
-                      | Updated {updatedAgo} ago
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  pb: 2,
-                  px: 3,
-                  maxHeight: '10rem',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                <Typography
-                  color="text.secondary"
-                  variant="body2"
-                >
-                  {project.description}
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  px: 3,
-                  py: 2,
-                }}
-              >
-                <Stack
-                  alignItems="center"
-                  direction="row"
-                  justifyContent="space-between"
-                  spacing={3}
-                >
-                  <div>
-                    <Typography variant="subtitle2">{project.price} lei / oră</Typography>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                    >
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2">{project.location}</Typography>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                    >
-                      Location
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="subtitle2">{project.type}</Typography>
-                    <Typography
-                      color="text.secondary"
-                      variant="body2"
-                    >
-                      Type
-                    </Typography>
-                  </div>
-                </Stack>
-              </Box>
-              <Divider />
-              <Box
-                sx={{
-                  alignItems: 'center',
-                  display: 'flex',
-                  pl: 2,
-                  pr: 3,
-                  py: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  <Tooltip title="Unlike">
-                    <IconButton>
-                      <SvgIcon
+                        variant="h6"
                         sx={{
-                          color: 'error.main',
-                          '& path': {
-                            fill: (theme) => theme.palette.error.main,
-                            fillOpacity: 1,
-                          },
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        <HeartIcon />
-                      </SvgIcon>
-                    </IconButton>
-                  </Tooltip>
-                  <Typography
-                    color="text.secondary"
-                    variant="subtitle2"
-                  >
-                    {project.likes}
-                  </Typography>
+                        {announcement.title}
+                      </Link>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                      >
+                        by{' '}
+                        <Link
+                          color="text.primary"
+                          variant="subtitle2"
+                        >
+                          {announcement.tutorName}
+                        </Link>{' '}
+                        | Updated {updatedAgo} ago
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
                 <Box
                   sx={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    ml: 2,
+                    pb: 2,
+                    px: 3,
+                    maxHeight: '4rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
                 >
-                  <SvgIcon>
-                    <Users01Icon />
-                  </SvgIcon>
                   <Typography
                     color="text.secondary"
-                    sx={{ ml: 1 }}
-                    variant="subtitle2"
+                    variant="body2"
                   >
-                    {project.membersCount}
+                    {announcement.description}
                   </Typography>
                 </Box>
-                <Box sx={{ flexGrow: 1 }} />
-                <Rating
-                  readOnly
-                  size="small"
-                  value={project.rating}
-                />
-              </Box>
-            </Card>
-          </Grid>
-        );
-      })}
-    </Grid>
-  </Box>
-);
+
+                <Box
+                  sx={{
+                    px: 3,
+                    py: 2,
+                  }}
+                >
+                  <Stack
+                    alignItems="center"
+                    direction="row"
+                    justifyContent="space-between"
+                    spacing={3}
+                  >
+                    <div>
+                      <Typography color="primary.main" variant="subtitle2">{announcement.price} lei
+                        / oră</Typography>
+                    </div>
+                    <div>
+
+                      <Typography color="primary.main"
+                                  variant="subtitle2">{announcement.subject}</Typography>
+                    </div>
+                  </Stack>
+                </Box>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
+    </Box>
+  )
+}

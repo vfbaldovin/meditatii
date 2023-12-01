@@ -19,7 +19,7 @@ public class Announcement {
      private User user;
 
     @Column(name = "subject")
-    private String subject;
+    private String subjectOld;
 
     @Column(name = "title")
     private String title;
@@ -68,5 +68,10 @@ public class Announcement {
 
     @Column(name = "promotion_expiry_date")
     private LocalDateTime promotionExpiryDate;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id", referencedColumnName = "id")
+    private Subject subject; // Renamed for clarity
+
 
 }
