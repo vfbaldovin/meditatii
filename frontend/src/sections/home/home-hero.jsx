@@ -70,7 +70,10 @@ export const HomeHero = () => {
     const subjectId = subjects[subjectName];
     if (subjectId && subjectName !== searchText) {
       setSearchText(subjectName);
-      handleSubjectSelect(subjectId);
+      handleSubjectSelect({
+        id: subjectId,
+        name: subjectName
+      })
     }
   });
 
@@ -87,14 +90,14 @@ export const HomeHero = () => {
     }));
   }
 
-  const handleSubjectSelect = async (subjectId) => {
-    if (subjects[searchText] === subjectId) {
+  const handleSubjectSelect = async (val) => {
+    if (searchText === val.name || val.id === undefined) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const response = await axios.get(`${apiBaseUrl}/announcement/paginated?subjectId=${subjectId}`);
+      const response = await axios.get(`${apiBaseUrl}/announcement/paginated?subjectId=${val.id}`);
       const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
       setProjects(announcementWithImages);
       setTotalItems(response.data.totalElements);
@@ -222,8 +225,6 @@ export const HomeHero = () => {
 
             </Stack>
           )}
-
-
 
             <Container maxWidth="lg">
               <Stack spacing={8}>

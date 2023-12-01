@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import SearchMdIcon from '@untitled-ui/icons-react/build/esm/SearchMd';
 import Box from '@mui/material/Box';
@@ -13,6 +13,9 @@ import CloseIcon from '@mui/icons-material/Close';
 export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearchText }) => {
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState([]);
+  const [firstResult, setFirstResult] = useState(null);
+  const keyPressRef = useRef(false);
+
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
@@ -25,27 +28,23 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
         try {
           const response = await axios.get(`${apiBaseUrl}/subject/search?q=${searchText}`);
           setResults(response.data);
+          setFirstResult(response.data[0] || null); // Update the first result
         } catch (error) {
           console.error('Error fetching search results:', error);
         }
       } else {
         setResults([]);
+        setFirstResult(null);
       }
     };
 
     fetchSearchResults();
-  }, [searchText, apiBaseUrl]); // Dependency on searchText
+  }, [searchText, apiBaseUrl]);
+
 
   const handleInputChange = (event, value, reason) => {
     if (reason === 'input') {
       setSearchText(value);
-    }
-  };
-
-  const handleSelect = (event, value) => {
-    if (value) {
-      onSubjectSelect(value.id);
-      onUpdateSearchText(value.name);
     }
   };
 
@@ -54,9 +53,39 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
     // onUpdateSearchText('');
   };
 
-  function handleSearch() {
+  const handleSearch = (e) => {
+    if (firstResult) {
+      setSearchText(firstResult.name);
+      onSubjectSelect(firstResult);
+      onUpdateSearchText(firstResult.name);
+    }
+  };
 
-  }
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && firstResult) {
+      keyPressRef.current = true;
+      event.preventDefault();
+      setSearchText(firstResult.name);
+      onSubjectSelect(firstResult);
+      onUpdateSearchText(firstResult.name);
+    }
+  };
+
+  const handleSelect = (event, value) => {
+    if (searchText.length < 2) {
+      return;
+    }
+
+    if (keyPressRef.current) {
+      keyPressRef.current = false;
+      return;
+    }
+    if (value) {
+      onSubjectSelect(value);
+      onUpdateSearchText(value.name);
+    }
+  };
+
 
   return (
     <Card sx={{ borderRadius: '5rem', width: '60%', maxWidth: '50rem' }}>
@@ -77,10 +106,11 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
           }}
           freeSolo
           options={results}
-          getOptionLabel={(option) => option.name}
+          getOptionLabel={(option) => option.name || ''}
           onInputChange={handleInputChange}
           onChange={handleSelect}
           inputValue={searchText}
+          onKeyDown={handleKeyPress}
           PaperComponent={({ children, ...other }) => (
             <Paper {...other} sx={{
               width: '92.8%',
@@ -95,6 +125,7 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
               fullWidth
               placeholder="Ce ți-ar plăcea să înveți?"
               variant="outlined"
+
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
