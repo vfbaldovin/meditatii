@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
-    @Query("SELECT a FROM Announcement a WHERE (:subjectId IS NULL OR a.subject.id = :subjectId)")
+    @Query("SELECT a FROM Announcement a WHERE (:subjectId IS NULL OR a.subject.id = :subjectId) ORDER BY a.promotionDate DESC")
     Page<Announcement> findBySubjectId(@Param("subjectId") Long subjectId, Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.wbr.meditatii.rest;
 
 import com.wbr.meditatii.model.Announcement;
 import com.wbr.meditatii.model.dto.AnnouncementCard;
+import com.wbr.meditatii.model.dto.AnnouncementResponse;
 import com.wbr.meditatii.service.AnnouncementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,9 +31,8 @@ public class AnnouncementController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Announcement> getAnnouncementById(@PathVariable Long id) {
-        Announcement announcement = announcementService.findById(id);
-        return ResponseEntity.ok(announcement);
+    public ResponseEntity<AnnouncementResponse> getAnnouncementById(@PathVariable Long id) {
+        return ResponseEntity.ok(announcementService.findById(id));
     }
 
     @PostMapping
@@ -42,7 +42,8 @@ public class AnnouncementController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Announcement> updateAnnouncement(@PathVariable Long id, @RequestBody Announcement announcement) {
+    public ResponseEntity<Announcement> updateAnnouncement(@PathVariable Long id,
+                                                           @RequestBody Announcement announcement) {
         Announcement updatedAnnouncement = announcementService.update(id, announcement);
         return ResponseEntity.ok(updatedAnnouncement);
     }
@@ -57,8 +58,11 @@ public class AnnouncementController {
     public ResponseEntity<Page<AnnouncementCard>> getAllAnnouncementsPaginated(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam @Nullable Long subjectId) {
-        Page<AnnouncementCard> announcementPage = announcementService.findAllPaginated(page, size, subjectId);
+            @RequestParam @Nullable Long subjectId,
+            @RequestParam(defaultValue = "CREATED.DESC") String sort) {
+        Page<AnnouncementCard> announcementPage =
+                announcementService.findAllPaginated(page, size, subjectId, sort);
         return ResponseEntity.ok(announcementPage);
     }
+
 }

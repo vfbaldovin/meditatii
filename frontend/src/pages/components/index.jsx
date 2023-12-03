@@ -20,7 +20,7 @@ const getSections = (paletteMode) => [
     items: [
       {
         title: 'Detail Lists',
-        subtitle: '8 components',
+        subtitle: '8 comaponents',
         image: `/assets/components/detail-list-${paletteMode}.png`,
         path: paths.components.dataDisplay.detailLists,
       },

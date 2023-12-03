@@ -14,7 +14,7 @@ import {RouterLink} from 'src/components/router-link';
 import {paths} from 'src/paths';
 
 import {HomeCodeSamples} from './home-code-samples';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import Chip from "@mui/material/Chip";
 import {TrendingUp} from "@mui/icons-material";
 import {GridList2} from "../components/grid-lists/grid-list-2";
@@ -24,11 +24,28 @@ import {GridListPlaceholder} from "../components/grid-lists/grid-list-placeholde
 import TablePagination from "@mui/material/TablePagination";
 import TypingEffect from "./TypingEffect";
 import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
-import Slider from "react-slick";
+import Grid from "@mui/material/Grid";
+import {FilterLines} from "@untitled-ui/icons-react";
+import {MultiSelect} from "../../components/multi-select";
 
 
 export const HomeHero = () => {
   const theme = useTheme();
+  const filterOptions = [
+    {
+      label: 'Cele mai noi',
+      value: 'CREATED.DESC',
+    },
+    {
+      label: 'Preț crescător',
+      value: 'PRICE.ASC',
+    },
+    {
+      label: 'Preț descrescător',
+      value: 'PRICE.DESC',
+    },
+  ];
+
   const subjects = {
     'Limba engleză': 30,
     'Matematică': 8,
@@ -37,7 +54,7 @@ export const HomeHero = () => {
     'Biologie': 18,
     'Limba germană': 33,
     'Chimie': 2,
-    'Limbă și literatură română': 24,
+    'Limba și literatură română': 24,
     'Fizică': 5
   };
 
@@ -45,11 +62,12 @@ export const HomeHero = () => {
 
   const [projects, setProjects] = useState([]);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(100);
+  const [size, setSize] = useState(8);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const [isLoading, setIsLoading] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [searchText, setSearchText] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState([filterOptions[0].value]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -61,10 +79,10 @@ export const HomeHero = () => {
     }
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setSize(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // const handleChangeRowsPerPage = (event) => {
+  //   setSize(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
 
   const handleChipClick = useCallback((subjectName) => {
     const subjectId = subjects[subjectName];
@@ -108,23 +126,59 @@ export const HomeHero = () => {
     setIsLoading(false);
   };
 
+  const fetchAndSetProjects = useCallback(async () => {
+    setIsLoading(true);
+    const selectedSort = selectedFilter.length > 0 ? selectedFilter[0] : filterOptions[0].value;
+    let apiUrl = `${apiBaseUrl}/announcement/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
+
+    const subjectId = subjects[searchText];
+    if (subjectId) {
+      apiUrl += `&subjectId=${subjectId}`;
+    }
+
+    try {
+      const response = await axios.get(apiUrl);
+      const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
+      setProjects(announcementWithImages);
+      setTotalItems(response.data.totalElements);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+    setIsLoading(false);
+  }, [apiBaseUrl, page, size, selectedFilter, searchText]);
+
+
+  const resetSearch = async () => {
+    setSearchText('');
+    await fetchAndSetProjects();
+  };
+
+  const handleFilterChange = (newValues) => {
+    if (newValues.length === 0) {
+      return;
+    }
+
+    setPage(0);
+    const lastSelectedValue = newValues[newValues.length - 1];
+    setSelectedFilter([lastSelectedValue]);
+  };
+
+
+  const selectedOptionLabel = () => {
+    const foundOption = filterOptions.find(option => selectedFilter.includes(option.value));
+    return foundOption ? foundOption.label : 'Default Label';
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`${apiBaseUrl}/announcement/paginated?page=${page}&size=${size}`);
-        const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
-        setProjects(announcementWithImages);
-        setTotalItems(response.data.totalElements);
-      } catch (error) {
-        console.error('Error fetching projects:', error);
-      }
-      setIsLoading(false);
-    };
+    fetchAndSetProjects();
+  }, [fetchAndSetProjects]);
 
-    fetchProjects();
+  useEffect(() => {
+    setSelectedFilter([filterOptions[0].value]);
+    setPage(0);
+    // fetchAndSetProjects();
+  }, [searchText]);
 
-  }, [apiBaseUrl, page, size]);
 
   return (
     <Box
@@ -140,7 +194,7 @@ export const HomeHero = () => {
         <Box maxWidth="lg">
           <Typography
             variant="h2"
-            sx={{ mb: 1, mt:1, textAlign: 'center'}}
+            sx={{mb: 1, mt: 1, textAlign: 'center'}}
           >
             Învață sau oferă pregătire la&nbsp;
           </Typography>
@@ -168,7 +222,7 @@ export const HomeHero = () => {
             }}
           >
             <SvgIcon sx={{marginBottom: 'unset'}}>
-              <TrendingUp />
+              <TrendingUp/>
             </SvgIcon>
             <Typography
               color="text.secondary"
@@ -187,75 +241,117 @@ export const HomeHero = () => {
                 onClick={() => handleChipClick(subjectName)}
                 sx={{
                   '&:hover': {
-                    backgroundColor: 'grey.400', // Adjust this color as needed
+                    backgroundColor: 'grey.400',
                   },
                 }}
               />
             ))}
           </Stack>
 
-          {searchText && ( // Conditional rendering based on searchText
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              mb={3}
-              sx={{
-                flexWrap: 'wrap',
-                gap: 1,
-                '& > *': {
-                  marginBottom: '8px',
-                },
-              }}
-            >
-              <SvgIcon sx={{marginBottom: 'unset'}}>
-                <SearchMdIcon />
-              </SvgIcon>
-              <Typography
-                color="text.secondary"
-                sx={{
-                  fontSize: 18,
-                  fontWeight: 'bold',
-                  marginLeft: 0
-                }}
-              >
-                Termeni:
-              </Typography>
-              <Chip label={searchText} />
+          {searchText && (
+            <Grid container spacing={2} alignItems="center" mb={3} justifyContent="space-between">
+              <Grid item xs={9} md={3}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <SvgIcon>
+                    <SearchMdIcon/>
+                  </SvgIcon>
+                  <Typography color="text.secondary"
+                              sx={{fontSize: 18, fontWeight: 'bold', marginLeft: 0}}>
+                    Termeni:
+                  </Typography>
+                  <Chip
+                    label={
+                      <Box sx={{alignItems: 'center', display: 'flex'}}>
+                        <span>{searchText}</span>
+                      </Box>
+                    }
+                    onDelete={resetSearch}
+                    sx={{m: 1}}
+                    variant="outlined"
+                  />
 
-            </Stack>
+
+                </Stack>
+              </Grid>
+              <Grid item xs={9} md={3}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <TablePagination
+                    labelRowsPerPage="Anunțuri"
+                    component="div"
+                    count={totalItems}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={size}
+                    labelDisplayedRows={({page, count}) => {
+                      const totalNumberOfPages = Math.ceil(count / size);
+                      return `Pagina ${page + 1} din ${totalNumberOfPages}`;
+                    }}
+                    rowsPerPageOptions={[]}
+                  />
+                </Stack>
+              </Grid>
+
+              <Grid item xs={9} md={3}>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <SvgIcon>
+                    <FilterLines/>
+                  </SvgIcon>
+                  <Typography color="text.secondary" sx={{fontSize: 18, fontWeight: 'bold'}}>
+                    Filtru:
+                  </Typography>
+
+                  <MultiSelect
+                    label={selectedOptionLabel()}
+                    options={filterOptions}
+                    value={selectedFilter}
+                    onChange={handleFilterChange}
+                  />
+
+                </Stack>
+              </Grid>
+
+
+            </Grid>
           )}
 
-            <Container maxWidth="lg">
-              <Stack spacing={8}>
 
-                {isLoading ? (
-                  <Box sx={{ position: 'relative', height: '100%' }}>
-                    <GridListPlaceholder listLength={size}/>
-                    <Box sx={{
-                      position: 'fixed',
-                      top: '57.5%',
-                      left: '50%',
-                      transform: 'translate(-50%, -50%)'
-                    }}>
-                      <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }}/>
-                    </Box>
+          <Container maxWidth="lg">
+            <Stack spacing={8}>
+
+              {isLoading ? (
+                <Box sx={{position: 'relative', height: '100%'}}>
+                  <GridListPlaceholder listLength={size}/>
+                  <Box sx={{
+                    position: 'fixed',
+                    top: '57.5%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}>
+                    <CircularProgress size={40} thickness={6} style={{opacity: 0.7}}/>
                   </Box>
-                ) : (
-                  <GridList2 projects={projects} />
-                )}
+                </Box>
+              ) : (
+                <GridList2 projects={projects}/>
+              )}
 
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
                 <TablePagination
+                  labelRowsPerPage="Anunțuri"
                   component="div"
                   count={totalItems}
                   page={page}
                   onPageChange={handleChangePage}
                   rowsPerPage={size}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelDisplayedRows={({ page, count }) => {
+                    const totalNumberOfPages = Math.ceil(count / size);
+                    return `Pagina ${page + 1} din ${totalNumberOfPages}`;
+                  }}
+                  rowsPerPageOptions={[]}
                 />
+              </Box>
 
-              </Stack>
-            </Container>
+            </Stack>
+          </Container>
           <Stack
             alignItems="center"
             direction="row"
@@ -266,25 +362,25 @@ export const HomeHero = () => {
               href={paths.dashboard.index}
               startIcon={
                 <SvgIcon fontSize="small">
-                  <EyeIcon />
+                  <EyeIcon/>
                 </SvgIcon>
               }
               sx={(theme) =>
                 theme.palette.mode === 'dark'
                   ? {
-                      backgroundColor: 'neutral.50',
-                      color: 'neutral.900',
-                      '&:hover': {
-                        backgroundColor: 'neutral.200',
-                      },
-                    }
+                    backgroundColor: 'neutral.50',
+                    color: 'neutral.900',
+                    '&:hover': {
+                      backgroundColor: 'neutral.200',
+                    },
+                  }
                   : {
-                      backgroundColor: 'neutral.900',
-                      color: 'neutral.50',
-                      '&:hover': {
-                        backgroundColor: 'neutral.700',
-                      },
-                    }
+                    backgroundColor: 'neutral.900',
+                    color: 'neutral.50',
+                    '&:hover': {
+                      backgroundColor: 'neutral.700',
+                    },
+                  }
               }
               variant="contained"
             >
@@ -295,7 +391,7 @@ export const HomeHero = () => {
               direction="row"
               flexWrap="wrap"
               spacing={1}
-              sx={{ my: 3 }}
+              sx={{my: 3}}
             >
               <Rating
                 readOnly
@@ -306,7 +402,7 @@ export const HomeHero = () => {
               <Typography
                 color="text.primary"
                 variant="caption"
-                sx={{ fontWeight: 700 }}
+                sx={{fontWeight: 700}}
               >
                 4.7/5
               </Typography>
@@ -323,7 +419,7 @@ export const HomeHero = () => {
               href={paths.components.index}
               startIcon={
                 <SvgIcon fontSize="small">
-                  <LayoutBottomIcon />
+                  <LayoutBottomIcon/>
                 </SvgIcon>
               }
             >
@@ -376,7 +472,7 @@ export const HomeHero = () => {
               },
             }}
           >
-            <HomeCodeSamples />
+            <HomeCodeSamples/>
           </Box>
         </Box>
       </Container>

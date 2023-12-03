@@ -113,6 +113,8 @@ ALTER TABLE announcement
 
 
 
+UPDATE announcement a set a.subject = 'Tobe' where a.subject = 'Toba';
+
 UPDATE announcement a
     JOIN subject s ON a.subject = REPLACE(
     REPLACE(
@@ -132,3 +134,6 @@ UPDATE announcement a
     'Â', 'A'),
     'Î', 'I')
     SET a.subject_id = s.id;
+
+update subject set name ='Limba și literatura maghiară' where name ='Limbă și literatură maghiară';
+update subject set name ='Limba și literatura română' where name ='Limbă și literatură română';

@@ -71,7 +71,6 @@ public class Announcement {
 
     @ManyToOne
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
-    private Subject subject; // Renamed for clarity
-
+    private Subject subject;
 
 }

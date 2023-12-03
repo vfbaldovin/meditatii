@@ -14,10 +14,10 @@ const Page = () => {
       <Seo />
       <main>
         <HomeHero />
-        <HomeFeatures />
-        <HomeReviews />
-        <HomeCta />
-        <HomeFaqs />
+        {/*<HomeFeatures />*/}
+        {/*<HomeReviews />*/}
+        {/*<HomeCta />*/}
+        {/*<HomeFaqs />*/}
       </main>
     </>
   );

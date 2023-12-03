@@ -80,7 +80,7 @@ export const GridList2 = ({projects}) => {
 
                   border:  (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
                   '&:hover': {
-                    border: (theme) => (theme.palette.mode === 'light' ? '1px solid black' : '1px solid whitesmoke'),
+                    border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
                     borderRadius: '20px',
                   },
                 }}
@@ -108,19 +108,14 @@ export const GridList2 = ({projects}) => {
                       >
                         {announcement.title}
                       </Link>
-                      <Typography
-                        color="text.secondary"
-                        variant="body2"
-                      >
-                        by{' '}
-                        <Link
-                          color="text.primary"
-                          variant="subtitle2"
-                        >
+                      <Typography color="text.secondary" variant="body2">
+                        de{' '}
+                        <Typography component="span" color="text.primary" variant="subtitle2">
                           {announcement.tutorName}
-                        </Link>{' '}
-                        | Updated {updatedAgo} ago
+                        </Typography>
+                        {' '}| Actualizat acum {updatedAgo.replace('days ago','zile')}
                       </Typography>
+
                     </Box>
                   </Box>
                 </Box>

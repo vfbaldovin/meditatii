@@ -13,6 +13,8 @@ const Error404Page = lazy(() => import('src/pages/404'));
 const Error500Page = lazy(() => import('src/pages/500'));
 
 const HomePage = lazy(() => import('src/pages'));
+const AnnouncementPage = lazy(() => import('src/pages/announcement'));
+
 const ContactPage = lazy(() => import('src/pages/contact'));
 const CheckoutPage = lazy(() => import('src/pages/checkout'));
 const PricingPage = lazy(() => import('src/pages/pricing'));
@@ -28,6 +30,10 @@ export const routes = [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'announcement/:id',
+        element: <AnnouncementPage />,
       },
       {
         path: 'pricing',

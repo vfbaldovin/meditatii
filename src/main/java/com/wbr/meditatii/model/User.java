@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Data
 @Entity
@@ -63,8 +64,18 @@ public class User {
     private LocalDateTime expiryDate;
 
     public String getTutorName() {
-        return getFirstName() +
-                (getLastName() != null && !getLastName().isEmpty() ? " " + getLastName().charAt(0) + "." : "");
+        if (firstName == null) {
+            return "Unknown";
+        }
+        return firstName +
+                (lastName != null && !lastName.isEmpty() ? " " + lastName.charAt(0) + "." : "");
+    }
+
+    public int getAge() {
+        if (dateOfBirth == null) {
+            return 42;
+        }
+        return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
 }

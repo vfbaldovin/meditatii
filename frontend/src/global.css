@@ -79,3 +79,30 @@ body {
   height: 1em;
   animation: blink 1s step-start 0s infinite;
 }
+
+@media (min-width: 1200px) {
+  .largeScreenAvatar {
+    /*position: absolute;*/
+    top: 0;
+    transform: translateY(-8%) !important;
+  }
+}
+@media (max-width: 1199px) {
+  .largeScreenAvatar {
+    /*position: absolute;*/
+    top: 0;
+    transform: translateY(-10%) !important;
+  }
+  .largeScreenAvatar2 {
+    /*position: absolute;*/
+    top: 0;
+    transform: translateY(-8%) !important;
+  }
+}
+/*@media (max-width: 1199px) {*/
+/*  .largeScreenAvatar {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    transform: translateY(20%);*/
+/*  }*/
+/*}*/

@@ -125,7 +125,10 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
               fullWidth
               placeholder="Ce ți-ar plăcea să înveți?"
               variant="outlined"
-
+              inputProps={{
+                ...params.inputProps,
+                maxLength: 32,
+              }}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
