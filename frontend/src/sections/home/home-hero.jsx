@@ -17,7 +17,6 @@ import {HomeCodeSamples} from './home-code-samples';
 import React, {useState, useEffect, useCallback} from 'react';
 import Chip from "@mui/material/Chip";
 import {TrendingUp} from "@mui/icons-material";
-import {GridList2} from "../components/grid-lists/grid-list-2";
 import axios from "axios";
 import CircularProgress from '@mui/material/CircularProgress';
 import {GridListPlaceholder} from "../components/grid-lists/grid-list-placeholder";
@@ -27,9 +26,44 @@ import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
 import Grid from "@mui/material/Grid";
 import {FilterLines} from "@untitled-ui/icons-react";
 import {MultiSelect} from "../../components/multi-select";
+import {useDispatch, useSelector} from "../../store";
+import {setCurrentPage, setSort, setSubjectId} from "../../slices/home";
+import {useNavigate} from "react-router";
+import {formatDistanceToNowStrict, parseISO} from "date-fns";
+import Card from "@mui/material/Card";
+import Avatar from "@mui/material/Avatar";
+import Link from "@mui/material/Link";
+import { useLocation } from 'react-router-dom';
+
 
 
 export const HomeHero = () => {
+
+  const dispatch = useDispatch();
+
+    const handleChangePage = (event, newPage) => {
+      setPage(newPage);
+      window.scrollTo({
+        top: 280,
+        behavior: 'smooth' // Optional: defines smooth scrolling
+      });
+      // dispatch(setCurrentPage(newPage)); // Update the Redux store
+    };
+
+  //
+  // const totalItemsInStore = useSelector((state) => state.home.totalItems);
+  //
+  // useEffect(() => {
+  //   setTotalItems(totalItemsInStore); // Set the current page when the component mounts
+  // }, [totalItemsInStore]);
+
+  /*
+    const [page, setPage] = useState(0);
+
+    const handleChangePage = (event, newPage) => {
+      setPage(newPage);
+    };*/
+
   const theme = useTheme();
   const filterOptions = [
     {
@@ -60,18 +94,44 @@ export const HomeHero = () => {
 
   const subjectNames = Object.keys(subjects);
 
-  const [projects, setProjects] = useState([]);
-  const [page, setPage] = useState(0);
+
   const [size, setSize] = useState(8);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [searchText, setSearchText] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState([filterOptions[0].value]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const searchParams = new URLSearchParams(location.search);
+
+  const pageParam = parseInt(searchParams.get('page'), 10);
+  const subjectIdParam = parseInt(searchParams.get('q'), 10);
+  const sortParam = searchParams.get('sort');
+
+  // Initialize state with values from URL parameters or default values
+  const [page, setPage] = useState(isNaN(pageParam) ? 0 : pageParam);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(subjectIdParam || null);
+  const [selectedFilter, setSelectedFilter] = useState(sortParam ? [sortParam] : [filterOptions[0].value]);
+
+
+  /*  const location = useLocation();
+    useEffect(() => {
+      const searchParams = new URLSearchParams(location.search);
+      const pageParam = parseInt(searchParams.get('page'), 10);
+      const subjectId = parseInt(searchParams.get('q'), 10);
+      const sort = searchParams.get('sort');
+
+      console.log(pageParam)
+      console.log(subjectId)
+      console.log(sort)
+      // setPage(isNaN(pageParam) ? 0 : pageParam);
+      // setSelectedSubjectId(isNaN(subjectId) ? 0 : subjectId);
+      // if (sort) {
+      //   setSelectedFilter(sort ? [sort] : filterOptions[0].value)
+      // }
+    }, [location]);*/
+
+
 
   const handleSearchTextUpdate = (selectedValue) => {
     if (selectedValue !== searchText) {
@@ -84,16 +144,6 @@ export const HomeHero = () => {
   //   setPage(0);
   // };
 
-  const handleChipClick = useCallback((subjectName) => {
-    const subjectId = subjects[subjectName];
-    if (subjectId && subjectName !== searchText) {
-      setSearchText(subjectName);
-      handleSubjectSelect({
-        id: subjectId,
-        name: subjectName
-      })
-    }
-  });
 
   async function enhanceAnnouncementsWithImages(announcements) {
     return await Promise.all(announcements.map(async (announcement) => {
@@ -108,12 +158,26 @@ export const HomeHero = () => {
     }));
   }
 
+  const handleChipClick = useCallback((subjectName) => {
+    const subjectId = subjects[subjectName];
+    if (subjectId && subjectName !== searchText) {
+      setSearchText(subjectName);
+      handleSubjectSelect({
+        id: subjectId,
+        name: subjectName
+      })
+    }
+  });
+
   const handleSubjectSelect = async (val) => {
     if (searchText === val.name || val.id === undefined) {
       return;
     }
 
     setIsLoading(true);
+    setSelectedFilter([filterOptions[0].value]);
+    setPage(0);
+    setSelectedSubjectId(val.id);
     try {
       const response = await axios.get(`${apiBaseUrl}/announcement/paginated?subjectId=${val.id}`);
       const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
@@ -131,37 +195,50 @@ export const HomeHero = () => {
     const selectedSort = selectedFilter.length > 0 ? selectedFilter[0] : filterOptions[0].value;
     let apiUrl = `${apiBaseUrl}/announcement/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
 
-    const subjectId = subjects[searchText];
-    if (subjectId) {
-      apiUrl += `&subjectId=${subjectId}`;
+    // const subjectId = subjects[searchText];
+    if (selectedSubjectId) {
+      apiUrl += `&subjectId=${selectedSubjectId}`;
     }
 
     try {
       const response = await axios.get(apiUrl);
       const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
+      if (selectedSubjectId) {
+        console.log('only one time')
+        setSearchText(response.data.content[0].subject)
+      }
       setProjects(announcementWithImages);
       setTotalItems(response.data.totalElements);
     } catch (error) {
       console.error('Error fetching projects:', error);
     }
     setIsLoading(false);
-  }, [apiBaseUrl, page, size, selectedFilter, searchText]);
-
-
-  const resetSearch = async () => {
-    setSearchText('');
-    await fetchAndSetProjects();
-  };
+  }, [page, selectedFilter]);
 
   const handleFilterChange = (newValues) => {
+    console.log(newValues)
     if (newValues.length === 0) {
       return;
     }
-
     setPage(0);
     const lastSelectedValue = newValues[newValues.length - 1];
     setSelectedFilter([lastSelectedValue]);
   };
+
+  const resetSearch = async () => {
+    setSelectedSubjectId(null)
+    setSearchText('');
+    setSelectedFilter([filterOptions[0].value]);
+    setPage(0);
+    // await fetchAndSetProjects();
+  };
+
+  useEffect(() => {
+    fetchAndSetProjects();
+    console.log('asfd')
+
+  }, [fetchAndSetProjects]);
+
 
 
   const selectedOptionLabel = () => {
@@ -169,16 +246,42 @@ export const HomeHero = () => {
     return foundOption ? foundOption.label : 'Default Label';
   };
 
-  useEffect(() => {
-    fetchAndSetProjects();
-  }, [fetchAndSetProjects]);
+  const navigate = useNavigate();
+
+  const handleCardClick = (id) => {
+    /*    dispatch(setCurrentPage(page));
+        dispatch(setSubjectId(selectedSubjectId));
+        dispatch(setSort(selectedFilter));
+        navigate(`/announcement/${id}`);*/
+
+    navigate(`/announcement/${id}`, {
+      state: {
+        page: page,
+        selectedSubjectId: selectedSubjectId,
+        selectedFilter: selectedFilter
+      }
+    });
+  };
+
 
   useEffect(() => {
-    setSelectedFilter([filterOptions[0].value]);
-    setPage(0);
-    // fetchAndSetProjects();
-  }, [searchText]);
+    if (!isLoading) {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          const yOffset = -100; // Adjust this value based on the height of fixed elements
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+          if (window.history.pushState) {
+            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({path:newurl}, '', newurl);
+          }
+        }
+      }
+    }
 
+  }, [isLoading]);
 
   return (
     <Box
@@ -275,19 +378,21 @@ export const HomeHero = () => {
               </Grid>
               <Grid item xs={9} md={3}>
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <TablePagination
-                    labelRowsPerPage="Anunțuri"
-                    component="div"
-                    count={totalItems}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    rowsPerPage={size}
-                    labelDisplayedRows={({page, count}) => {
-                      const totalNumberOfPages = Math.ceil(count / size);
-                      return `Pagina ${page + 1} din ${totalNumberOfPages}`;
-                    }}
-                    rowsPerPageOptions={[]}
-                  />
+                  {totalItems && (
+                    <TablePagination
+                      labelRowsPerPage="Anunțuri"
+                      component="div"
+                      count={totalItems}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      rowsPerPage={size}
+                      labelDisplayedRows={({ page, count }) => {
+                        const totalNumberOfPages = Math.ceil(count / size);
+                        return `Pagina ${page + 1} din ${totalNumberOfPages}`;
+                      }}
+                      rowsPerPageOptions={[]}
+                    />
+                  )}
                 </Stack>
               </Grid>
 
@@ -331,23 +436,141 @@ export const HomeHero = () => {
                   </Box>
                 </Box>
               ) : (
-                <GridList2 projects={projects}/>
+                <Box
+                  sx={{
+                    // backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50'),
+                    p: 3,
+                  }}
+                >
+                  <Grid
+                    container
+                    spacing={3}
+                  >
+                    {projects.map((announcement) => {
+                      const updatedAgo = formatDistanceToNowStrict(parseISO(announcement.createdDate), {addSuffix: true});
+
+                      return (
+                        <Grid
+                          key={announcement.id}
+                          item
+                          xs={12}
+                          md={12}
+                        >
+                          <Card
+                            onClick={() => handleCardClick(announcement.id)}
+                            id={announcement.id}
+                            sx={{
+                              boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                              borderRadius: '20px',
+                              cursor: 'pointer',
+                              position: 'relative',
+
+                              border:  (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
+                              '&:hover': {
+                                border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
+                                borderRadius: '20px',
+                              },
+                            }}
+                          >
+                            {announcement.promoted && <PromotedChip />}
+                            <Box sx={{p: 2, boxShadow: 'unset', padding: '8px 16px 16px'}}>
+
+                              <Box
+                                sx={{
+                                  alignItems: 'center',
+                                  display: 'flex',
+                                  mt: 2
+                                }}
+                              >
+                                <Avatar src={announcement.tutorImage}/>
+                                <Box sx={{ml: 2, boxShadow: 'unset'}}>
+                                  <Link
+                                    color="text.primary"
+                                    variant="h6"
+                                    sx={{
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    {announcement.title}
+                                  </Link>
+                                  <Typography color="text.secondary" variant="body2">
+                                    de{' '}
+                                    <Typography component="span" color="text.primary" variant="subtitle2">
+                                      {announcement.tutorName}
+                                    </Typography>
+                                    {' '}| Actualizat acum {updatedAgo.replace('days ago','zile')}
+                                  </Typography>
+
+                                </Box>
+                              </Box>
+                            </Box>
+                            <Box
+                              sx={{
+                                pb: 2,
+                                px: 3,
+                                maxHeight: '4rem',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              <Typography
+                                color="text.secondary"
+                                variant="body2"
+                              >
+                                {announcement.description}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                px: 3,
+                                py: 2,
+                              }}
+                            >
+                              <Stack
+                                alignItems="center"
+                                direction="row"
+                                justifyContent="space-between"
+                                spacing={3}
+                              >
+                                <div>
+                                  <Typography color="primary.main" variant="subtitle2">{announcement.price} lei
+                                    / oră</Typography>
+                                </div>
+                                <div>
+
+                                  <Typography color="primary.main"
+                                              variant="subtitle2">{announcement.subject}</Typography>
+                                </div>
+                              </Stack>
+                            </Box>
+                          </Card>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </Box>
               )}
 
               <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-                <TablePagination
-                  labelRowsPerPage="Anunțuri"
-                  component="div"
-                  count={totalItems}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={size}
-                  labelDisplayedRows={({ page, count }) => {
-                    const totalNumberOfPages = Math.ceil(count / size);
-                    return `Pagina ${page + 1} din ${totalNumberOfPages}`;
-                  }}
-                  rowsPerPageOptions={[]}
-                />
+                {totalItems && (
+                  <TablePagination
+                    labelRowsPerPage="Anunțuri"
+                    component="div"
+                    count={totalItems}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={size}
+                    labelDisplayedRows={({ page, count }) => {
+                      const totalNumberOfPages = Math.ceil(count / size);
+                      return `Pagina ${page + 1} din ${totalNumberOfPages}`;
+                    }}
+                    rowsPerPageOptions={[]}
+                  />
+                )}
+
               </Box>
 
             </Stack>
@@ -479,3 +702,40 @@ export const HomeHero = () => {
     </Box>
   );
 };
+
+
+
+const PromotedChip = () => {
+  return (
+
+    <Box
+      sx={{
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        color: 'white',
+        fontWeight: 'bold',
+        backgroundColor: 'primary.main',
+        borderRadius: '50%', // Make the box circular
+        width: '2rem',      // Set a specific width
+        height: '2rem',     // Set a specific height to match the width
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', // Nice, subtle boxShadow
+        opacity: 0.9,
+      }}
+    >
+      <svg width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
+           viewBox="0 0 47.94 47.94" xmlSpace="preserve">
+        <path fill="white" d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
+          c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
+          c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685
+          c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528
+          c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956
+          C22.602,0.567,25.338,0.567,26.285,2.486z"/>
+      </svg>
+    </Box>
+  );
+};
+

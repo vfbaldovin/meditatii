@@ -15,7 +15,8 @@ import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {ArrowNarrowLeft} from "@untitled-ui/icons-react";
 import {AnnouncementBio} from "../sections/announcement/announcement-bio";
-import Link from "@mui/material/Link";
+import {useSelector} from "../store";
+import {useLocation} from "react-router-dom";
 
 const Page = () => {
   const theme = useTheme();
@@ -23,8 +24,15 @@ const Page = () => {
   const [announcement, setAnnouncement] = useState({
     title: '',
     description: '',
-    // Add other properties with default values as needed
+    tutorName: '',
+    age: null,
+    subject: '',
+    price: 0,
+    tutorId: '',
+    createdDate: '',
+    updatedDate: '',
   });
+
   const [tutorImageUrl, setTutorImageUrl] = useState('');
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -47,15 +55,25 @@ const Page = () => {
   }, [id]);
 
   const navigate = useNavigate();
-
+/*  const currentPage = useSelector((state) => state.home.currentPage);
+  const subjectId = useSelector((state) => state.home.subjectId);
+  const sort = useSelector((state) => state.home.sort);*/
+  let location = useLocation();
   const goBack = () => {
-    navigate(-1);
+    let page = location.state?.page;
+    let selectedSubjectId = location.state?.selectedSubjectId;
+    let selectedFilter = location.state?.selectedFilter;
+    if (page === undefined || selectedSubjectId === undefined || selectedFilter === undefined) {
+      navigate(`/`);
+    } else {
+      navigate(`/?page=${page}&q=${selectedSubjectId}&sort=${selectedFilter}#${announcement.id}`);
+    }
   };
   usePageView();
 
   return (
     <>
-      <Seo title={announcement.subject}/>
+      <Seo title={announcement.title}/>
       <Box
         sx={{
           backgroundColor: (theme) =>
@@ -65,7 +83,7 @@ const Page = () => {
       >
         <Container maxWidth="lg">
           <Stack spacing={1}>
-            <Box sx={{
+            <Box className='up-spacing' sx={{
               backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50',
               pt: {
                 xs: '6rem',
@@ -75,7 +93,7 @@ const Page = () => {
               }
             }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: 2 }}>
-                <Typography onClick={goBack} sx={{
+                <Typography className='bck-btn' onClick={goBack} sx={{
                   cursor: 'pointer',
                   '&:hover': {
                     textDecoration: 'underline'
@@ -84,7 +102,9 @@ const Page = () => {
                   <SvgIcon style={{ verticalAlign: 'middle', marginRight: '8px' }}>
                     <ArrowNarrowLeft/>
                   </SvgIcon>
-                  {announcement.subject}
+                  {location.state?.selectedSubjectId
+                    ? announcement.subject
+                    : 'Înapoi'}
                 </Typography>
               </Box>
 
@@ -121,29 +141,33 @@ const Page = () => {
                 lg={3}
                 className="largeScreenAvatar"
               >
-                <Avatar
-                  src={tutorImageUrl}
-                  sx={{
-                    width: '100px',
-                    height: '100px',
-                    border: (theme) =>
-                      theme.palette.mode === 'dark' ? '4px solid #0E1320' : '4px solid white',
-                  }}
-                />
-
-                <Typography
-                  sx={{fontWeight: 800}}
-                  variant="h4"
-                >
-                  {announcement.tutorName}
-                </Typography>
-                <Typography variant="body1">
-                  Vârstă{' '}
-                  <span style={{fontWeight: 800}}>
-                    {announcement.age} ani
-                  </span>
-                </Typography>
-
+                <Box sx={{
+                  textAlign: 'center'
+                }}>
+                  <Avatar
+                    src={tutorImageUrl}
+                    sx={{
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                      width: '100px',
+                      height: '100px',
+                      border: (theme) =>
+                        theme.palette.mode === 'dark' ? '4px solid #0E1320' : '4px solid white',
+                    }}
+                  />
+                  <Typography
+                    sx={{fontWeight: 800}}
+                    variant="h4"
+                  >
+                    {announcement.tutorName}
+                  </Typography>
+                  <Typography variant="body1">
+                    {' '}
+                    <span style={{fontWeight: 800}}>
+                      {announcement.age} ani
+                    </span>
+                  </Typography>
+                </Box>
                 <AnnouncementBio announcement={announcement}/>
 
               </Grid>

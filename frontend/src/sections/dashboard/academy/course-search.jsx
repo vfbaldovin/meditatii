@@ -14,6 +14,9 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
   const [searchText, setSearchText] = useState('');
   const [results, setResults] = useState([]);
   const [firstResult, setFirstResult] = useState(null);
+  const [isDebouncing, setIsDebouncing] = useState(false);
+  const debounceTimeoutRef = useRef(null);
+
   const keyPressRef = useRef(false);
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -22,13 +25,20 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
     setSearchText(searchTextDefault || '');
   }, [searchTextDefault]);
 
+  const debounce = (func, delay) => {
+    clearTimeout(debounceTimeoutRef.current);
+    debounceTimeoutRef.current = setTimeout(func, delay);
+  };
+
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (searchText.length >= 2) {
         try {
+          console.log(results)
+          console.log(firstResult)
           const response = await axios.get(`${apiBaseUrl}/subject/search?q=${searchText}`);
           setResults(response.data);
-          setFirstResult(response.data[0] || null); // Update the first result
+          setFirstResult(response.data[0] || null);
         } catch (error) {
           console.error('Error fetching search results:', error);
         }
@@ -38,8 +48,19 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
       }
     };
 
-    fetchSearchResults();
-  }, [searchText, apiBaseUrl]);
+    if (searchText.length >= 2) {
+      debounce(() => {
+        setIsDebouncing(false);
+        fetchSearchResults();
+      }, 300); // 500ms debounce time
+      setIsDebouncing(true);
+    } else if (results.length !== 0) {
+      clearTimeout(debounceTimeoutRef.current);
+      setIsDebouncing(false);
+      setResults([]);
+      setFirstResult(null);
+    }
+    }, [searchText, apiBaseUrl]);
 
 
   const handleInputChange = (event, value, reason) => {
@@ -67,6 +88,7 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
       event.preventDefault();
       setSearchText(firstResult.name);
       onSubjectSelect(firstResult);
+
       onUpdateSearchText(firstResult.name);
     }
   };
@@ -80,7 +102,7 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
       keyPressRef.current = false;
       return;
     }
-    if (value) {
+    if (value && results.length !== 0) {
       onSubjectSelect(value);
       onUpdateSearchText(value.name);
     }

@@ -8,7 +8,8 @@ import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import {useNavigate} from "react-router";
-
+import { useDispatch } from 'react-redux';
+import {setCurrentPage} from "../../../slices/home";
 export const GridList2 = ({projects}) => {
 
   const PromotedChip = () => {
@@ -46,6 +47,7 @@ export const GridList2 = ({projects}) => {
   };
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleCardClick = (id) => {
     navigate(`/announcement/${id}`);

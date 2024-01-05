@@ -25,8 +25,10 @@ export const MultiSelect = (props) => {
       }
 
       onChange?.(newValue);
+      popover.handleClose(); // Add this line to close the menu after selection
+
     },
-    [onChange, value]
+    [onChange, value, popover]
   );
 
   return (

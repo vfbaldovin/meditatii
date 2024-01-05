@@ -5,9 +5,12 @@ import { HomeFaqs } from 'src/sections/home/home-faqs';
 import { HomeFeatures } from 'src/sections/home/home-features';
 import { HomeHero } from 'src/sections/home/home-hero';
 import { HomeReviews } from 'src/sections/home/home-reviews';
+import { useSelector } from 'react-redux';
 
 const Page = () => {
   usePageView();
+  const currentPage = useSelector((state) => state.home.currentPage);
+  const totalItems = useSelector((state) => state.home.totalItems);
 
   return (
     <>
