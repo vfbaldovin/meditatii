@@ -88,8 +88,8 @@ export const HomeHero = () => {
     'Biologie': 18,
     'Limba germană': 33,
     'Chimie': 2,
-    'Limba și literatură română': 24,
-    'Fizică': 5
+    // 'Limba și literatură română': 24,
+    // 'Fizică': 5
   };
 
   const subjectNames = Object.keys(subjects);
@@ -311,7 +311,7 @@ export const HomeHero = () => {
               searchTextDefault={searchText}/>
           </Box>
 
-          <Stack
+          {/*<Stack
             direction="row"
             alignItems="center"
             spacing={1}
@@ -349,11 +349,11 @@ export const HomeHero = () => {
                 }}
               />
             ))}
-          </Stack>
+          </Stack>*/}
 
           {searchText && (
             <Grid container spacing={2} alignItems="center" mb={3} justifyContent="space-between">
-              <Grid item xs={6} md={3}>
+              <Grid item xs={14} md={3}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <SvgIcon>
                     <SearchMdIcon/>
@@ -376,10 +376,44 @@ export const HomeHero = () => {
 
                 </Stack>
               </Grid>
+              <Grid item xs={12} md={6}>
+                <Grid container spacing={1} alignItems="center">
+                  {/* Left side with Icon and Text */}
+                  <Grid item xs={12} md={3}>
+                    <Grid container alignItems="center" spacing={1}>
+                      <Grid item>
+                        <SvgIcon>
+                          <TrendingUp />
+                        </SvgIcon>
+                      </Grid>
+                      <Grid item>
+                        <Typography color="text.secondary" sx={{ fontSize: 18, fontWeight: 'bold' }}>
+                          Populare:
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Grid>
 
-              <Grid item xs={6} md={3}>
+                  {/* Right side with Chips */}
+                  <Grid item xs={12} md={8}>
+                    <Grid container spacing={1}>
+                      {subjectNames.map((subjectName) => (
+                        <Grid item key={subjectName}>
+                          <Chip
+                            label={subjectName}
+                            onClick={() => handleChipClick(subjectName)}
+                            sx={{ '&:hover': { backgroundColor: 'grey.400' } }}
+                          />
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Grid>
+                </Grid>
+            </Grid>
+
+              <Grid item xs={14} md={3}>
                 <Stack direction="row" alignItems="center" spacing={1}
-                       sx={{float: 'right'}}>
+                       /*sx={{float: 'right'}}*/>
                   <SvgIcon>
                     <FilterLines/>
                   </SvgIcon>
