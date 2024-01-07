@@ -31,7 +31,7 @@ public class SubjectService {
 
         String normalizedInputName = removeDiacritics(name.toLowerCase());
 
-        return this.repository.findAll().stream()
+        return this.repository.findSubjectsAttachedToAnnouncements().stream()
                 .map(this::getSubjectSearch)
                 .filter(value -> removeDiacritics(value.getName().toLowerCase()).contains(normalizedInputName))
                 .collect(Collectors.toList());

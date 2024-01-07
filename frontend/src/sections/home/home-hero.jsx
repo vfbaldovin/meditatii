@@ -353,7 +353,7 @@ export const HomeHero = () => {
 
           {searchText && (
             <Grid container spacing={2} alignItems="center" mb={3} justifyContent="space-between">
-              <Grid item xs={9} md={3}>
+              <Grid item xs={6} md={3}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <SvgIcon>
                     <SearchMdIcon/>
@@ -376,28 +376,10 @@ export const HomeHero = () => {
 
                 </Stack>
               </Grid>
-              <Grid item xs={9} md={3}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  {totalItems && (
-                    <TablePagination
-                      labelRowsPerPage="Anunțuri"
-                      component="div"
-                      count={totalItems}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      rowsPerPage={size}
-                      labelDisplayedRows={({ page, count }) => {
-                        const totalNumberOfPages = Math.ceil(count / size);
-                        return `Pagina ${page + 1} din ${totalNumberOfPages}`;
-                      }}
-                      rowsPerPageOptions={[]}
-                    />
-                  )}
-                </Stack>
-              </Grid>
 
-              <Grid item xs={9} md={3}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+              <Grid item xs={6} md={3}>
+                <Stack direction="row" alignItems="center" spacing={1}
+                       sx={{float: 'right'}}>
                   <SvgIcon>
                     <FilterLines/>
                   </SvgIcon>

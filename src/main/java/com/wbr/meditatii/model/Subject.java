@@ -21,6 +21,6 @@ public class Subject {
     @JoinColumn(name = "subject_category_id", referencedColumnName = "id")
     private SubjectCategory subjectCategory;
 
-    @OneToMany(mappedBy = "subjectOld")
+    @OneToMany(mappedBy = "subject")
     private Set<Announcement> announcements;
 }

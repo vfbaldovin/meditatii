@@ -15,8 +15,8 @@ import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {ArrowNarrowLeft} from "@untitled-ui/icons-react";
 import {AnnouncementBio} from "../sections/announcement/announcement-bio";
-import {useSelector} from "../store";
 import {useLocation} from "react-router-dom";
+import Chip from "@mui/material/Chip";
 
 const Page = () => {
   const theme = useTheme();
@@ -161,13 +161,15 @@ const Page = () => {
                   >
                     {announcement.tutorName}
                   </Typography>
-                  <Typography variant="body1">
-                    {' '}
-                    <span style={{fontWeight: 800}}>
-                      {announcement.age} ani
-                    </span>
-                  </Typography>
+{/*                  <Button
+                    color="inherit"
+                    variant="outlined"
+                  >
+                    Contactează
+                  </Button>*/}
                 </Box>
+
+
                 <AnnouncementBio announcement={announcement}/>
 
               </Grid>
@@ -180,19 +182,65 @@ const Page = () => {
                   spacing={4}
                   className="largeScreenAvatar2"
                 >
-                  <Grid
-                    xs={12}
-                    lg={9}>
+                  <Grid xs={12} lg={9}>
                     <Typography variant="h4">
                       {announcement.title}
                     </Typography>
                   </Grid>
+                  <Grid xs={12} lg={9}
+                        sx={{
+                          paddingTop: 'unset'
+                        }}>
+                  <Chip
+                    label={
+                      <span>
+                    <strong>Preț:</strong> {announcement.price} lei
+                  </span>
+                    }
+                    key='sa'
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'grey.400',
+                      },
+                      marginRight: 1,
+                    }}
+                  />
+
+                  <Chip
+                    label={
+                      <span>
+                    <strong>Experiență:</strong> {announcement.experience}
+                  </span>
+                    }
+                    key='sa'
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'grey.400',
+                      },
+                      marginRight: 1,
+                    }}
+                  />
+                    <Chip
+                      label={
+                        <span>
+                    <strong>Vârstă:</strong> {announcement.age} ani
+                  </span>
+                      }
+                      key='sa'
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'grey.400',
+                        },
+                      }}
+                    />
                   <Typography
                     variant="body1"
                     sx={{padding: 2, whiteSpace: 'pre-wrap'}}
                   >
+
                     {announcement.description}
                   </Typography>
+                  </Grid>
                 </Grid>
 
               </Grid>

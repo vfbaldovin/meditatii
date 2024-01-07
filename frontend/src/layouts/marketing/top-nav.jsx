@@ -196,26 +196,8 @@ export const TopNav = (props) => {
               size={mdUp ? 'medium' : 'small'}
               href="https://mui.com/store/items/devias-kit-pro"
               target="_blank"
-              variant="contained"
-              sx={(theme) =>
-                theme.palette.mode === 'light'
-                  ? {
-                    border: '1px solid black',
-                    backgroundColor: 'neutral.50',
-                    color: 'neutral.900',
-                    '&:hover': {
-                      backgroundColor: 'neutral.200',
-                    },
-                  }
-                  : {
-                    border: '1px solid white',
-                    backgroundColor: 'neutral.900',
-                    color: 'neutral.50',
-                    '&:hover': {
-                      backgroundColor: 'neutral.700',
-                    },
-                  }
-              }
+              color="inherit"
+              variant="outlined"
               startIcon={
                 <SvgIcon fontSize="small">
                   <User03/>
