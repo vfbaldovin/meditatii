@@ -1,9 +1,9 @@
-package com.wbr.meditatii.service;
+package com.org.meditatii.service;
 
-import com.wbr.meditatii.exception.AppException;
-import com.wbr.meditatii.exception.AppNotFoundException;
-import com.wbr.meditatii.model.User;
-import com.wbr.meditatii.repository.UserRepository;
+import com.org.meditatii.exception.AppException;
+import com.org.meditatii.exception.AppNotFoundException;
+import com.org.meditatii.model.User;
+import com.org.meditatii.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +38,12 @@ public class UserService {
     public byte[] getUserAvatar(Long id) {
         User user = findById(id);
 
-        if (user.getImage() == null || user.getImage().length == 0) {
+        if (user.getUserProfileImage() == null || user.getUserProfileImage().getImage() == null || user.getUserProfileImage().getImage().length == 0) {
             return null;
         }
 
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(user.getImage());
+            ByteArrayInputStream bis = new ByteArrayInputStream(user.getUserProfileImage().getImage());
             BufferedImage bufferedImage = ImageIO.read(bis);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ImageIO.write(bufferedImage, "jpeg", bos);
@@ -53,16 +53,6 @@ public class UserService {
             throw new AppException("Unable building avatar");
         }
 
-    }
-
-    private byte[] getDefaultAvatar() {
-        try {
-            Resource defaultImageResource = new ClassPathResource("/static/img/user-default.jpg");
-            return StreamUtils.copyToByteArray(defaultImageResource.getInputStream());
-        } catch (IOException e) {
-            log.error("Unable to fetch /static/img/user-default.jpg", new AppException("Error default image"));
-            throw new AppException("Error default image");
-        }
     }
 
 }
