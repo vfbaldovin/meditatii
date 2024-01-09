@@ -19,6 +19,7 @@ import { paths } from 'src/paths';
 import { PagesPopover } from './pages-popover';
 import { TopNavItem } from './top-nav-item';
 import {User03} from "@untitled-ui/icons-react";
+import {useNavigate} from "react-router";
 
 const items = [
   {
@@ -58,6 +59,12 @@ export const TopNav = (props) => {
     handler: handleWindowScroll,
     delay,
   });
+
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate('/login'); // Navigate to the login page
+  };
 
   return (
     <Box
@@ -194,10 +201,9 @@ export const TopNav = (props) => {
             <Button
               component="a"
               size={mdUp ? 'medium' : 'small'}
-              href="https://mui.com/store/items/devias-kit-pro"
-              target="_blank"
               color="inherit"
               variant="outlined"
+              onClick={handleLoginClick}
               startIcon={
                 <SvgIcon fontSize="small">
                   <User03/>

@@ -65,6 +65,26 @@ body {
 /* Remove if mapbox is not used */
 @import '~mapbox-gl/dist/mapbox-gl.css';
 
+.line-or-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+}
+
+.line {
+  flex-grow: 1;
+  border: 0;
+  border-top: 1px solid lightgray;
+  margin: 0 10px;
+}
+
+.word {
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+
 @keyframes blink {
   50% {
     opacity: 0;
@@ -80,6 +100,12 @@ body {
   animation: blink 1s step-start 0s infinite;
 }
 
+.search-card {
+  border-radius: 5rem;
+  width: 60%;
+  max-width: 50rem;
+}
+
 @media (min-width: 1200px) {
   .largeScreenAvatar {
     /*position: absolute;*/
@@ -88,6 +114,11 @@ body {
   }
 }
 @media (max-width: 1199px) {
+  .search-card {
+    border-radius: 5rem;
+    width: 90%;
+    max-width: 50rem;
+  }
   .up-spacing {
     padding-bottom: 1.2rem;
   }
@@ -102,10 +133,12 @@ body {
   .largeScreenAvatar2 {
     /*position: absolute;*/
     top: 0;
-    transform: translateY(-8%) !important;
+    transform: translateY(-5%) !important;
   }
 
 }
+
+
 /*@media (max-width: 1199px) {*/
 /*  .largeScreenAvatar {*/
 /*    position: absolute;*/

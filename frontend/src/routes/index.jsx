@@ -19,6 +19,9 @@ const ContactPage = lazy(() => import('src/pages/contact'));
 const CheckoutPage = lazy(() => import('src/pages/checkout'));
 const PricingPage = lazy(() => import('src/pages/pricing'));
 
+const LoginClassicPage = lazy(() => import('src/pages/auth-demo/login/classic'));
+
+
 export const routes = [
   {
     element: (
@@ -34,6 +37,10 @@ export const routes = [
       {
         path: 'announcement/:id',
         element: <AnnouncementPage />,
+      },
+      {
+        path: 'login',
+        element: <LoginClassicPage />,
       },
       {
         path: 'pricing',

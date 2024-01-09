@@ -17,6 +17,9 @@ import {ArrowNarrowLeft} from "@untitled-ui/icons-react";
 import {AnnouncementBio} from "../sections/announcement/announcement-bio";
 import {useLocation} from "react-router-dom";
 import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
+import ContactDialog from "../app/pages/contact-dialog";
+import {QuillEditor} from "../components/quill-editor";
 
 const Page = () => {
   const theme = useTheme();
@@ -34,16 +37,25 @@ const Page = () => {
   });
 
   const [tutorImageUrl, setTutorImageUrl] = useState('');
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/announcement/${id}`);
+        const response = await axios.get(`${apiBaseUrl}/api/announcement/${id}`);
         setAnnouncement(response.data);
 
-        const imageResponse = await axios.get(`${apiBaseUrl}/user/${response.data.tutorId}/profile-image`, {responseType: 'blob'});
+        const imageResponse = await axios.get(`${apiBaseUrl}/api/user/${response.data.tutorId}/profile-image`, {responseType: 'blob'});
         const imageUrl = URL.createObjectURL(imageResponse.data);
         setTutorImageUrl(imageUrl);
       } catch (error) {
@@ -69,6 +81,11 @@ const Page = () => {
       navigate(`/?page=${page}&q=${selectedSubjectId}&sort=${selectedFilter}#${announcement.id}`);
     }
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   usePageView();
 
   return (
@@ -161,12 +178,7 @@ const Page = () => {
                   >
                     {announcement.tutorName}
                   </Typography>
-{/*                  <Button
-                    color="inherit"
-                    variant="outlined"
-                  >
-                    Contactează
-                  </Button>*/}
+
                 </Box>
 
 
@@ -197,7 +209,7 @@ const Page = () => {
                     <strong>Preț:</strong> {announcement.price} lei
                   </span>
                     }
-                    key='sa'
+                    key='price'
                     sx={{
                       '&:hover': {
                         backgroundColor: 'grey.400',
@@ -212,7 +224,7 @@ const Page = () => {
                     <strong>Experiență:</strong> {announcement.experience}
                   </span>
                     }
-                    key='sa'
+                    key='experience'
                     sx={{
                       '&:hover': {
                         backgroundColor: 'grey.400',
@@ -226,7 +238,7 @@ const Page = () => {
                     <strong>Vârstă:</strong> {announcement.age} ani
                   </span>
                       }
-                      key='sa'
+                      key='age'
                       sx={{
                         '&:hover': {
                           backgroundColor: 'grey.400',
@@ -240,6 +252,9 @@ const Page = () => {
 
                     {announcement.description}
                   </Typography>
+
+
+                    <ContactDialog open={open} handleClose={handleClose} />
                   </Grid>
                 </Grid>
 

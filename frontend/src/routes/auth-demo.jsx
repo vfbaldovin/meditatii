@@ -17,7 +17,7 @@ const VerifyCodeModernPage = lazy(() => import('src/pages/auth-demo/verify-code/
 
 export const authDemoRoutes = [
   {
-    path: 'auth-demo',
+    // path: 'auth-demo',
     children: [
       {
         element: (
@@ -32,10 +32,10 @@ export const authDemoRoutes = [
             path: 'forgot-password/classic',
             element: <ForgotPasswordClassicPage />,
           },
-          {
-            path: 'login/classic',
+ /*         {
+            path: 'login',
             element: <LoginClassicPage />,
-          },
+          },*/
           {
             path: 'register/classic',
             element: <RegisterClassicPage />,

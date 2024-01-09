@@ -43,10 +43,13 @@ export const HomeHero = () => {
 
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
-      window.scrollTo({
-        top: 280,
-        behavior: 'smooth' // Optional: defines smooth scrolling
-      });
+      console.log('DDD')
+      setTimeout(() => {
+        window.scrollTo({
+          top: 280,
+          behavior: 'smooth'
+        });
+      }, 100);
       // dispatch(setCurrentPage(newPage)); // Update the Redux store
     };
 
@@ -67,15 +70,15 @@ export const HomeHero = () => {
   const theme = useTheme();
   const filterOptions = [
     {
-      label: 'Cele mai noi',
+      label: 'Noi',
       value: 'CREATED.DESC',
     },
     {
-      label: 'Preț crescător',
+      label: 'Ieftine',
       value: 'PRICE.ASC',
     },
     {
-      label: 'Preț descrescător',
+      label: 'Scumpe',
       value: 'PRICE.DESC',
     },
   ];
@@ -148,7 +151,7 @@ export const HomeHero = () => {
   async function enhanceAnnouncementsWithImages(announcements) {
     return await Promise.all(announcements.map(async (announcement) => {
       try {
-        const imageResponse = await axios.get(`${apiBaseUrl}/user/${announcement.tutorId}/profile-image`, {responseType: 'blob'});
+        const imageResponse = await axios.get(`${apiBaseUrl}/api/user/${announcement.tutorId}/profile-image`, {responseType: 'blob'});
         const imageUrl = URL.createObjectURL(imageResponse.data);
         return {...announcement, tutorImage: imageUrl};
       } catch (error) {
@@ -179,7 +182,7 @@ export const HomeHero = () => {
     setPage(0);
     setSelectedSubjectId(val.id);
     try {
-      const response = await axios.get(`${apiBaseUrl}/announcement/paginated?subjectId=${val.id}`);
+      const response = await axios.get(`${apiBaseUrl}/api/announcement/paginated?subjectId=${val.id}`);
       const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
       setProjects(announcementWithImages);
       setTotalItems(response.data.totalElements);
@@ -193,7 +196,7 @@ export const HomeHero = () => {
   const fetchAndSetProjects = useCallback(async () => {
     setIsLoading(true);
     const selectedSort = selectedFilter.length > 0 ? selectedFilter[0] : filterOptions[0].value;
-    let apiUrl = `${apiBaseUrl}/announcement/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
+    let apiUrl = `${apiBaseUrl}/api/announcement/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
 
     // const subjectId = subjects[searchText];
     if (selectedSubjectId) {
@@ -268,6 +271,7 @@ export const HomeHero = () => {
     if (!isLoading) {
       const hash = window.location.hash;
       if (hash) {
+        console.log('heeeeeeee')
         const element = document.getElementById(hash.substring(1));
         if (element) {
           const yOffset = -100; // Adjust this value based on the height of fixed elements
@@ -354,14 +358,14 @@ export const HomeHero = () => {
           {searchText && (
             <Grid container spacing={2} alignItems="center" mb={3} justifyContent="space-between">
               <Grid item xs={6} md={3}>
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack direction="row" alignItems="center" >
                   <SvgIcon>
                     <SearchMdIcon/>
                   </SvgIcon>
-                  <Typography color="text.secondary"
-                              sx={{fontSize: 18, fontWeight: 'bold', marginLeft: 0}}>
-                    Termeni:
-                  </Typography>
+                  {/*<Typography color="text.secondary"*/}
+                  {/*            sx={{fontSize: 18, fontWeight: 'bold', marginLeft: 0}}>*/}
+                  {/*  Termeni:*/}
+                  {/*</Typography>*/}
                   <Chip
                     label={
                       <Box sx={{alignItems: 'center', display: 'flex'}}>
@@ -378,14 +382,14 @@ export const HomeHero = () => {
               </Grid>
 
               <Grid item xs={6} md={3}>
-                <Stack direction="row" alignItems="center" spacing={1}
+                <Stack direction="row" alignItems="center"
                        sx={{float: 'right'}}>
                   <SvgIcon>
                     <FilterLines/>
                   </SvgIcon>
-                  <Typography color="text.secondary" sx={{fontSize: 18, fontWeight: 'bold'}}>
-                    Filtru:
-                  </Typography>
+                  {/*<Typography color="text.secondary" sx={{fontSize: 18, fontWeight: 'bold'}}>*/}
+                  {/*  Filtru:*/}
+                  {/*</Typography>*/}
 
                   <MultiSelect
                     label={selectedOptionLabel()}
@@ -421,7 +425,7 @@ export const HomeHero = () => {
                 <Box
                   sx={{
                     // backgroundColor: (theme) => (theme.palette.mode === 'dark' ? 'neutral.800' : 'neutral.50'),
-                    p: 3,
+                    // p: 3,
                   }}
                 >
                   <Grid
@@ -446,7 +450,7 @@ export const HomeHero = () => {
                               borderRadius: '20px',
                               cursor: 'pointer',
                               position: 'relative',
-
+                              // padding: '1rem',
                               border:  (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
                               '&:hover': {
                                 border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
@@ -465,7 +469,11 @@ export const HomeHero = () => {
                                 }}
                               >
                                 <Avatar src={announcement.tutorImage}/>
-                                <Box sx={{ml: 2, boxShadow: 'unset'}}>
+                                <Box sx={{ml: 2, boxShadow: 'unset',
+                                  paddingRight: announcement.promoted ? '2.5rem' : '0.5rem',
+                                  maxHeight: '4rem',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',}}>
                                   <Link
                                     color="text.primary"
                                     variant="h6"
@@ -482,24 +490,31 @@ export const HomeHero = () => {
                                     <Typography component="span" color="text.primary" variant="subtitle2">
                                       {announcement.tutorName}
                                     </Typography>
-                                    {' '}| Actualizat acum {updatedAgo.replace('days ago','zile')}
+                                    {' '}| Actualizat acum {updatedAgo
+                                    .replace('days ago','zile')
+                                    .replace('months ago','luni')
+                                    .replace('years ago','ani')
+                                    .replace('day ago','zi')
+                                    .replace('month ago','luna')
+                                    .replace('year ago','an')
+                                  }
                                   </Typography>
 
                                 </Box>
                               </Box>
                             </Box>
-                            <Box
-                              sx={{
-                                pb: 2,
-                                px: 3,
-                                maxHeight: '4rem',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                            >
+                            <Box>
                               <Typography
                                 color="text.secondary"
                                 variant="body2"
+                                sx={{
+                                  pb: 2,
+                                  px: 3,
+                                  maxHeight: '4rem',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+
+                                }}
                               >
                                 {announcement.description}
                               </Typography>

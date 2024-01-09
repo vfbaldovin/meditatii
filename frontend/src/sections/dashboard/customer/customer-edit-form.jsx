@@ -36,7 +36,7 @@ export const CustomerEditForm = (props) => {
       address1: Yup.string().max(255),
       address2: Yup.string().max(255),
       country: Yup.string().max(255),
-      email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+      email: Yup.string().email('Adresa email nu este validă').max(255).required('Adresa email este obligatorie'),
       hasDiscount: Yup.bool(),
       isVerified: Yup.bool(),
       name: Yup.string().max(255).required('Name is required'),

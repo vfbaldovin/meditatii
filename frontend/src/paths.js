@@ -30,7 +30,7 @@ export const paths = {
       modern: '/auth-demo/forgot-password/modern',
     },
     login: {
-      classic: '/auth-demo/login/classic',
+      classic: '/login',
       modern: '/auth-demo/login/modern',
     },
     register: {

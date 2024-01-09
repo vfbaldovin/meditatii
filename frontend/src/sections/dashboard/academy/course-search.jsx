@@ -36,7 +36,7 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
         try {
           console.log(results)
           console.log(firstResult)
-          const response = await axios.get(`${apiBaseUrl}/subject/search?q=${searchText}`);
+          const response = await axios.get(`${apiBaseUrl}/api/subject/search?q=${searchText}`);
           setResults(response.data);
           setFirstResult(response.data[0] || null);
         } catch (error) {
@@ -110,7 +110,7 @@ export const CourseSearch = ({ onSubjectSelect, searchTextDefault, onUpdateSearc
 
 
   return (
-    <Card sx={{ borderRadius: '5rem', width: '60%', maxWidth: '50rem' }}>
+    <Card className="search-card" sx={{ borderRadius: '5rem'}}>
       <Stack
         alignItems="center"
         direction="row"

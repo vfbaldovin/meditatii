@@ -39,7 +39,7 @@ const getInitialValues = (username) => {
 };
 
 const validationSchema = Yup.object({
-  email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+  email: Yup.string().email('Adresa email nu este validă').max(255).required('Adresa email este obligatorie'),
 });
 
 const Page = () => {
