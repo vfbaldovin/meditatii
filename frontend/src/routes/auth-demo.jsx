@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 
 const ForgotPasswordClassicPage = lazy(() => import('src/pages/auth-demo/forgot-password/classic'));
 const ForgotPasswordModernPage = lazy(() => import('src/pages/auth-demo/forgot-password/modern'));
-const LoginClassicPage = lazy(() => import('src/pages/auth-demo/login/classic'));
+const LoginClassicPage = lazy(() => import('src/app/pages/login-page'));
 const LoginModernPage = lazy(() => import('src/pages/auth-demo/login/modern'));
 const RegisterClassicPage = lazy(() => import('src/pages/auth-demo/register/classic'));
 const RegisterModernPage = lazy(() => import('src/pages/auth-demo/register/modern'));

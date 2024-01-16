@@ -17,10 +17,10 @@ export const AnnouncementBio = ({ announcement }) => {
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'left',
-          gap: 2 // adjust as needed for spacing between items
+          gap: 2
         },
         '.MuiListItem-root': {
-          width: 'auto' // or specific width if you want to control the width of each item
+          width: 'auto'
         }
       }
     }}>

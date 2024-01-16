@@ -14,12 +14,12 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {ArrowNarrowLeft} from "@untitled-ui/icons-react";
-import {AnnouncementBio} from "../sections/announcement/announcement-bio";
+import {AnnouncementBio} from "../../sections/announcement/announcement-bio";
 import {useLocation} from "react-router-dom";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
-import ContactDialog from "../app/pages/contact-dialog";
-import {QuillEditor} from "../components/quill-editor";
+import ContactDialog from "./contact-dialog";
+import {QuillEditor} from "../../components/quill-editor";
 
 const Page = () => {
   const theme = useTheme();
@@ -75,10 +75,11 @@ const Page = () => {
     let page = location.state?.page;
     let selectedSubjectId = location.state?.selectedSubjectId;
     let selectedFilter = location.state?.selectedFilter;
+    let scrollPosition = location.state?.scrollPosition;
     if (page === undefined || selectedSubjectId === undefined || selectedFilter === undefined) {
       navigate(`/`);
     } else {
-      navigate(`/?page=${page}&q=${selectedSubjectId}&sort=${selectedFilter}#${announcement.id}`);
+      navigate(`/?page=${page}&q=${selectedSubjectId}&sort=${selectedFilter}&scroll=${scrollPosition}`);
     }
   };
 
@@ -253,8 +254,6 @@ const Page = () => {
                     {announcement.description}
                   </Typography>
 
-
-                    <ContactDialog open={open} handleClose={handleClose} />
                   </Grid>
                 </Grid>
 

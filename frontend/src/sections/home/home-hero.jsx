@@ -110,6 +110,7 @@ export const HomeHero = () => {
   const pageParam = parseInt(searchParams.get('page'), 10);
   const subjectIdParam = parseInt(searchParams.get('q'), 10);
   const sortParam = searchParams.get('sort');
+  const scrollParam = parseInt(searchParams.get('scroll'), 10);
 
   // Initialize state with values from URL parameters or default values
   const [page, setPage] = useState(isNaN(pageParam) ? 0 : pageParam);
@@ -219,7 +220,6 @@ export const HomeHero = () => {
   }, [page, selectedFilter]);
 
   const handleFilterChange = (newValues) => {
-    console.log(newValues)
     if (newValues.length === 0) {
       return;
     }
@@ -261,31 +261,21 @@ export const HomeHero = () => {
       state: {
         page: page,
         selectedSubjectId: selectedSubjectId,
-        selectedFilter: selectedFilter
+        selectedFilter: selectedFilter,
+        scrollPosition: window.scrollY
       }
     });
   };
 
 
   useEffect(() => {
-    if (!isLoading) {
-      const hash = window.location.hash;
-      if (hash) {
-        console.log('heeeeeeee')
-        const element = document.getElementById(hash.substring(1));
-        if (element) {
-          const yOffset = -100; // Adjust this value based on the height of fixed elements
-          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-          if (window.history.pushState) {
-            var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.pushState({path:newurl}, '', newurl);
-          }
-        }
-      }
+    console.log("xxxxxxxxxx")
+    console.log(scrollParam)
+    if (!isNaN(scrollParam)) {
+      window.scrollTo(0, scrollParam);
     }
+  }, [scrollParam]);
 
-  }, [isLoading]);
 
   return (
     <Box
@@ -409,7 +399,7 @@ export const HomeHero = () => {
           <Container maxWidth="lg">
             <Stack spacing={8}>
 
-              {isLoading ? (
+              {(isLoading || projects.length === 0) ? (
                 <Box sx={{position: 'relative', height: '100%'}}>
                   <GridListPlaceholder listLength={size}/>
                   <Box sx={{

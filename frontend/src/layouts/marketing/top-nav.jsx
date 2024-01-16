@@ -61,9 +61,12 @@ export const TopNav = (props) => {
   });
 
   const navigate = useNavigate();
-
   const handleLoginClick = () => {
-    navigate('/login'); // Navigate to the login page
+
+    if (location.pathname === '/login') {
+      return;
+    }
+      navigate('/login');
   };
 
   return (

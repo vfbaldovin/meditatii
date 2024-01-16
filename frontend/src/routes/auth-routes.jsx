@@ -22,12 +22,12 @@ const FirebaseLoginPage = lazy(() => import('src/pages/auth/firebase/login'));
 const FirebaseRegisterPage = lazy(() => import('src/pages/auth/firebase/register'));
 
 // JWT
-const JwtLoginPage = lazy(() => import('src/pages/auth/jwt/login'));
-const JwtRegisterPage = lazy(() => import('src/pages/auth/jwt/register'));
+const LoginPage = lazy(() => import('src/app/pages/login-page'));
+const RegisterPage = lazy(() => import('src/app/pages/register-page'));
 
 export const authRoutes = [
   {
-    path: 'auth',
+    // path: 'auth',
     children: [
       {
         path: 'amplify',
@@ -106,7 +106,7 @@ export const authRoutes = [
         ],
       },
       {
-        path: 'jwt',
+        // path: 'jwt',
         element: (
           <IssuerGuard issuer={Issuer.JWT}>
             <GuestGuard>
@@ -119,11 +119,11 @@ export const authRoutes = [
         children: [
           {
             path: 'login',
-            element: <JwtLoginPage />,
+            element: <LoginPage />,
           },
           {
             path: 'register',
-            element: <JwtRegisterPage />,
+            element: <RegisterPage />,
           },
         ],
       },

@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 import { Layout as MarketingLayout } from 'src/layouts/marketing';
 
-import { authRoutes } from './auth';
+import { authRoutes } from './auth-routes';
 import { authDemoRoutes } from './auth-demo';
 import { componentsRoutes } from './components';
 import { dashboardRoutes } from './dashboard';
@@ -13,13 +13,13 @@ const Error404Page = lazy(() => import('src/pages/404'));
 const Error500Page = lazy(() => import('src/pages/500'));
 
 const HomePage = lazy(() => import('src/pages'));
-const AnnouncementPage = lazy(() => import('src/pages/announcement'));
+const AnnouncementPage = lazy(() => import('src/app/pages/announcement-page'));
 
 const ContactPage = lazy(() => import('src/pages/contact'));
 const CheckoutPage = lazy(() => import('src/pages/checkout'));
 const PricingPage = lazy(() => import('src/pages/pricing'));
 
-const LoginClassicPage = lazy(() => import('src/pages/auth-demo/login/classic'));
+const LoginClassicPage = lazy(() => import('src/app/pages/login-page'));
 
 
 export const routes = [
@@ -38,10 +38,10 @@ export const routes = [
         path: 'announcement/:id',
         element: <AnnouncementPage />,
       },
-      {
+      /*{
         path: 'login',
         element: <LoginClassicPage />,
-      },
+      },*/
       {
         path: 'pricing',
         element: <PricingPage />,
