@@ -9,8 +9,8 @@ import { es } from './translations/es';
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
-    de: { translation: de },
-    es: { translation: es },
+/*    de: { translation: de },
+    es: { translation: es },*/
   },
   lng: 'en',
   fallbackLng: 'en',

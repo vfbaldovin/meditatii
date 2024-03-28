@@ -83,4 +83,21 @@ public class SecurityConfig {
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
+
+//    @Bean
+//    public CustomOAuth2UserService customOAuth2UserService() {
+//        return new CustomOAuth2UserService();
+//    }
+
+    // Define the bean for OAuth2AuthenticationSuccessHandler
+    @Bean
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
+        return new OAuth2AuthenticationSuccessHandler();
+    }
+
+    // Define the bean for OAuth2AuthenticationFailureHandler
+    @Bean
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
+        return new OAuth2AuthenticationFailureHandler();
+    }
 }

@@ -13,7 +13,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { chatApi } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { useRouter } from 'src/hooks/use-router';
 import { paths } from 'src/paths';
 import { useSelector } from 'src/store';
@@ -47,7 +47,7 @@ const useCurrentThreadId = () => {
 
 export const ChatSidebar = (props) => {
   const { container, onClose, open, ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const router = useRouter();
   const threads = useThreads();
   const currentThreadId = useCurrentThreadId();

@@ -4,13 +4,14 @@ import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import SvgIcon from '@mui/material/SvgIcon';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { usePopover } from 'src/hooks/use-popover';
 
 import { AccountPopover } from './account-popover';
+import React from "react";
 
 export const AccountButton = () => {
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const popover = usePopover();
 
   return (

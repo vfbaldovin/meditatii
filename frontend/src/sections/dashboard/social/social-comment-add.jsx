@@ -11,12 +11,12 @@ import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { getInitials } from 'src/utils/get-initials';
 
 export const SocialCommentAdd = (props) => {
   const smUp = useMediaQuery((theme) => theme.breakpoints.up('sm'));
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
 
   return (
     <div {...props}>

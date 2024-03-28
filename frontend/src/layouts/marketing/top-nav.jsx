@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import Menu01Icon from '@untitled-ui/icons-react/build/esm/Menu01';
 import { alpha } from '@mui/system/colorManipulator';
@@ -20,6 +20,8 @@ import { PagesPopover } from './pages-popover';
 import { TopNavItem } from './top-nav-item';
 import {User03} from "@untitled-ui/icons-react";
 import {useNavigate} from "react-router";
+import {useAuth} from "../../hooks/use-auth";
+import {AuthContext} from "../../contexts/auth/jwt";
 
 const items = [
   {
@@ -59,6 +61,9 @@ export const TopNav = (props) => {
     handler: handleWindowScroll,
     delay,
   });
+
+  const { user } = useAuth();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const handleLoginClick = () => {
@@ -201,20 +206,39 @@ export const TopNav = (props) => {
             spacing={2}
             sx={{ flexGrow: 1 }}
           >
-            <Button
-              component="a"
-              size={mdUp ? 'medium' : 'small'}
-              color="inherit"
-              variant="outlined"
-              onClick={handleLoginClick}
-              startIcon={
-                <SvgIcon fontSize="small">
-                  <User03/>
-                </SvgIcon>
-              }
-            >
-              Autentificare
-            </Button>
+            {isAuthenticated ? (
+              // Display the user's name and navigate to /dashboard when clicked
+              <Button
+                component="a"
+                size={mdUp ? 'medium' : 'small'}
+                color="inherit"
+                variant="outlined"
+                onClick={() => navigate('/dashboard')}
+                startIcon={
+                  <SvgIcon fontSize="small">
+                    <User03 />
+                  </SvgIcon>
+                }
+              >
+                {user.split('@')[0]} {/* Assuming 'username' is the attribute holding the user's name */}
+              </Button>
+            ) : (
+              // Display the login button if the user is not authenticated
+              <Button
+                component="a"
+                size={mdUp ? 'medium' : 'small'}
+                color="inherit"
+                variant="outlined"
+                onClick={handleLoginClick}
+                startIcon={
+                  <SvgIcon fontSize="small">
+                    <User03 />
+                  </SvgIcon>
+                }
+              >
+                Autentificare
+              </Button>
+            )}
             {!mdUp && (
               <IconButton onClick={onMobileNavOpen}>
                 <SvgIcon fontSize="small">
@@ -223,6 +247,7 @@ export const TopNav = (props) => {
               </IconButton>
             )}
           </Stack>
+
         </Stack>
       </Container>
     </Box>

@@ -9,7 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 
 import { Seo } from 'src/components/seo';
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { usePageView } from 'src/hooks/use-page-view';
 import { AccountBillingSettings } from 'src/sections/dashboard/account/account-billing-settings';
 import { AccountGeneralSettings } from 'src/sections/dashboard/account/account-general-settings';
@@ -28,7 +28,7 @@ const tabs = [
 ];
 
 const Page = () => {
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const [currentTab, setCurrentTab] = useState('general');
 
   usePageView();

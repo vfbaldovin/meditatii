@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { authApi } from 'src/api/auth';
 import { Issuer } from 'src/utils/auth';
 import { AuthContext, initialState } from './auth-context';
+import {useAuth} from "../../../hooks/use-auth";
 
 const STORAGE_KEY = 'accessToken';
 
@@ -17,17 +18,26 @@ var ActionType;
 
 const handlers = {
   INITIALIZE: (state, action) => {
-    const { isAuthenticated, user } = action.payload;
+    console.log('fiuuute')
+
+    console.log(action.payload)
+
+    const { isAuthenticated, user, user_id, user_name } = action.payload;
 
     return {
       ...state,
       isAuthenticated,
       isInitialized: true,
       user,
+      user_id,
+      user_name
     };
   },
   SIGN_IN: (state, action) => {
-    const { user } = action.payload;
+    const { user  } = action.payload;
+    console.log('New state after SIGN_IN:', state);
+    console.log('New state after SIGN_IN:', action);
+    console.log('New state after SIGN_IN:', action);
 
     return {
       ...state,
@@ -48,6 +58,8 @@ const handlers = {
     ...state,
     isAuthenticated: false,
     user: null,
+    user_id: null,
+    user_name: null,
   }),
 };
 
@@ -59,25 +71,80 @@ export const AuthProvider = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const initialize = useCallback(async () => {
+    console.log("AUTH PROVIDER LOADED")
     try {
-      const accessToken = window.sessionStorage.getItem(STORAGE_KEY);
+      const urlParams = new URLSearchParams(window.location.search);
+      let accessToken = urlParams.get('accessToken') || window.sessionStorage.getItem('accessToken');
+      let refreshToken = urlParams.get('refreshToken') || window.sessionStorage.getItem('refreshToken');
+      let expiresAt = urlParams.get('expiresAt') || window.sessionStorage.getItem('expiresAt');
+      // expiresAt = parseInt(expiresAt, 10); // Convert to integer if stored as a string
 
-      if (accessToken) {
-        const user = await authApi.me({ accessToken });
+      if (urlParams.get('refreshToken')) {
+        sessionStorage.setItem('refreshToken', refreshToken);
+      }
 
+      console.log('her')
+      console.log(accessToken)
+      console.log(refreshToken)
+
+      let now = Date.now();
+
+      // console.log(accessToken)
+      // console.log(refreshToken)
+      // console.log(expiresAt)
+      // console.log(now)
+      console.log(now)
+      console.log('<')
+      console.log(expiresAt)
+
+      console.log(now < expiresAt)
+
+      if (accessToken && now < expiresAt) {
+        const user = await authApi.me(accessToken);
         dispatch({
           type: ActionType.INITIALIZE,
           payload: {
             isAuthenticated: true,
-            user,
+            user: user.email,
+            user_id: user.id,
+            user_name: user.fullName,
           },
         });
+      } else if (refreshToken) {
+
+        const user = await authApi.me(accessToken);
+        console.log('here')
+        console.log(user)
+        accessToken = await refreshAccessToken(refreshToken, user.email);
+        if (accessToken) {
+          dispatch({
+            type: ActionType.INITIALIZE,
+            payload: {
+              isAuthenticated: true,
+              user: user.email,
+              user_id: user.id,
+              user_name: user.fullName,
+            },
+          });
+        } else {
+          dispatch({
+            type: ActionType.INITIALIZE,
+            payload: {
+              isAuthenticated: false,
+              user: null,
+              user_id: null,
+              user_name: null,
+            },
+          });
+        }
       } else {
         dispatch({
           type: ActionType.INITIALIZE,
           payload: {
             isAuthenticated: false,
             user: null,
+            user_id: null,
+            user_name: null,
           },
         });
       }
@@ -88,6 +155,8 @@ export const AuthProvider = (props) => {
         payload: {
           isAuthenticated: false,
           user: null,
+          user_id: null,
+          user_name: null,
         },
       });
     }
@@ -101,6 +170,24 @@ export const AuthProvider = (props) => {
     []
   );
 
+  const signIn = useCallback(async (email, password) => {
+    try {
+      const { accessToken, refreshToken, expiresAt, user } = await authApi.signIn({ email, password });
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('refreshToken', refreshToken);
+      sessionStorage.setItem('expiresAt', expiresAt);
+      dispatch({
+        type: ActionType.SIGN_IN,
+        payload: { user },
+      });
+    } catch (err) {
+      console.error(err);
+      // Handle sign-in error (e.g., incorrect credentials)
+      throw err;
+    }
+  }, [dispatch]);
+
+/*
   const signIn = useCallback(
     async (email, password) => {
       const { accessToken } = await authApi.signIn({ email, password });
@@ -117,11 +204,22 @@ export const AuthProvider = (props) => {
     },
     [dispatch]
   );
-
+*/
+  const refreshAccessToken = async (refreshToken, username) => {
+    try {
+      const { accessToken, expiresAt } = await authApi.refreshToken({ refreshToken, username });
+      sessionStorage.setItem('accessToken', accessToken);
+      sessionStorage.setItem('expiresAt', expiresAt);
+      return accessToken;
+    } catch (err) {
+      console.error(err);
+      // Handle refresh token error
+    }
+  };
   const signUp = useCallback(
     async (email, name, password) => {
       const { accessToken } = await authApi.signUp({ email, name, password });
-      const user = await authApi.me({ accessToken });
+      const user = await authApi.me(accessToken);
 
       sessionStorage.setItem(STORAGE_KEY, accessToken);
 
@@ -136,9 +234,29 @@ export const AuthProvider = (props) => {
   );
 
   const signOut = useCallback(async () => {
-    sessionStorage.removeItem(STORAGE_KEY);
-    dispatch({ type: ActionType.SIGN_OUT });
+    try {
+      // Assuming you have the accessToken stored in sessionStorage
+      const refreshToken = sessionStorage.getItem('refreshToken');
+
+      // Call to backend to invalidate the accessToken
+
+      // Remove tokens and other auth-related data from sessionStorage
+      console.log("MARISU")
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('expiresAt');
+
+      // Dispatch sign out action to update local state
+      dispatch({ type: ActionType.SIGN_OUT });
+      await authApi.signOut({ refreshToken });
+
+    } catch (err) {
+      console.error(err);
+      // Optionally handle errors (e.g., logging out user locally even if backend call fails)
+      dispatch({ type: ActionType.SIGN_OUT });
+    }
   }, [dispatch]);
+
 
   return (
     <AuthContext.Provider

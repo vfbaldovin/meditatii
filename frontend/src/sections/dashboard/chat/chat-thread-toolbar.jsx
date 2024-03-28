@@ -19,7 +19,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { usePopover } from 'src/hooks/use-popover';
 
 const getRecipients = (participants, userId) => {
@@ -42,7 +42,7 @@ const getLastActive = (recipients) => {
 
 export const ChatThreadToolbar = (props) => {
   const { participants = [], ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const popover = usePopover();
 
   // Maybe use memo for these values

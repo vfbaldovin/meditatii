@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 
 import { chatApi } from 'src/api/chat';
 import { Scrollbar } from 'src/components/scrollbar';
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { useRouter } from 'src/hooks/use-router';
 import { paths } from 'src/paths';
 import { useDispatch, useSelector } from 'src/store';
@@ -138,7 +138,7 @@ const useMessagesScroll = (thread) => {
 export const ChatThread = (props) => {
   const { threadKey, ...other } = props;
   const dispatch = useDispatch();
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const thread = useThread(threadKey);
   const participants = useParticipants(threadKey);
   const { messagesRef } = useMessagesScroll(thread);

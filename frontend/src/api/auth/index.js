@@ -33,9 +33,73 @@ const persistUser = (user) => {
     console.error(err);
   }
 };
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 class AuthApi {
-  async signIn(request) {
+  async signIn({ email, password }) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to sign in');
+    }
+    return response.json();
+  }
+
+  async refreshToken({ refreshToken, username }) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/refresh/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken, username }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to refresh token');
+    }
+    return response.json();
+  }
+
+  async signUp({ email, name, password }) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, name, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to sign up');
+    }
+
+    return response.json(); // Expects to receive { accessToken }
+  }
+
+  async me(accessToken) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch user profile');
+    }
+    return response.json(); // Expects to receive user details
+  }
+/*  async signIn(request) {
     const { email, password } = request;
 
     await wait(500);
@@ -135,7 +199,24 @@ class AuthApi {
         reject(new Error('Internal server error'));
       }
     });
+  }*/
+  async signOut({ refreshToken}) {
+    console.log("AAAAAAAAAAAAAAAAAAAAA")
+    const response = await fetch(`${apiBaseUrl}/api/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }), // Include username if needed, or you can omit it if the backend doesn't require it for logout
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to sign out');
+    }
+    return response.json();
   }
+
 }
 
 export const authApi = new AuthApi();

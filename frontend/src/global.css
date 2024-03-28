@@ -138,6 +138,11 @@ body {
 
 }
 
+.googleLogin {
+  width: 100%;
+  color: inherit;
+}
+
 
 /*@media (max-width: 1199px) {*/
 /*  .largeScreenAvatar {*/

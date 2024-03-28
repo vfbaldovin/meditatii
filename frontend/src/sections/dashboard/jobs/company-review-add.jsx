@@ -6,11 +6,11 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { getInitials } from 'src/utils/get-initials';
 
 export const CompanyReviewAdd = () => {
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const [rating, setRating] = useState(null);
 
   const handleRatingChange = useCallback((event, newRating) => {

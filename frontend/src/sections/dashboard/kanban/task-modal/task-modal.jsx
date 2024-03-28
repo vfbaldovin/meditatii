@@ -25,7 +25,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { useDispatch, useSelector } from 'src/store';
 import { thunks } from 'src/thunks/kanban';
 
@@ -95,7 +95,7 @@ const useAssignees = (assigneesIds) => {
 
 export const TaskModal = (props) => {
   const { taskId, onClose, open = false, ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const dispatch = useDispatch();
   const columns = useColumns();
   const task = useTask(taskId);

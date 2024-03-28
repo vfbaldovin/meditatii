@@ -11,11 +11,11 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 
 export const ChatMessageAdd = (props) => {
   const { disabled = false, onSend, ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const fileInputRef = useRef(null);
   const [body, setBody] = useState('');
 

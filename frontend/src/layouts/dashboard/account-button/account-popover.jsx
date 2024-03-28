@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/components/router-link';
 import { useAuth } from 'src/hooks/use-auth';
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { useRouter } from 'src/hooks/use-router';
 import { paths } from 'src/paths';
 import { Issuer } from 'src/utils/auth';
@@ -25,7 +25,7 @@ export const AccountPopover = (props) => {
   const { anchorEl, onClose, open, ...other } = props;
   const router = useRouter();
   const auth = useAuth();
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
 
   const handleLogout = useCallback(async () => {
     try {
@@ -83,7 +83,7 @@ export const AccountPopover = (props) => {
           color="text.secondary"
           variant="body2"
         >
-          demo@devias.io
+          {user.email}
         </Typography>
       </Box>
       <Divider />

@@ -70,6 +70,14 @@ public class User {
                 (lastName != null && !lastName.isEmpty() ? " " + lastName.charAt(0) + "." : "");
     }
 
+    public String getTutorNameFull() {
+        if (firstName == null) {
+            return "Unknown";
+        }
+        return firstName +
+                (lastName != null && !lastName.isEmpty() ? " " + lastName : "");
+    }
+
     public int getAge() {
         if (dateOfBirth == null) {
             return 42;
@@ -77,4 +85,22 @@ public class User {
         return Period.between(dateOfBirth, LocalDate.now()).getYears();
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", registrationDate=" + registrationDate +
+                ", gender='" + gender + '\'' +
+                ", occupation='" + occupation + '\'' +
+                ", education='" + education + '\'' +
+                ", couponApplied=" + couponApplied +
+                ", password='" + password + '\'' +
+                ", enabled=" + enabled +
+                '}';
+    }
 }

@@ -22,13 +22,22 @@ import { OverviewHelp } from 'src/sections/dashboard/overview/overview-help';
 import { OverviewJobs } from 'src/sections/dashboard/overview/overview-jobs';
 import { OverviewOpenTickets } from 'src/sections/dashboard/overview/overview-open-tickets';
 import { OverviewTips } from 'src/sections/dashboard/overview/overview-tips';
+import {useAuth} from "../../hooks/use-auth";
+import {useContext} from "react";
+import {AuthContext} from "../../contexts/auth/jwt";
 
 const now = new Date();
 
 const Page = () => {
+  console.log('SIMARIMA')
   const settings = useSettings();
-
+  console.log("aaa")
   usePageView();
+  console.log("abra")
+  console.log(useAuth());
+  const { user } = useAuth();
+  const { user_id } = useAuth();
+  const { isAuthenticated } = useContext(AuthContext);
 
   return (
     <>
@@ -56,7 +65,12 @@ const Page = () => {
                 spacing={4}
               >
                 <div>
-                  <Typography variant="h4">Overview</Typography>
+
+                  <Typography variant="h4">Overviews
+                    {user}
+                    {user_id}
+                    a
+                  </Typography>
                 </div>
                 <div>
                   <Stack

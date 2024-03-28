@@ -11,12 +11,12 @@ import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { getInitials } from 'src/utils/get-initials';
 
 export const PostCommentAdd = (props) => {
   const smUp = useMediaQuery((theme) => theme.breakpoints.up('sm'));
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
 
   return (
     <div {...props}>

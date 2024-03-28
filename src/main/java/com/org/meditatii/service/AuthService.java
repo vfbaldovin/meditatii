@@ -1,5 +1,11 @@
 package com.org.meditatii.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.org.meditatii.exception.AppException;
 import com.org.meditatii.exception.error.ApiHttpStatus;
 import com.org.meditatii.model.NotificationEmail;
@@ -9,6 +15,7 @@ import com.org.meditatii.model.dto.*;
 import com.org.meditatii.repository.UserRepository;
 import com.org.meditatii.repository.VerificationTokenRepository;
 import com.org.meditatii.security.JwtProvider;
+import com.org.meditatii.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.*;
@@ -16,13 +23,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,6 +46,10 @@ public class AuthService {
 
     @Value("${app.url}")
     private String URL;
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String GOOGLE_CLIENT_ID;
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String GOOGLE_CLIENT_SECRET;
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -39,9 +58,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    public AuthService(PasswordEncoder passwordEncoder, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository, MailService mailService, AuthenticationManager authenticationManager, JwtProvider jwtProvider, RefreshTokenService refreshTokenService) {
+    public AuthService(PasswordEncoder passwordEncoder, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository, MailService mailService, AuthenticationManager authenticationManager, JwtProvider jwtProvider, RefreshTokenService refreshTokenService, OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService, UserDetailsServiceImpl userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
@@ -49,6 +70,8 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;
         this.refreshTokenService = refreshTokenService;
+        this.customOAuth2UserService = customOAuth2UserService;
+        this.userDetailsService = userDetailsService;
     }
 
     public ApiResponse signup(RegisterRequest registerRequest) {
@@ -147,21 +170,109 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate);
         String token = jwtProvider.generateToken(authenticate);
         return AuthenticationResponse.builder()
-                .authenticationToken(token)
+                .accessToken(token)
                 .refreshToken(refreshTokenService.generateRefreshToken().getToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
-                .username(loginRequest.getEmail())
+                .user(loginRequest.getEmail())
                 .build();
     }
+
+    public AuthenticationResponse googleLogin(String code) throws IOException, GeneralSecurityException {
+        GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                new NetHttpTransport(),
+                JacksonFactory.getDefaultInstance(),
+                "https://oauth2.googleapis.com/token",
+                GOOGLE_CLIENT_ID,
+                GOOGLE_CLIENT_SECRET,
+                code,
+                URL + "/api/auth/oauth2-google")  // Specify the same redirect URI you use with your client
+                .execute();
+
+        String idToken = tokenResponse.getIdToken();
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
+                .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
+                .build();
+
+        GoogleIdToken googleIdToken = verifier.verify(idToken);
+        if (googleIdToken != null) {
+            GoogleIdToken.Payload payload = googleIdToken.getPayload();
+            String email = payload.getEmail();
+            boolean emailVerified = payload.getEmailVerified();
+
+            if (emailVerified) {
+                // Check if the user already exists in your database
+                User user = userRepository.findByEmail(email)
+                        .orElseGet(() -> registerNewGoogleUser(email, payload));
+
+                // Generate token
+                Authentication authentication = new UsernamePasswordAuthenticationToken
+                                (userDetailsService.loadUserByUsername(user.getEmail()), null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                // Return JWT token
+                String token = jwtProvider.generateToken(authentication);
+                return AuthenticationResponse.builder()
+                        .accessToken(token)
+                        .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                        .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                        .user(email)
+                        .build();
+            } else {
+                throw new AppException("Email not verified with Google");
+            }
+        } else {
+            throw new AppException("Invalid ID token");
+        }
+    }
+
+    private User registerNewGoogleUser(String email, GoogleIdToken.Payload payload) {
+        // Register a new user with the information from Google
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setEnabled(true); // Or false if you want email verification
+        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        // Set other fields from payload
+        newUser.setFirstName((String) payload.get("given_name"));
+        newUser.setLastName((String) payload.get("family_name"));
+        // ...
+        userRepository.save(newUser);
+        return newUser;
+    }
+
+    public String getSuccessfullyGoogleLoginUrl(AuthenticationResponse authenticationResponse) {
+        String url = Objects.equals(URL, "http://localhost:8080") ? "http://localhost:3000" : "https://meditatiianunturi.ro";
+        return String.format(url + "/login?accessToken=%s&refreshToken=%s&expiresAt=%s",
+                authenticationResponse.getAccessToken(),
+                authenticationResponse.getRefreshToken(),
+                authenticationResponse.getExpiresAt()
+        );
+    }
+
+    public String getGoogleRedirectUrl() {
+        String redirectUri = URL + "/api/auth/oauth2-google"; // This should be the URI where Google redirects after authorization
+        String clientId = GOOGLE_CLIENT_ID;
+        String responseType = "code";
+        String scope = "email openid";
+        String accessType = "offline";
+        String prompt = "consent";
+        return "https://accounts.google.com/o/oauth2/v2/auth?" +
+                "client_id=" + clientId +
+                "&redirect_uri=" + redirectUri +
+                "&response_type=" + responseType +
+                "&scope=" + scope;/* +
+                "&prompt=" + prompt;*/
+    }
+
 
     public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
         String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
         return AuthenticationResponse.builder()
-                .authenticationToken(token)
+                .accessToken(token)
                 .refreshToken(refreshTokenRequest.getRefreshToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
-                .username(refreshTokenRequest.getUsername())
+                .user(refreshTokenRequest.getUsername())
                 .build();
     }
 

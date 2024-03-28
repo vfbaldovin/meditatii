@@ -12,10 +12,10 @@ import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 
 export const MailThreadReply = (props) => {
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
   const fileRef = useRef(null);
   const [message, setMessage] = useState('');
 

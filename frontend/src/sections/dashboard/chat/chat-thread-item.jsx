@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { customLocale } from 'src/utils/date-locale';
 
 const getLastMessage = (thread) => {
@@ -45,7 +45,7 @@ const getLastActivity = (lastMessage) => {
 
 export const ChatThreadItem = (props) => {
   const { active = false, thread, onSelect, ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
 
   const recipients = getRecipients(thread.participants || [], user.id);
   const lastMessage = getLastMessage(thread);

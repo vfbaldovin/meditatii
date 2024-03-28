@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 
 import { ChatMessage } from './chat-message';
 
@@ -36,7 +36,7 @@ const getAuthor = (message, participants, user) => {
 
 export const ChatMessages = (props) => {
   const { messages = [], participants = [], ...other } = props;
-  const user = useMockedUser();
+  const user = getAuthenticatedUser();
 
   return (
     <Stack

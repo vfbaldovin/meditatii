@@ -458,6 +458,7 @@ export const HomeHero = () => {
                                   mt: 2
                                 }}
                               >
+                                {announcement.tutorImage}
                                 <Avatar src={announcement.tutorImage}/>
                                 <Box sx={{ml: 2, boxShadow: 'unset',
                                   paddingRight: announcement.promoted ? '2.5rem' : '0.5rem',
