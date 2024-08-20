@@ -68,13 +68,13 @@ class AuthApi {
     return response.json();
   }
 
-  async signUp({ email, name, password }) {
+  async signUp({ email, password }) {
     const response = await fetch(`${apiBaseUrl}/api/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, name, password }),
+      body: JSON.stringify({ email, password }),
     });
 
     if (!response.ok) {

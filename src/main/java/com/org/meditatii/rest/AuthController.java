@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.OK;
 
@@ -27,16 +28,15 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> signup(@RequestBody RegisterRequest registerRequest) {
         authService.signup(registerRequest);
-        return new ResponseEntity<>("User Registration Successful",
-                OK);
+        return new ResponseEntity<>(Map.of("message", "success"), OK);
     }
 
-    @GetMapping("accountVerification/{token}")
-    public ResponseEntity<String> verifyAccount(@PathVariable String token) {
-        authService.verifyAccount(token);
-        return new ResponseEntity<>("Account Activated Successfully", OK);
+    @GetMapping("/accountVerification/{token}")
+    public ResponseEntity<?> verifyAccount(@PathVariable String token) {
+        String email = authService.verifyAccount(token);
+        return new ResponseEntity<>(Map.of("message", email), OK);
     }
 
     @PostMapping("/login")

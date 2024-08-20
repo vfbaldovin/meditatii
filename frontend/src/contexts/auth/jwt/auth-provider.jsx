@@ -217,18 +217,18 @@ export const AuthProvider = (props) => {
     }
   };
   const signUp = useCallback(
-    async (email, name, password) => {
-      const { accessToken } = await authApi.signUp({ email, name, password });
-      const user = await authApi.me(accessToken);
+    async (email, password) => {
+      const { accessToken } = await authApi.signUp({ email, password });
+      // const user = await authApi.me(accessToken);
 
       sessionStorage.setItem(STORAGE_KEY, accessToken);
 
-      dispatch({
-        type: ActionType.SIGN_UP,
-        payload: {
-          user,
-        },
-      });
+      // dispatch({
+      //   type: ActionType.SIGN_UP,
+      //   payload: {
+      //     user,
+      //   },
+      // });
     },
     [dispatch]
   );

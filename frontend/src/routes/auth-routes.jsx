@@ -122,6 +122,10 @@ export const authRoutes = [
             element: <LoginPage />,
           },
           {
+            path: 'login/:token',  // Add this line to handle token as a path parameter
+            element: <LoginPage />,  // Reuse the same component
+          },
+          {
             path: 'register',
             element: <RegisterPage />,
           },

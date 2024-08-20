@@ -80,8 +80,11 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (!user.getEnabled()) {
-                resendMailActivation(user);
-                throw new AppException(ApiHttpStatus.RESEND_ACTIVATION_MAIL.getMessage());
+                String token = generateVerificationToken(user);
+                System.out.println("Activation link = " + (URL + "/api/auth/accountVerification/" + token));
+
+                mailService.sendMail(getSignupNotificationEmail(user.getEmail(), token));
+                return ApiResponse.build(ApiHttpStatus.SUCCESS);
             }
             throw new AppException(ApiHttpStatus.EMAIL_TAKEN.getMessage());
         }
@@ -96,16 +99,20 @@ public class AuthService {
 
         String token = generateVerificationToken(user);
 
-        mailService.sendMail(new NotificationEmail("Bine ai venit la meditatiianunturi.ro!", user.getEmail(),
-                "<html><body><div>Bună ziua,</div><br><div>Felicitări! Ai făcut primul tău pas către noul tău student " +
-                        "și suntem încântați să împărtășim cu tine serviciile noastre.\n</div><br>" +
-                        "<div>Accesează următorul link pentru a-ți activa contul:</div><br><div><a href = '" + URL + "/accountVerification/" + token + "'>" +
-                        URL +"accountVerification</a></div><br><div>Dacă ceva nu este clar, anunță-ne cum te putem ajuta." +
-                        "</div><br><div>Cu stimă,</div><a href='"+ URL +"'>Echipa Meditatii Anunturi</a></body></html>"));
+        mailService.sendMail(getSignupNotificationEmail(user.getEmail(), token));
 
         System.out.println("Activation link = " + (URL + "/api/auth/accountVerification/" + token));
 
         return ApiResponse.build(ApiHttpStatus.SUCCESS);
+    }
+
+    private NotificationEmail getSignupNotificationEmail(String email, String token) {
+        return new NotificationEmail("Bine ai venit la meditatiianunturi.ro!", email,
+                "<html><body><div>Bună ziua,</div><br><div>Felicitări! Ai făcut primul tău pas către noul tău student " +
+                        "și suntem încântați să împărtășim cu tine serviciile noastre.\n</div><br>" +
+                        "<div>Accesează următorul link pentru a-ți activa contul:</div><br><div><a href = '" + URL + "/login/" + token + "'>" +
+                        URL + "accountVerification</a></div><br><div>Dacă ceva nu este clar, anunță-ne cum te putem ajuta." +
+                        "</div><br><div>Cu stimă,</div><a href='" + URL + "'>Echipa Meditatii Anunturi</a></body></html>");
     }
 
     @Transactional(readOnly = true)
@@ -116,26 +123,13 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
     }
 
-    private ApiResponse fetchUserAndEnable(VerificationToken verificationToken) {
+    private String fetchUserAndEnable(VerificationToken verificationToken) {
         String username = verificationToken.getUser().getEmail();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new AppException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
         user.setEnabled(true);
         userRepository.save(user);
 
-        return ApiResponse.build(ApiHttpStatus.SUCCESS);
-    }
-
-    public void resendMailActivation(User user) {
-        String token = generateVerificationToken(user);
-        System.out.println("Activation link = " + (URL + "/api/auth/accountVerification/" + token));
-
-        mailService.sendMail(new NotificationEmail("Bine ai venit la meditatiianunturi.ro!", user.getEmail(),
-                "<html><body><div>Bună ziua,</div><br><div>Felicitări! Ai făcut primul tău pas către noul tău student " +
-                        "și suntem încântați să împărtășim cu tine serviciile noastre.\n</div><br>" +
-                        "<div>Accesează următorul link pentru a-ți activa contul:</div>" +
-                        "<br><div><a href = '" + URL + "/accountVerification/" + token + "'>" + URL + "/accountVerification</a></div>" +
-                        "<br><div>Dacă ceva nu este clar, anunță-ne cum te putem ajuta.</div><br><div>Cu stimă,</div><a href='"+ URL +"'>Echipa Meditatii Anunturi</a></body></html>"));
-
+        return user.getEmail();
     }
 
     protected String generateVerificationToken(User user) {
@@ -149,7 +143,7 @@ public class AuthService {
         return token;
     }
 
-    public ApiResponse verifyAccount(String token) {
+    public String verifyAccount(String token) {
         Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
         VerificationToken verificationToken = verificationTokenOptional.orElseThrow(() -> new AppException(ApiHttpStatus.INVALID_TOKEN.getMessage()));
         return fetchUserAndEnable(verificationToken);
