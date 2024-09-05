@@ -127,8 +127,9 @@ export const Footer = (props) => (
               color="text.secondary"
               variant="caption"
             >
-              © 2022 Devias IO
+              © {new Date().getFullYear()} WBR
             </Typography>
+
           </Stack>
         </Grid>
         {sections.map((section, index) => (

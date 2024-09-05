@@ -187,24 +187,34 @@ export const AuthProvider = (props) => {
     }
   }, [dispatch]);
 
-/*
-  const signIn = useCallback(
-    async (email, password) => {
-      const { accessToken } = await authApi.signIn({ email, password });
-      const user = await authApi.me({ accessToken });
+  const resetPassword = useCallback(async ({ email }) => {
+    await authApi.resetPassword({ email });
+  }, []);
 
-      sessionStorage.setItem(STORAGE_KEY, accessToken);
+  const changePassword = useCallback(async ({ token, password }) => {
+    await authApi.changePassword({ token, password });
+  }, []);
 
-      dispatch({
-        type: ActionType.SIGN_IN,
-        payload: {
-          user,
-        },
-      });
-    },
-    [dispatch]
-  );
-*/
+
+
+  /*
+    const signIn = useCallback(
+      async (email, password) => {
+        const { accessToken } = await authApi.signIn({ email, password });
+        const user = await authApi.me({ accessToken });
+
+        sessionStorage.setItem(STORAGE_KEY, accessToken);
+
+        dispatch({
+          type: ActionType.SIGN_IN,
+          payload: {
+            user,
+          },
+        });
+      },
+      [dispatch]
+    );
+  */
   const refreshAccessToken = async (refreshToken, username) => {
     try {
       const { accessToken, expiresAt } = await authApi.refreshToken({ refreshToken, username });
@@ -232,6 +242,7 @@ export const AuthProvider = (props) => {
     },
     [dispatch]
   );
+
 
   const signOut = useCallback(async () => {
     try {
@@ -266,6 +277,8 @@ export const AuthProvider = (props) => {
         signIn,
         signUp,
         signOut,
+        resetPassword,
+        changePassword,
       }}
     >
       {children}

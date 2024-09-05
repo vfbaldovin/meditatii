@@ -24,6 +24,8 @@ const FirebaseRegisterPage = lazy(() => import('src/pages/auth/firebase/register
 // JWT
 const LoginPage = lazy(() => import('src/app/pages/login-page'));
 const RegisterPage = lazy(() => import('src/app/pages/register-page'));
+const RecoverPassword = lazy(() => import('src/app/pages/recover-password'));
+const ResetPassword = lazy(() => import('src/app/pages/reset-password'));
 
 export const authRoutes = [
   {
@@ -128,6 +130,14 @@ export const authRoutes = [
           {
             path: 'register',
             element: <RegisterPage />,
+          },
+          {
+            path: 'recover/password',
+            element: <RecoverPassword />,
+          },
+          {
+            path: 'reset/:token',
+            element: <ResetPassword />,
           },
         ],
       },

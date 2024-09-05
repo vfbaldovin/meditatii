@@ -57,7 +57,7 @@ public class AnnouncementController {
     @GetMapping("/paginated")
     public ResponseEntity<Page<AnnouncementCard>> getAllAnnouncementsPaginated(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam @Nullable Long subjectId,
             @RequestParam(defaultValue = "CREATED.DESC") String sort) {
         Page<AnnouncementCard> announcementPage =

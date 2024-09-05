@@ -179,7 +179,7 @@ public class AuthService {
                 GOOGLE_CLIENT_ID,
                 GOOGLE_CLIENT_SECRET,
                 code,
-                URL + "/api/auth/oauth2-google")  // Specify the same redirect URI you use with your client
+                getUrl() + "/api/auth/oauth2-google")  // Specify the same redirect URI you use with your client
                 .execute();
 
         String idToken = tokenResponse.getIdToken();
@@ -235,8 +235,7 @@ public class AuthService {
     }
 
     public String getSuccessfullyGoogleLoginUrl(AuthenticationResponse authenticationResponse) {
-        String url = Objects.equals(URL, "http://localhost:8080") ? "http://localhost:3000" : "https://meditatiianunturi.ro";
-        return String.format(url + "/login?accessToken=%s&refreshToken=%s&expiresAt=%s",
+        return String.format(URL + "/login?accessToken=%s&refreshToken=%s&expiresAt=%s",
                 authenticationResponse.getAccessToken(),
                 authenticationResponse.getRefreshToken(),
                 authenticationResponse.getExpiresAt()
@@ -244,19 +243,21 @@ public class AuthService {
     }
 
     public String getGoogleRedirectUrl() {
-        String redirectUri = URL + "/api/auth/oauth2-google"; // This should be the URI where Google redirects after authorization
+        String redirectUri = getUrl() + "/api/auth/oauth2-google"; // This should be the URI where Google redirects after authorization
         String clientId = GOOGLE_CLIENT_ID;
-        String responseType = "code";
-        String scope = "email openid";
-        String accessType = "offline";
-        String prompt = "consent";
+        String responseType = "code";  // Request an authorization code
+        String scope = "openid email profile";  // Only request basic scopes
+        String accessType = "online";  // Do not request offline access (no refresh token)
+
         return "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
                 "&response_type=" + responseType +
-                "&scope=" + scope;/* +
-                "&prompt=" + prompt;*/
+                "&scope=" + scope +
+                "&access_type=" + accessType +
+                "&prompt=select_account";  // Prompt the user to select their account (skip the consent screen)
     }
+
 
 
     public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
@@ -291,13 +292,44 @@ public class AuthService {
         return ApiResponse.build(ApiHttpStatus.SUCCESS);
     }
 
-    public ApiResponse changePassword(ChangePasswordRequest changePasswordDto) {
+    public String changePassword(ChangePasswordRequest changePasswordDto) {
+        // Fetch the verification token
         VerificationToken verificationToken = verificationTokenRepository.findByToken(changePasswordDto.getToken())
                 .orElseThrow(() -> new AppException(ApiHttpStatus.INVALID_TOKEN.getMessage()));
+
+        // Check if the token is expired
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            // If expired, throw an exception
+            throw new AppException(ApiHttpStatus.EXPIRED_TOKEN_RESET_PASSWORD.getMessage());
+        }
+
+        // Fetch the user associated with the token
         String username = verificationToken.getUser().getEmail();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new AppException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new AppException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
+
+        // Update the user's password
         user.setPassword(passwordEncoder.encode(changePasswordDto.getPassword()));
         userRepository.save(user);
-        return ApiResponse.build(ApiHttpStatus.SUCCESS);
+
+        // Delete the token after successful password reset
+        verificationTokenRepository.delete(verificationToken);
+
+        // Return the username as a success message
+        return username;
     }
+
+    public boolean isTokenValid(String token) {
+        Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
+        if (verificationTokenOptional.isPresent()) {
+            VerificationToken verificationToken = verificationTokenOptional.get();
+            return verificationToken.getExpiryDate().isAfter(LocalDateTime.now());
+        }
+        return false;
+    }
+
+    private String getUrl() {
+        return Objects.equals(URL, "http://localhost:3000") ? "http://localhost:8080" : "https://meditatiianunturi.ro";
+    }
+
 }

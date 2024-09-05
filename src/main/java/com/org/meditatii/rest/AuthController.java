@@ -1,5 +1,6 @@
 package com.org.meditatii.rest;
 
+import com.org.meditatii.exception.error.ApiHttpStatus;
 import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.*;
 import com.org.meditatii.service.AuthService;
@@ -7,6 +8,7 @@ import com.org.meditatii.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -91,14 +93,25 @@ public class AuthController {
     }
 
     @PostMapping("/reset")
-    public ResponseEntity<ApiResponse> resetPassword(@RequestBody String email) {
-        ApiResponse apiResponse = authService.resetPassword(email);
+    public ResponseEntity<ApiResponse> resetPassword(@RequestBody RecoverPasswordRequest email) {
+        ApiResponse apiResponse = authService.resetPassword(email.getEmail());
         return new ResponseEntity<>(apiResponse, OK);
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<ApiResponse> changePassword(@RequestBody ChangePasswordRequest changePasswordDto) {
-        ApiResponse apiResponse = authService.changePassword(changePasswordDto);
-        return new ResponseEntity<>(apiResponse, OK);
+    public ResponseEntity<Map<String, String>> changePassword(@RequestBody ChangePasswordRequest changePasswordDto) {
+        String email = authService.changePassword(changePasswordDto);
+        return new ResponseEntity<>(Map.of("message", email), OK);
+    }
+
+    @GetMapping("/validateToken/{token}")
+    public ResponseEntity<ApiResponse> validateToken(@PathVariable String token) {
+        boolean isValid = authService.isTokenValid(token);
+        if (isValid) {
+            return ResponseEntity.ok(ApiResponse.build(ApiHttpStatus.SUCCESS));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.build(ApiHttpStatus.INVALID_TOKEN));
+        }
     }
 }

@@ -14,4 +14,6 @@ export const AuthContext = createContext({
   signIn: () => Promise.resolve(),
   signUp: () => Promise.resolve(),
   signOut: () => Promise.resolve(),
+  resetPassword: () => Promise.resolve(),
+  // changePassword: () => Promise.resolve(),
 });

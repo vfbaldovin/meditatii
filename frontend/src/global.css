@@ -151,3 +151,21 @@ body {
 /*    transform: translateY(20%);*/
 /*  }*/
 /*}*/
+
+.shiny-gold {
+  background: linear-gradient(135deg, #D4AF37, #FFD700); /* Gradient to simulate a shine */
+  background-size: 200% 200%;
+  background-position: 50% 50%;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4); /* Inner and outer shadows */
+  transition: background-position 1s ease; /* Smooth transition for hover effect */
+}
+
+.shiny-gold:hover {
+  background-position: 100% 0;
+}
+

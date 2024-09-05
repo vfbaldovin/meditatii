@@ -256,7 +256,11 @@ export const Login = () => {
               mt: 3,
             }}
           >
-            <Link href="#" underline="hover" variant="subtitle2">
+            <Link
+              component={RouterLink}
+              href={paths.auth.jwt.recoverPassword}
+              underline="hover"
+              variant="subtitle2">
               Ai uitat parola?
             </Link>
           </Box>

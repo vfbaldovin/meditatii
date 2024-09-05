@@ -50,22 +50,7 @@ export const HomeHero = () => {
           behavior: 'smooth'
         });
       }, 100);
-      // dispatch(setCurrentPage(newPage)); // Update the Redux store
     };
-
-  //
-  // const totalItemsInStore = useSelector((state) => state.home.totalItems);
-  //
-  // useEffect(() => {
-  //   setTotalItems(totalItemsInStore); // Set the current page when the component mounts
-  // }, [totalItemsInStore]);
-
-  /*
-    const [page, setPage] = useState(0);
-
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };*/
 
   const theme = useTheme();
   const filterOptions = [
@@ -98,7 +83,7 @@ export const HomeHero = () => {
   const subjectNames = Object.keys(subjects);
 
 
-  const [size, setSize] = useState(8);
+  const [size, setSize] = useState(12);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -118,35 +103,12 @@ export const HomeHero = () => {
   const [selectedFilter, setSelectedFilter] = useState(sortParam ? [sortParam] : [filterOptions[0].value]);
 
 
-  /*  const location = useLocation();
-    useEffect(() => {
-      const searchParams = new URLSearchParams(location.search);
-      const pageParam = parseInt(searchParams.get('page'), 10);
-      const subjectId = parseInt(searchParams.get('q'), 10);
-      const sort = searchParams.get('sort');
-
-      console.log(pageParam)
-      console.log(subjectId)
-      console.log(sort)
-      // setPage(isNaN(pageParam) ? 0 : pageParam);
-      // setSelectedSubjectId(isNaN(subjectId) ? 0 : subjectId);
-      // if (sort) {
-      //   setSelectedFilter(sort ? [sort] : filterOptions[0].value)
-      // }
-    }, [location]);*/
-
-
 
   const handleSearchTextUpdate = (selectedValue) => {
     if (selectedValue !== searchText) {
       setSearchText(selectedValue);
     }
   };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   setSize(parseInt(event.target.value, 10));
-  //   setPage(0);
-  // };
 
 
   async function enhanceAnnouncementsWithImages(announcements) {
@@ -252,10 +214,6 @@ export const HomeHero = () => {
   const navigate = useNavigate();
 
   const handleCardClick = (id) => {
-    /*    dispatch(setCurrentPage(page));
-        dispatch(setSubjectId(selectedSubjectId));
-        dispatch(setSort(selectedFilter));
-        navigate(`/announcement/${id}`);*/
 
     navigate(`/announcement/${id}`, {
       state: {
@@ -429,8 +387,11 @@ export const HomeHero = () => {
                         <Grid
                           key={announcement.id}
                           item
-                          xs={12}
-                          md={12}
+                          // xs={12}
+                          // md={12}
+                          xs={12}      // Full width on extra small screens
+                          sm={6}       // Half width on small screens (600px and up)
+                          md={4}       // Half width on medium screens (960px and up)
                         >
                           <Card
                             onClick={() => handleCardClick(announcement.id)}
@@ -480,14 +441,14 @@ export const HomeHero = () => {
                                     <Typography component="span" color="text.primary" variant="subtitle2">
                                       {announcement.tutorName}
                                     </Typography>
-                                    {' '}| Actualizat acum {updatedAgo
-                                    .replace('days ago','zile')
-                                    .replace('months ago','luni')
-                                    .replace('years ago','ani')
-                                    .replace('day ago','zi')
-                                    .replace('month ago','luna')
-                                    .replace('year ago','an')
-                                  }
+                                  {/*  {' '}| Actualizat acum {updatedAgo*/}
+                                  {/*  .replace('days ago','zile')*/}
+                                  {/*  .replace('months ago','luni')*/}
+                                  {/*  .replace('years ago','ani')*/}
+                                  {/*  .replace('day ago','zi')*/}
+                                  {/*  .replace('month ago','luna')*/}
+                                  {/*  .replace('year ago','an')*/}
+                                  {/*}*/}
                                   </Typography>
 
                                 </Box>
@@ -702,15 +663,21 @@ const PromotedChip = () => {
         right: 20,
         color: 'white',
         fontWeight: 'bold',
-        backgroundColor: 'primary.main',
+        background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
+        backgroundSize: '200% 200%',
+        backgroundPosition: '50% 50%',
         borderRadius: '50%', // Make the box circular
         width: '2rem',      // Set a specific width
         height: '2rem',     // Set a specific height to match the width
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', // Nice, subtle boxShadow
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4)', // Inner and outer shadows
         opacity: 0.9,
+        transition: 'background-position 1s ease', // Smooth transition for hover effect
+        '&:hover': {
+          backgroundPosition: '100% 0', // Hover effect for the shine
+        },
       }}
     >
       <svg width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"

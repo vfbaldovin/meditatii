@@ -85,6 +85,41 @@ class AuthApi {
     return response.json(); // Expects to receive { accessToken }
   }
 
+  async resetPassword({ email }) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to reset password');
+    }
+    return response.json();
+  }
+
+/*  async changePassword({ token, password }) {
+    const response = await fetch(`${apiBaseUrl}/api/auth/changePassword`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, password }),
+    });
+
+    // Ensure we are correctly parsing the response body
+    const responseData = await response.json().catch(() => undefined);
+
+    if (!response.ok) {
+      throw new Error(responseData ? responseData.message : 'Failed to change password');
+    }
+
+    return responseData; // This should return the parsed JSON object
+  }*/
+
   async me(accessToken) {
     const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
       method: 'GET',

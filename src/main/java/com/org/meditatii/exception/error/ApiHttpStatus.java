@@ -14,6 +14,7 @@ public enum ApiHttpStatus {
     USER_NOT_ENABLED(5, "Contul dumneavoastră nu este activat. Vă rugăm să vă înregistrați din nou."),
     INVALID_PASSWORD(6, "Parola este incorectă."),
     INVALID_TOKEN(7, "Token invalid, vă rugăm încercați din nou."),
+    EXPIRED_TOKEN_RESET_PASSWORD(8, "Token expirat, vă rugăm să resetați parola din nou."),
 
     BAD_REQUEST(8, "Cerere greșită"),
     UNKNOWN_EXCEPTION(60, "Excepție necunoscută");

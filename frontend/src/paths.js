@@ -11,6 +11,8 @@ export const paths = {
     jwt: {
       login: '/login',
       register: '/register',
+      recoverPassword: '/recover/password',
+      resetPassword: '/reset',
     },
     firebase: {
       login: '/auth/firebase/login',
