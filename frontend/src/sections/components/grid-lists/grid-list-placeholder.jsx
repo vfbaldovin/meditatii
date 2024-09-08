@@ -15,7 +15,10 @@ export const GridListPlaceholder = ({listLength}) => {
     >
     <Grid container spacing={3}>
       {Array.from(new Array(listLength)).map((_, index) => (
-        <Grid item key={index} xs={12} md={12}>
+        <Grid item key={index}
+              xs={12}      // Full width on extra small screens
+              sm={6}       // Half width on small screens (600px and up)
+              md={4}  >
           <Card>
             <Box sx={{ p: 2 }}>
               <Stack direction="row" spacing={2} alignItems="center">

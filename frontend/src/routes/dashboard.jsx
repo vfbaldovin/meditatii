@@ -45,7 +45,7 @@ const SocialFeedPage = lazy(() => import('src/pages/dashboard/social/feed'));
 const SocialProfilePage = lazy(() => import('src/pages/dashboard/social/profile'));
 
 // Other
-const AccountPage = lazy(() => import('src/pages/dashboard/account'));
+const AccountPage = lazy(() => import('src/pages/dashboard/dashboard-old'));
 const AnalyticsPage = lazy(() => import('src/pages/dashboard/analytics'));
 const BlankPage = lazy(() => import('src/pages/dashboard/blank'));
 const CalendarPage = lazy(() => import('src/pages/dashboard/calendar'));

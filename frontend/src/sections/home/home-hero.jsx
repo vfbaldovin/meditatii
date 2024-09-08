@@ -111,15 +111,15 @@ export const HomeHero = () => {
   };
 
 
-  async function enhanceAnnouncementsWithImages(announcements) {
-    return await Promise.all(announcements.map(async (announcement) => {
+  async function enhanceListingsWithImages(listing) {
+    return await Promise.all(listing.map(async (listing) => {
       try {
-        const imageResponse = await axios.get(`${apiBaseUrl}/api/user/${announcement.tutorId}/profile-image`, {responseType: 'blob'});
+        const imageResponse = await axios.get(`${apiBaseUrl}/api/user/${listing.tutorId}/profile-image`, {responseType: 'blob'});
         const imageUrl = URL.createObjectURL(imageResponse.data);
-        return {...announcement, tutorImage: imageUrl};
+        return {...listing, tutorImage: imageUrl};
       } catch (error) {
         console.error('Error fetching tutor image:', error);
-        return {...announcement, tutorImage: null};
+        return {...listing, tutorImage: null};
       }
     }));
   }
@@ -145,9 +145,11 @@ export const HomeHero = () => {
     setPage(0);
     setSelectedSubjectId(val.id);
     try {
-      const response = await axios.get(`${apiBaseUrl}/api/announcement/paginated?subjectId=${val.id}`);
-      const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
-      setProjects(announcementWithImages);
+      console.log(val)
+      console.log('asdfadfaf')
+      const response = await axios.get(`${apiBaseUrl}/api/listing/paginated?subjectId=${val.id}`);
+      const listingWithImages = await enhanceListingsWithImages(response.data.content);
+      setProjects(listingWithImages);
       setTotalItems(response.data.totalElements);
 
     } catch (error) {
@@ -159,7 +161,7 @@ export const HomeHero = () => {
   const fetchAndSetProjects = useCallback(async () => {
     setIsLoading(true);
     const selectedSort = selectedFilter.length > 0 ? selectedFilter[0] : filterOptions[0].value;
-    let apiUrl = `${apiBaseUrl}/api/announcement/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
+    let apiUrl = `${apiBaseUrl}/api/listing/paginated?page=${page}&size=${size}&sort=${selectedSort}`;
 
     // const subjectId = subjects[searchText];
     if (selectedSubjectId) {
@@ -168,12 +170,12 @@ export const HomeHero = () => {
 
     try {
       const response = await axios.get(apiUrl);
-      const announcementWithImages = await enhanceAnnouncementsWithImages(response.data.content);
+      const listingWithImages = await enhanceListingsWithImages(response.data.content);
       if (selectedSubjectId) {
         console.log('only one time')
         setSearchText(response.data.content[0].subject)
       }
-      setProjects(announcementWithImages);
+      setProjects(listingWithImages);
       setTotalItems(response.data.totalElements);
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -215,7 +217,7 @@ export const HomeHero = () => {
 
   const handleCardClick = (id) => {
 
-    navigate(`/announcement/${id}`, {
+    navigate(`/listing/${id}`, {
       state: {
         page: page,
         selectedSubjectId: selectedSubjectId,
@@ -380,12 +382,12 @@ export const HomeHero = () => {
                     container
                     spacing={3}
                   >
-                    {projects.map((announcement) => {
-                      const updatedAgo = formatDistanceToNowStrict(parseISO(announcement.createdDate), {addSuffix: true});
+                    {projects.map((listing) => {
+                      const updatedAgo = formatDistanceToNowStrict(parseISO(listing.createdDate), {addSuffix: true});
 
                       return (
                         <Grid
-                          key={announcement.id}
+                          key={listing.id}
                           item
                           // xs={12}
                           // md={12}
@@ -394,8 +396,8 @@ export const HomeHero = () => {
                           md={4}       // Half width on medium screens (960px and up)
                         >
                           <Card
-                            onClick={() => handleCardClick(announcement.id)}
-                            id={announcement.id}
+                            onClick={() => handleCardClick(listing.id)}
+                            id={listing.id}
                             sx={{
                               boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
                               borderRadius: '20px',
@@ -409,7 +411,7 @@ export const HomeHero = () => {
                               },
                             }}
                           >
-                            {announcement.promoted && <PromotedChip />}
+                            {listing.promoted && <PromotedChip />}
                             <Box sx={{p: 2, boxShadow: 'unset', padding: '8px 16px 16px'}}>
 
                               <Box
@@ -419,9 +421,9 @@ export const HomeHero = () => {
                                   mt: 2
                                 }}
                               >
-                                <Avatar src={announcement.tutorImage}/>
+                                <Avatar src={listing.tutorImage}/>
                                 <Box sx={{ml: 2, boxShadow: 'unset',
-                                  paddingRight: announcement.promoted ? '2.5rem' : '0.5rem',
+                                  paddingRight: listing.promoted ? '2.5rem' : '0.5rem',
                                   maxHeight: '4rem',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',}}>
@@ -434,12 +436,12 @@ export const HomeHero = () => {
                                       whiteSpace: 'nowrap',
                                     }}
                                   >
-                                    {announcement.title}
+                                    {listing.title}
                                   </Link>
                                   <Typography color="text.secondary" variant="body2">
                                     de{' '}
                                     <Typography component="span" color="text.primary" variant="subtitle2">
-                                      {announcement.tutorName}
+                                      {listing.tutorName}
                                     </Typography>
                                   {/*  {' '}| Actualizat acum {updatedAgo*/}
                                   {/*  .replace('days ago','zile')*/}
@@ -467,7 +469,7 @@ export const HomeHero = () => {
 
                                 }}
                               >
-                                {announcement.description}
+                                {listing.description}
                               </Typography>
                             </Box>
 
@@ -484,13 +486,13 @@ export const HomeHero = () => {
                                 spacing={3}
                               >
                                 <div>
-                                  <Typography color="primary.main" variant="subtitle2">{announcement.price} lei
+                                  <Typography color="primary.main" variant="subtitle2">{listing.price} lei
                                     / oră</Typography>
                                 </div>
                                 <div>
 
                                   <Typography color="primary.main"
-                                              variant="subtitle2">{announcement.subject}</Typography>
+                                              variant="subtitle2">{listing.subject}</Typography>
                                 </div>
                               </Stack>
                             </Box>

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class AnnouncementCard {
+public class ListingCard {
     private Long id;
     private String title;
     private String description;

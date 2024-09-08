@@ -28,7 +28,6 @@ public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
-
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody RegisterRequest registerRequest) {
         authService.signup(registerRequest);

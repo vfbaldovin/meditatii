@@ -161,7 +161,7 @@ export const MobileNav = (props) => {
             >
               <Logo />
             </Box>
-            <TenantSwitch sx={{ flexGrow: 1 }} />
+            {/*<TenantSwitch sx={{ flexGrow: 1 }} />*/}
           </Stack>
           <Stack
             component="nav"

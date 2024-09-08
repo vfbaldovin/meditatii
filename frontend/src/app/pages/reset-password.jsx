@@ -210,7 +210,7 @@ const ResetPasswordPage = () => {
                 type="submit"
                 variant="contained"
               >
-                Resetează parola
+                Înainte
               </Button>
             </form>
           </CardContent>

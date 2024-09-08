@@ -14,7 +14,7 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import {ArrowNarrowLeft} from "@untitled-ui/icons-react";
-import {AnnouncementBio} from "../../sections/announcement/announcement-bio";
+import {ListingBio} from "../../sections/listing/listing-bio";
 import {useLocation} from "react-router-dom";
 import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
@@ -24,7 +24,7 @@ import {QuillEditor} from "../../components/quill-editor";
 const Page = () => {
   const theme = useTheme();
   const {id} = useParams();
-  const [announcement, setAnnouncement] = useState({
+  const [listing, setListing] = useState({
     title: '',
     description: '',
     tutorName: '',
@@ -50,20 +50,20 @@ const Page = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    const fetchAnnouncement = async () => {
+    const fetchListing = async () => {
       try {
-        const response = await axios.get(`${apiBaseUrl}/api/announcement/${id}`);
-        setAnnouncement(response.data);
+        const response = await axios.get(`${apiBaseUrl}/api/listing/${id}`);
+        setListing(response.data);
 
         const imageResponse = await axios.get(`${apiBaseUrl}/api/user/${response.data.tutorId}/profile-image`, {responseType: 'blob'});
         const imageUrl = URL.createObjectURL(imageResponse.data);
         setTutorImageUrl(imageUrl);
       } catch (error) {
-        console.error('Error fetching announcement:', error);
+        console.error('Error fetching listing:', error);
       }
     };
 
-    fetchAnnouncement();
+    fetchListing();
   }, [id]);
 
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title={announcement.title}/>
+      <Seo title={listing.title}/>
       <Box
         sx={{
           backgroundColor: (theme) =>
@@ -121,7 +121,7 @@ const Page = () => {
                     <ArrowNarrowLeft/>
                   </SvgIcon>
                   {location.state?.selectedSubjectId
-                    ? announcement.subject
+                    ? listing.subject
                     : 'Înapoi'}
                 </Typography>
               </Box>
@@ -177,13 +177,13 @@ const Page = () => {
                     sx={{fontWeight: 800}}
                     variant="h4"
                   >
-                    {announcement.tutorName}
+                    {listing.tutorName}
                   </Typography>
 
                 </Box>
 
 
-                <AnnouncementBio announcement={announcement}/>
+                <ListingBio listing={listing}/>
 
               </Grid>
               <Grid
@@ -197,7 +197,7 @@ const Page = () => {
                 >
                   <Grid xs={12} lg={9}>
                     <Typography variant="h4">
-                      {announcement.title}
+                      {listing.title}
                     </Typography>
                   </Grid>
                   <Grid xs={12} lg={9}
@@ -207,7 +207,7 @@ const Page = () => {
                   <Chip
                     label={
                       <span>
-                    <strong>Preț:</strong> {announcement.price} lei
+                    <strong>Preț:</strong> {listing.price} lei
                   </span>
                     }
                     key='price'
@@ -222,7 +222,7 @@ const Page = () => {
                   <Chip
                     label={
                       <span>
-                    <strong>Experiență:</strong> {announcement.experience}
+                    <strong>Experiență:</strong> {listing.experience}
                   </span>
                     }
                     key='experience'
@@ -236,7 +236,7 @@ const Page = () => {
                     <Chip
                       label={
                         <span>
-                    <strong>Vârstă:</strong> {announcement.age} ani
+                    <strong>Vârstă:</strong> {listing.age} ani
                   </span>
                       }
                       key='age'
@@ -251,7 +251,7 @@ const Page = () => {
                     sx={{padding: 2, whiteSpace: 'pre-wrap'}}
                   >
 
-                    {announcement.description}
+                    {listing.description}
                   </Typography>
 
                   </Grid>

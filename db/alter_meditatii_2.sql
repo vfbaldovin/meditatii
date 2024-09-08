@@ -105,17 +105,17 @@ INSERT INTO subject (name, subject_category_id) VALUES ('Yoga', 8);
 INSERT INTO subject (name, subject_category_id) VALUES ('Alte materii', 9);
 
 
-ALTER TABLE announcement
+ALTER TABLE listing
     ADD COLUMN subject_id INT;
 
-ALTER TABLE announcement
+ALTER TABLE listing
     ADD FOREIGN KEY (subject_id) REFERENCES subject(id);
 
 
 
-UPDATE announcement a set a.subject = 'Tobe' where a.subject = 'Toba';
+UPDATE listing a set a.subject = 'Tobe' where a.subject = 'Toba';
 
-UPDATE announcement a
+UPDATE listing a
     JOIN subject s ON a.subject = REPLACE(
     REPLACE(
     REPLACE(

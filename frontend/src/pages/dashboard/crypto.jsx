@@ -117,29 +117,7 @@ const Page = () => {
                 />
               </Stack>
             </Grid>
-            <Grid
-              xs={12}
-              md={5}
-            >
-              <CryptoCards
-                cards={[
-                  {
-                    id: '79f8212e4245e4c11952f2cf',
-                    brand: 'Mastercard',
-                    cardNumber: '5823 4492 2385 1102',
-                    expiryDate: '05/28',
-                    holderName: 'John Carter',
-                  },
-                  {
-                    id: '99f231b1c079b810ba66bef1',
-                    brand: 'VISA',
-                    cardNumber: '3455 4562 7710 3507',
-                    expiryDate: '02/30',
-                    holderName: 'John Carter',
-                  },
-                ]}
-              />
-            </Grid>
+
             <Grid
               xs={12}
               md={8}

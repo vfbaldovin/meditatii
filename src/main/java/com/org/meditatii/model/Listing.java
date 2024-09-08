@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "announcement")
-public class Announcement {
+@Table(name = "listing")
+public class Listing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -57,8 +57,8 @@ public class Announcement {
     @Column(name = "tutor_home")
     private Boolean tutorHome;
 
-    @Column(name = "announcement_views")
-    private Integer announcementViews;
+    @Column(name = "views")
+    private Integer views;
 
     @Column(name = "promoted")
     private Boolean promoted;

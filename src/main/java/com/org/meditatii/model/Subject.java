@@ -22,5 +22,5 @@ public class Subject {
     private SubjectCategory subjectCategory;
 
     @OneToMany(mappedBy = "subject")
-    private Set<Announcement> announcements;
+    private Set<Listing> listings;
 }

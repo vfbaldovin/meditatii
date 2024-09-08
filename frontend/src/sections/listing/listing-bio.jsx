@@ -7,7 +7,7 @@ import Mail01Icon from "@untitled-ui/icons-react/build/esm/Mail01";
 import {PhoneCall01} from "@untitled-ui/icons-react";
 import Box from "@mui/material/Box";
 
-export const AnnouncementBio = ({ announcement }) => {
+export const ListingBio = ({ listing: listing }) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const [isBlurred, setIsBlurred] = useState(true);
@@ -18,8 +18,8 @@ export const AnnouncementBio = ({ announcement }) => {
   };
 
   // Split the phone number into visible and blurred parts
-  const visiblePart = announcement.phone?.slice(0, 2);
-  const blurredPart = announcement.phone?.slice(2);
+  const visiblePart = listing.phone?.slice(0, 2);
+  const blurredPart = listing.phone?.slice(2);
   return (
     <Box
       sx={{
@@ -37,7 +37,7 @@ export const AnnouncementBio = ({ announcement }) => {
       }
     }}>
     <List>
-      {announcement.occupation && (
+      {listing.occupation && (
         <ListItem disableGutters divider>
           <ListItemAvatar style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SvgIcon color="action">
@@ -48,14 +48,14 @@ export const AnnouncementBio = ({ announcement }) => {
             disableTypography
             primary={
               <Typography color="text.primary" href="#" variant="body1">
-                {announcement.occupation}
+                {listing.occupation}
               </Typography>
             }
           />
         </ListItem>
       )}
 
-      {announcement.county && (
+      {listing.county && (
         <ListItem disableGutters divider>
           <ListItemAvatar style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SvgIcon color="action">
@@ -66,14 +66,14 @@ export const AnnouncementBio = ({ announcement }) => {
             disableTypography
             primary={
               <Typography color="text.primary" href="#" variant="body1">
-                {announcement.county}
+                {listing.county}
               </Typography>
             }
           />
         </ListItem>
       )}
 
-      {announcement.education && (
+      {listing.education && (
         <ListItem disableGutters divider>
           <ListItemAvatar style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SvgIcon color="action">
@@ -83,15 +83,15 @@ export const AnnouncementBio = ({ announcement }) => {
           <ListItemText
             primary={
               <Typography color="text.primary" href="#" variant="body1">
-                {announcement.education}
+                {listing.education}
               </Typography>
             }
           />
         </ListItem>
       )}
 
-      {announcement.phone && (
-        <ListItem disableGutters divider onClick={isBlurred ? revealNumber : () => window.location.href = `tel:${announcement.phone}`}>
+      {listing.phone && (
+        <ListItem disableGutters divider onClick={isBlurred ? revealNumber : () => window.location.href = `tel:${listing.phone}`}>
           <ListItemAvatar style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <SvgIcon color="action">
               <PhoneCall01 />
@@ -123,11 +123,11 @@ export const AnnouncementBio = ({ announcement }) => {
           />
         </ListItem>
       )}
-      {announcement.email && (
+      {listing.email && (
         <ListItem
           disableGutters
           onClick={() => {
-            window.location.href = `mailto:${announcement.email}`;
+            window.location.href = `mailto:${listing.email}`;
           }}
         >
           <ListItemAvatar style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -138,7 +138,7 @@ export const AnnouncementBio = ({ announcement }) => {
           <ListItemText
             primary={
               <Link color="text.primary" href="#" variant="body1">
-                {announcement.email}
+                {listing.email}
               </Link>
             }
           />

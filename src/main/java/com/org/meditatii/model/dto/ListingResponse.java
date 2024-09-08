@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class AnnouncementResponse {
+public class ListingResponse {
     private Long id;
     private String title;
     private String description;

@@ -1,47 +1,116 @@
-import { addDays, subDays, subHours, subMinutes } from 'date-fns';
-import PlusIcon from '@untitled-ui/icons-react/build/esm/Plus';
+import {useCallback, useState} from 'react';
+import {subDays, subHours, subMinutes, subMonths} from 'date-fns';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Unstable_Grid2';
+import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
-import SvgIcon from '@mui/material/SvgIcon';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 
-import { Seo } from 'src/components/seo';
-import { usePageView } from 'src/hooks/use-page-view';
-import { useSettings } from 'src/hooks/use-settings';
-import { OverviewBanner } from 'src/sections/dashboard/overview/overview-banner';
-import { OverviewDoneTasks } from 'src/sections/dashboard/overview/overview-done-tasks';
-import { OverviewEvents } from 'src/sections/dashboard/overview/overview-events';
-import { OverviewInbox } from 'src/sections/dashboard/overview/overview-inbox';
-import { OverviewTransactions } from 'src/sections/dashboard/overview/overview-transactions';
-import { OverviewPendingIssues } from 'src/sections/dashboard/overview/overview-pending-issues';
-import { OverviewSubscriptionUsage } from 'src/sections/dashboard/overview/overview-subscription-usage';
-import { OverviewHelp } from 'src/sections/dashboard/overview/overview-help';
-import { OverviewJobs } from 'src/sections/dashboard/overview/overview-jobs';
-import { OverviewOpenTickets } from 'src/sections/dashboard/overview/overview-open-tickets';
-import { OverviewTips } from 'src/sections/dashboard/overview/overview-tips';
-import {useAuth} from "../../hooks/use-auth";
-import {useContext} from "react";
-import {AuthContext} from "../../contexts/auth/jwt";
+import {Seo} from 'src/components/seo';
+import {getAuthenticatedUser} from 'src/app/hooks/get-authenticated-user';
+import {usePageView} from 'src/hooks/use-page-view';
+import {AccountBillingSettings} from 'src/sections/dashboard/account/account-billing-settings';
+import {AccountGeneralSettings} from 'src/sections/dashboard/account/account-general-settings';
+import {
+  AccountNotificationsSettings
+} from 'src/sections/dashboard/account/account-notifications-settings';
+import {AccountTeamSettings} from 'src/sections/dashboard/account/account-team-settings';
+import {AccountSecuritySettings} from 'src/sections/dashboard/account/account-security-settings';
+import Button from "@mui/material/Button";
+import SvgIcon from "@mui/material/SvgIcon";
+import PlusIcon from "@untitled-ui/icons-react/build/esm/Plus";
+import {OverviewDoneTasks} from "../../sections/dashboard/overview/overview-done-tasks";
+import Grid from "@mui/material/Unstable_Grid2";
+import {OverviewPendingIssues} from "../../sections/dashboard/overview/overview-pending-issues";
+import {OverviewOpenTickets} from "../../sections/dashboard/overview/overview-open-tickets";
+import {PersonalListingsTable} from "../../sections/dashboard/listings/personal-listings-table";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 const now = new Date();
+const dummyData = [
+  {
+    id: 1,
+    materie: 'Mathematics',
+    avatar: '/static/images/avatars/avatar_1.png',
+    totalViews: 1500,
+    promovare: true,
+    lastUpdated: '2024-09-01',
+  },
+  {
+    id: 2,
+    materie: 'Physics',
+    avatar: '/static/images/avatars/avatar_2.png',
+    totalViews: 1200,
+    promovare: false,
+    lastUpdated: '2024-08-15',
+  },
+  {
+    id: 3,
+    materie: 'Chemistry',
+    avatar: '/static/images/avatars/avatar_3.png',
+    totalViews: 800,
+    promovare: true,
+    lastUpdated: '2024-07-22',
+  },
+  {
+    id: 4,
+    materie: 'History',
+    avatar: '/static/images/avatars/avatar_4.png',
+    totalViews: 950,
+    promovare: false,
+    lastUpdated: '2024-06-30',
+  },
+  {
+    id: 5,
+    materie: 'Biology',
+    avatar: '/static/images/avatars/avatar_5.png',
+    totalViews: 1100,
+    promovare: true,
+    lastUpdated: '2024-05-10',
+  },
+  {
+    id: 6,
+    materie: 'Computer Science',
+    avatar: '/static/images/avatars/avatar_6.png',
+    totalViews: 1600,
+    promovare: false,
+    lastUpdated: '2024-04-18',
+  },
+];
+const tabs = [
+  {label: 'General', value: 'general'},
+  {label: 'Billing', value: 'billing'},
+  {label: 'Team', value: 'team'},
+  {label: 'Notifications', value: 'notifications'},
+  {label: 'Security', value: 'security'},
+];
 
 const Page = () => {
-  console.log('SIMARIMA')
-  const settings = useSettings();
-  console.log("aaa")
+  const user = getAuthenticatedUser();
+  const [currentTab, setCurrentTab] = useState('general');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   usePageView();
-  console.log("abra")
-  console.log(useAuth());
-  const { user } = useAuth();
-  const { user_id } = useAuth();
-  const { isAuthenticated } = useContext(AuthContext);
+
+  const handleTabsChange = useCallback((event, value) => {
+    setCurrentTab(value);
+  }, []);
 
   return (
     <>
-      <Seo title="Dashboard: Overview" />
+      <Seo title="Dashboard: Account"/>
       <Box
         component="main"
         sx={{
@@ -49,246 +118,200 @@ const Page = () => {
           py: 8,
         }}
       >
-        <Container maxWidth={settings.stretch ? false : 'xl'}>
-          <Grid
-            container
-            disableEqualOverflow
-            spacing={{
-              xs: 3,
-              lg: 4,
-            }}
+        <Container maxWidth="xl">
+          <Stack
+            spacing={3}
+            sx={{mb: 3}}
           >
-            <Grid xs={12}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                spacing={4}
-              >
-                <div>
-
-                  <Typography variant="h4">Overviews
-                    {user}
-                    {user_id}
-                    a
-                  </Typography>
-                </div>
-                <div>
-                  <Stack
-                    direction="row"
-                    spacing={4}
-                  >
-                    <Button
-                      startIcon={
-                        <SvgIcon>
-                          <PlusIcon />
-                        </SvgIcon>
-                      }
-                      variant="contained"
-                    >
-                      New Dashboard
-                    </Button>
-                  </Stack>
-                </div>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              spacing={4}
+            >
+              <Stack spacing={1}>
+                {/*<Typography variant="h4">Cont</Typography>*/}
               </Stack>
-            </Grid>
-            <Grid
-              xs={12}
-              md={4}
+              <Stack
+                alignItems="center"
+                direction="row"
+                spacing={2}
+              >
+                <Button
+                  startIcon={
+                    <SvgIcon>
+                      <PlusIcon/>
+                    </SvgIcon>
+                  }
+                  variant="contained"
+                >
+                  Adaugă anunț
+                </Button>
+              </Stack>
+            </Stack>
+            <div>
+              <Tabs
+                indicatorColor="primary"
+                onChange={handleTabsChange}
+                scrollButtons="auto"
+                textColor="primary"
+                value={currentTab}
+                variant="scrollable"
+                sx={{
+                  minHeight: '48px', // adjust the height of the Tabs component
+                }}
+              >
+                {tabs.map((tab) => (
+                  <Tab
+                    key={tab.value}
+                    label={tab.label}
+                    value={tab.value}
+                    sx={{
+                      fontSize: '16px', // adjust the font size of the Tab label
+                      minHeight: '48px', // adjust the height of each Tab
+                      padding: '12px',   // adjust the padding inside each Tab
+                    }}
+                  />
+                ))}
+              </Tabs>
+
+              <Divider/>
+            </div>
+          </Stack>
+          {currentTab === 'general' && (
+            <>
+            <Grid mb={3}
+              container
+              disableEqualOverflow
+              spacing={{
+                xs: 3,
+                lg: 4,
+              }}
             >
-              <OverviewDoneTasks amount={31} />
+              <Grid
+                xs={12}
+                md={4}
+              >
+                <OverviewDoneTasks amount={31} />
+              </Grid>
+              <Grid
+                xs={12}
+                md={4}
+              >
+                <OverviewPendingIssues amount={12} />
+              </Grid>
+              <Grid
+                xs={12}
+                md={4}
+              >
+                <OverviewOpenTickets amount={5} />
+              </Grid>
             </Grid>
-            <Grid
-              xs={12}
-              md={4}
-            >
-              <OverviewPendingIssues amount={12} />
-            </Grid>
-            <Grid
-              xs={12}
-              md={4}
-            >
-              <OverviewOpenTickets amount={5} />
-            </Grid>
-            <Grid
-              xs={12}
-              md={7}
-            >
-              <OverviewBanner />
-            </Grid>
-            <Grid
-              xs={12}
-              md={5}
-            >
-              <OverviewTips
-                sx={{ height: '100%' }}
-                tips={[
-                  {
-                    title: 'New fresh design.',
-                    content:
-                      'Your favorite template has a new trendy look, more customization options, screens & more.',
-                  },
-                  {
-                    title: 'Tip 2.',
-                    content: 'Tip content',
-                  },
-                  {
-                    title: 'Tip 3.',
-                    content: 'Tip content',
-                  },
-                ]}
-              />
-            </Grid>
-            <Grid
-              xs={12}
-              md={7}
-            >
-              <OverviewSubscriptionUsage
-                chartSeries={[
-                  {
-                    name: 'This year',
-                    data: [40, 37, 41, 42, 45, 42, 36, 45, 40, 44, 38, 41],
-                  },
-                  {
-                    name: 'Last year',
-                    data: [26, 22, 19, 22, 24, 28, 23, 25, 24, 21, 17, 19],
-                  },
-                ]}
-              />
-            </Grid>
-            <Grid
-              xs={12}
-              md={5}
-            >
-              <OverviewInbox
-                messages={[
-                  {
-                    id: 'b91cbe81ee3efefba6b915a7',
-                    content: 'Hello, we spoke earlier on the phone',
-                    createdAt: subMinutes(now, 2),
-                    senderAvatar: '/assets/avatars/avatar-alcides-antonio.png',
-                    senderName: 'Alcides Antonio',
-                    senderOnline: true,
-                  },
-                  {
-                    id: 'de0eb1ac517aae1aa57c0b7e',
-                    content: 'Is the job still available?',
-                    createdAt: subMinutes(now, 56),
-                    senderAvatar: '/assets/avatars/avatar-marcus-finn.png',
-                    senderName: 'Marcus Finn',
-                    senderOnline: false,
-                  },
-                  {
-                    id: '38e2b0942c90d0ad724e6f40',
-                    content: 'What is a screening task? I’d like to',
-                    createdAt: subHours(subMinutes(now, 23), 3),
-                    senderAvatar: '/assets/avatars/avatar-carson-darrin.png',
-                    senderName: 'Carson Darrin',
-                    senderOnline: true,
-                  },
-                  {
-                    id: '467505f3356f25a69f4c4890',
-                    content: 'Still waiting for feedback',
-                    createdAt: subHours(subMinutes(now, 6), 8),
-                    senderAvatar: '/assets/avatars/avatar-fran-perez.png',
-                    senderName: 'Fran Perez',
-                    senderOnline: true,
-                  },
-                  {
-                    id: '7e6af808e801a8361ce4cf8b',
-                    content: 'Need more information about campaigns',
-                    createdAt: subHours(subMinutes(now, 18), 10),
-                    senderAvatar: '/assets/avatars/avatar-jie-yan-song.png',
-                    senderName: 'Jie Yan Song',
-                    senderOnline: false,
-                  },
-                ]}
-              />
-            </Grid>
-            <Grid
-              xs={12}
-              md={7}
-            >
-              <OverviewTransactions
-                transactions={[
-                  {
-                    id: 'd46800328cd510a668253b45',
-                    amount: 25000,
-                    createdAt: now.getTime(),
-                    currency: 'usd',
-                    sender: 'Devias',
-                    status: 'on_hold',
-                    type: 'receive',
-                  },
-                  {
-                    id: 'b4b19b21656e44b487441c50',
-                    amount: 6843,
-                    createdAt: subDays(now, 1).getTime(),
-                    currency: 'usd',
-                    sender: 'Zimbru',
-                    status: 'confirmed',
-                    type: 'send',
-                  },
-                  {
-                    id: '56c09ad91f6d44cb313397db',
-                    amount: 91823,
-                    createdAt: subDays(now, 1).getTime(),
-                    currency: 'usd',
-                    sender: 'Vertical Jelly',
-                    status: 'failed',
-                    type: 'send',
-                  },
-                  {
-                    id: 'aaeb96c5a131a55d9623f44d',
-                    amount: 49550,
-                    createdAt: subDays(now, 3).getTime(),
-                    currency: 'usd',
-                    sender: 'Devias',
-                    status: 'confirmed',
-                    type: 'receive',
-                  },
-                ]}
-              />
-            </Grid>
-            <Grid
-              xs={12}
-              md={5}
-            >
-              <OverviewEvents
-                events={[
-                  {
-                    id: '3bfa0bc6cbc99bf747c94d51',
-                    createdAt: addDays(now, 1),
-                    description: '17:00 to 18:00',
-                    title: 'Meeting with Partners',
-                  },
-                  {
-                    id: 'dd6c8ce8655ac222b01f24f9',
-                    createdAt: addDays(now, 4),
-                    description: '17:00 to 18:00',
-                    title: 'Weekly Meeting',
-                  },
-                  {
-                    id: 'f274902e2bf226865b3cf947',
-                    createdAt: addDays(now, 4),
-                    description: '17:00 to 18:00',
-                    title: 'Weekly Meeting',
-                  },
-                  {
-                    id: 'd2a66e24110f52acb0cd0b9f',
-                    createdAt: addDays(now, 7),
-                    description: '17:00 to 18:00',
-                    title: 'Weekly Meeting',
-                  },
-                ]}
-              />
-            </Grid>
-            <Grid xs={6}>
-              <OverviewJobs />
-            </Grid>
-            <Grid xs={6}>
-              <OverviewHelp />
-            </Grid>
-          </Grid>
+              <Box mb={3}>
+                <Card>
+                  <CardContent>
+                    <Grid
+                      container
+                      spacing={3}
+                    >
+                      <Grid
+                        xs={12}
+                        md={4}
+                      >
+                    <Typography variant="h6">Anunțuri</Typography>
+                      </Grid>
+                      <Grid
+                        xs={12}
+                        md={8}
+                      >
+
+                    <PersonalListingsTable
+                      count={dummyData.length}
+                      items={dummyData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                      page={page}
+                      rowsPerPage={rowsPerPage}
+                      onPageChange={handlePageChange}
+                      onRowsPerPageChange={handleRowsPerPageChange}
+                    />
+                      </Grid>
+                    </Grid>
+
+                  </CardContent>
+
+
+                </Card>
+              </Box>
+
+              <Box mb={3}>
+                <AccountGeneralSettings
+                  avatar={user.avatar || ''}
+                  email={user.email || ''}
+                  name={user.name || ''}
+                />
+              </Box>
+            </>
+
+          )}
+          {currentTab === 'billing' && (
+            <AccountBillingSettings
+              plan="standard"
+              invoices={[
+                {
+                  id: '5547409069c59755261f5546',
+                  amount: 4.99,
+                  createdAt: subMonths(now, 1).getTime(),
+                },
+                {
+                  id: 'a3e17f4b551ff8766903f31f',
+                  amount: 4.99,
+                  createdAt: subMonths(now, 2).getTime(),
+                },
+                {
+                  id: '28ca7c66fc360d8203644256',
+                  amount: 4.99,
+                  createdAt: subMonths(now, 3).getTime(),
+                },
+              ]}
+            />
+          )}
+          {currentTab === 'team' && (
+            <AccountTeamSettings
+              members={[
+                {
+                  avatar: '/assets/avatars/avatar-cao-yu.png',
+                  email: 'cao.yu@devias.io',
+                  name: 'Cao Yu',
+                  role: 'Owner',
+                },
+                {
+                  avatar: '/assets/avatars/avatar-siegbert-gottfried.png',
+                  email: 'siegbert.gottfried@devias.io',
+                  name: 'Siegbert Gottfried',
+                  role: 'Standard',
+                },
+              ]}
+            />
+          )}
+          {currentTab === 'notifications' && <AccountNotificationsSettings/>}
+          {currentTab === 'security' && (
+            <AccountSecuritySettings
+              loginEvents={[
+                {
+                  id: '1bd6d44321cb78fd915462fa',
+                  createdAt: subDays(subHours(subMinutes(now, 5), 7), 1).getTime(),
+                  ip: '95.130.17.84',
+                  type: 'Credential login',
+                  userAgent: 'Chrome, Mac OS 10.15.7',
+                },
+                {
+                  id: 'bde169c2fe9adea5d4598ea9',
+                  createdAt: subDays(subHours(subMinutes(now, 25), 9), 1).getTime(),
+                  ip: '95.130.17.84',
+                  type: 'Credential login',
+                  userAgent: 'Chrome, Mac OS 10.15.7',
+                },
+              ]}
+            />
+          )}
         </Container>
       </Box>
     </>

@@ -14,7 +14,7 @@ import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
 import { usePathname } from 'src/hooks/use-pathname';
 import { paths } from 'src/paths';
-import { TenantSwitch } from '../tenant-switch';
+// import { TenantSwitch } from '../tenant-switch';
 import { SideNavSection } from './side-nav-section';
 
 const SIDE_NAV_WIDTH = 280;
@@ -203,7 +203,7 @@ export const SideNav = (props) => {
             >
               <Logo />
             </Box>
-            <TenantSwitch sx={{ flexGrow: 1 }} />
+            {/*<TenantSwitch sx={{ flexGrow: 1 }} />*/}
           </Stack>
           <Stack
             component="nav"

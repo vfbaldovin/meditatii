@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
-    @Query("SELECT DISTINCT s FROM Subject s JOIN s.announcements")
-    List<Subject> findSubjectsAttachedToAnnouncements();
+    @Query("SELECT DISTINCT s FROM Subject s JOIN s.listings")
+    List<Subject> findSubjectsAttachedToListings();
 }

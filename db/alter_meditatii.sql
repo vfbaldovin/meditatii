@@ -1,18 +1,15 @@
--- Add new columns to meditatii.user table
 ALTER TABLE meditatii.user
     ADD COLUMN password char(68) COLLATE utf8_romanian_ci,
 ADD COLUMN enabled tinyint(1),
 ADD COLUMN reset_token char(36) COLLATE utf8_romanian_ci,
 ADD COLUMN expiry_date date COLLATE utf8_romanian_ci;
 
--- Update meditatii.user table with data from security.users
 UPDATE meditatii.user u
     JOIN security.users s ON u.Email = s.username
     SET u.password = s.password,
         u.enabled = s.enabled;
 
 
---alter names in english
 ALTER TABLE meditatii.anunt
     CHANGE `id_user` `user_id` int NOT NULL,
     CHANGE `materie` `subject` varchar(50) NOT NULL,
@@ -28,7 +25,7 @@ ALTER TABLE meditatii.anunt
     CHANGE `online` `is_online` tinyint(1) DEFAULT NULL,
     CHANGE `domiciliu_elev` `student_home` tinyint(1) DEFAULT NULL,
     CHANGE `DomiciliuMeditator` `tutor_home` tinyint(1) DEFAULT NULL,
-    CHANGE `vizualizariAnunt` `announcement_views` int DEFAULT NULL,
+    CHANGE `vizualizariAnunt` `views` int DEFAULT NULL,
     CHANGE `promovat` `promoted` tinyint(1) DEFAULT NULL,
     CHANGE `data_promovare` `promotion_date` datetime DEFAULT NULL,
     CHANGE `data_expirare_promovare` `promotion_expiry_date` datetime DEFAULT NULL;
@@ -54,7 +51,7 @@ ALTER TABLE `meditatii`.`user`
     CHANGE `expiry_date` `expiry_date` date DEFAULT NULL;
 
 use meditatii;
-RENAME TABLE `anunt` TO `announcement`;
+RENAME TABLE `anunt` TO `listing`;
 
 
 

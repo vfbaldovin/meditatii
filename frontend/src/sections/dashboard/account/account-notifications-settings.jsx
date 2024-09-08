@@ -40,7 +40,7 @@ export const AccountNotificationsSettings = () => (
                   color="text.secondary"
                   variant="body2"
                 >
-                  News, announcements, and product updates.
+                  News, listings, and product updates.
                 </Typography>
               </Stack>
               <Switch defaultChecked />

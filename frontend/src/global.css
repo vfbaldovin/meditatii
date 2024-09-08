@@ -169,3 +169,6 @@ body {
   background-position: 100% 0;
 }
 
+.simplebar-placeholder {
+  display: none !important;
+}
