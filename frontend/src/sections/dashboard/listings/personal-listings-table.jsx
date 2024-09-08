@@ -1,12 +1,8 @@
 import numeral from 'numeral';
 import PropTypes from 'prop-types';
-import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Edit02Icon from '@untitled-ui/icons-react/build/esm/Edit02';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
-import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -14,13 +10,10 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 
 import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
 import { paths } from 'src/paths';
-import { getInitials } from 'src/utils/get-initials';
-import Button from "@mui/material/Button";
 import RefreshCcw01Icon from "@untitled-ui/icons-react/build/esm/RefreshCcw01";
 
 export const PersonalListingsTable = (props) => {
@@ -30,7 +23,7 @@ export const PersonalListingsTable = (props) => {
     onPageChange = () => {},
     onRowsPerPageChange,
     page = 0,
-    rowsPerPage = 0,
+    rowsPerPage = 5,  // Default to 5 instead of 0 to avoid warning
   } = props;
 
   return (
@@ -56,9 +49,9 @@ export const PersonalListingsTable = (props) => {
                   key={listing.id}
                 >
                   <TableCell >
-                    {listing.materie}
+                    {listing.subject}
                   </TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{totalViews}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{listing.promovare ? "Yes" : "No"}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>
 
@@ -71,7 +64,7 @@ export const PersonalListingsTable = (props) => {
                   <TableCell sx={{ textAlign: 'center' }} align="right">
                     <IconButton
                       component={RouterLink}
-                      href={paths.dashboard.personalListings.edit}
+                      href={paths.dashboard.personalListingsEdit}
                     >
                       <SvgIcon>
                         <Edit02Icon />

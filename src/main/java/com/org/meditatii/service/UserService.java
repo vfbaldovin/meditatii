@@ -2,32 +2,42 @@ package com.org.meditatii.service;
 
 import com.org.meditatii.exception.AppException;
 import com.org.meditatii.exception.AppNotFoundException;
+import com.org.meditatii.model.Listing;
 import com.org.meditatii.model.User;
+import com.org.meditatii.model.UserProfileImage;
+import com.org.meditatii.model.dto.PersonalListingRow;
+import com.org.meditatii.repository.ListingRepository;
 import com.org.meditatii.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
-    Logger log = LoggerFactory.getLogger(UserService.class);
-
     private final UserRepository userRepository;
+    private final AuthService authService;
+    private final ListingRepository listingRepository;
+
+    private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+    private static final List<String> ALLOWED_TYPES = Arrays.asList(
+            "image/jpeg", "image/png", "image/webp", "image/heic"
+    );
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuthService authService, ListingRepository listingRepository) {
         this.userRepository = userRepository;
+        this.authService = authService;
+        this.listingRepository = listingRepository;
     }
 
     public User findById(Long id) {
@@ -35,24 +45,101 @@ public class UserService {
                 .orElseThrow(() -> new AppNotFoundException("User not found with id: " + id));
     }
 
-    public byte[] getUserAvatar(Long id) {
-        User user = findById(id);
-
-        if (user.getUserProfileImage() == null || user.getUserProfileImage().getImage() == null || user.getUserProfileImage().getImage().length == 0) {
-            return null;
-        }
-
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(user.getUserProfileImage().getImage());
-            BufferedImage bufferedImage = ImageIO.read(bis);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "jpeg", bos);
-            return bos.toByteArray();
-        } catch (IOException e) {
-            log.error("Unable to build jpeg from byte array", new AppException("Unable building avatar"));
-            throw new AppException("Unable building avatar");
-        }
-
+    public List<PersonalListingRow> findPersonalListingsByUserId() {
+        return listingRepository.findByUserId(authService.getCurrentUser().getId())
+                .stream().map(this::mapListingToPersonalListingRow).toList();
     }
 
+    private PersonalListingRow mapListingToPersonalListingRow(Listing listing) {
+        return new PersonalListingRow(
+                listing.getId(),
+                listing.getSubjectOld(),
+                listing.getViews(),
+                listing.getPromoted(),
+                listing.getRefreshDate()
+        );
+    }
+
+    public byte[] getUserAvatar(Long id) {
+        User user = findById(id);
+        return Optional.ofNullable(user.getUserProfileImage())
+                .map(UserProfileImage::getImage)
+                .orElse(null);
+    }
+
+    public void updateUserAvatar(Long userId, MultipartFile file) {
+        User user = findById(userId);
+        validateImageFile(file);
+
+        UserProfileImage profileImage = Optional.ofNullable(user.getUserProfileImage())
+                .orElseGet(() -> createProfileImage(user));
+
+        setProfileImage(profileImage, file);
+        userRepository.save(user);
+    }
+
+    private void validateImageFile(MultipartFile file) {
+        if (!ALLOWED_TYPES.contains(file.getContentType())) {
+            throw new AppException("Tip de fișier nevalid. Sunt permise numai JPEG, PNG, WebP și HEIC.");
+        }
+
+        if (file.getSize() > MAX_IMAGE_SIZE) {
+            throw new AppException("Fișier mai mare de 5MB.");
+        }
+    }
+
+    private UserProfileImage createProfileImage(User user) {
+        UserProfileImage profileImage = new UserProfileImage();
+        profileImage.setUser(user);
+        user.setUserProfileImage(profileImage);
+        return profileImage;
+    }
+
+    private void setProfileImage(UserProfileImage profileImage, MultipartFile file) {
+        try {
+            profileImage.setImage(file.getBytes());
+        } catch (IOException e) {
+            throw new AppException("Failed to process image", e);
+        }
+    }
+
+    // Method to handle HEIC file conversion using ImageMagick
+    public String convertHeicToJpeg(MultipartFile file, String outputDir) throws IOException, InterruptedException {
+        // Save the original HEIC file temporarily
+        Path heicFilePath = saveTemporaryFile(file, outputDir);
+
+        // Define the output JPEG file path
+        String jpegFilePath = outputDir + File.separator + removeExtension(file.getOriginalFilename()) + ".jpg";
+
+        // Use ImageMagick (convert command) to convert HEIC to JPEG
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "magick",
+                heicFilePath.toString(),  // Input HEIC file
+                jpegFilePath              // Output JPEG file
+        );
+
+        Process process = processBuilder.start();
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("Failed to convert HEIC to JPEG. Exit code: " + exitCode);
+        }
+
+        // Clean up the temporary HEIC file
+        Files.delete(heicFilePath);
+
+        return jpegFilePath;  // Return the path to the new JPEG file
+    }
+
+    // Helper method to save the MultipartFile as a temporary file
+    private Path saveTemporaryFile(MultipartFile file, String outputDir) throws IOException {
+        String tempFileName = outputDir + File.separator + file.getOriginalFilename();
+        Path path = Paths.get(tempFileName);
+        Files.write(path, file.getBytes());
+        return path;
+    }
+
+    // Helper method to remove file extension
+    private String removeExtension(String fileName) {
+        return fileName.substring(0, fileName.lastIndexOf('.'));
+    }
 }

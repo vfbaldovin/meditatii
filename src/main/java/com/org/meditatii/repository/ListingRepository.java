@@ -8,8 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ListingRepository extends JpaRepository<Listing, Long> {
     @Query("SELECT a FROM Listing a WHERE (:subjectId IS NULL OR a.subject.id = :subjectId) ORDER BY a.promotionDate DESC")
     Page<Listing> findBySubjectId(@Param("subjectId") Long subjectId, Pageable pageable);
+    List<Listing> findByUserId(Long id);
 }

@@ -55,3 +55,6 @@ ALTER TABLE user_profile_image
     ADD FOREIGN KEY (user_id) REFERENCES user(id);
 
 ALTER TABLE user DROP COLUMN image;
+
+ALTER TABLE listing
+    ADD COLUMN refresh_date DATETIME DEFAULT CURRENT_TIMESTAMP;

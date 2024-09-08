@@ -73,7 +73,7 @@ const Page = () => {
     if (showConfetti) {
       const timer = setTimeout(() => {
         setShowConfetti(false);
-      }, 3000); // Show confetti for 2 seconds
+      }, 2500); // Show confetti for 2 seconds
 
       return () => clearTimeout(timer);
     }

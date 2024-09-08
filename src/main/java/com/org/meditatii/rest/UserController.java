@@ -1,6 +1,5 @@
 package com.org.meditatii.rest;
 
-import com.org.meditatii.service.ListingService;
 import com.org.meditatii.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    private ListingService listingService;
 
     @GetMapping(value = "/{userId}/profile-image", produces = {MediaType.IMAGE_JPEG_VALUE})
     public ResponseEntity<byte[]> getUserProfileImage(@PathVariable Long userId) {
@@ -25,8 +23,4 @@ public class UserController {
                 .body(userService.getUserAvatar(userId));
     }
 
-  /*  @GetMapping("/listings")
-    public ResponseEntity<List<ListingRowDto>> getPersonalListings() {
-
-    }*/
 }

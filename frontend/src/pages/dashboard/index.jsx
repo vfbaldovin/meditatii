@@ -1,5 +1,5 @@
-import {useCallback, useState} from 'react';
-import {subDays, subHours, subMinutes, subMonths} from 'date-fns';
+import React, { useCallback, useEffect, useState } from 'react';
+import { subDays, subHours, subMinutes, subMonths } from 'date-fns';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
@@ -7,102 +7,92 @@ import Stack from '@mui/material/Stack';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-
-import {Seo} from 'src/components/seo';
-import {getAuthenticatedUser} from 'src/app/hooks/get-authenticated-user';
-import {usePageView} from 'src/hooks/use-page-view';
-import {AccountBillingSettings} from 'src/sections/dashboard/account/account-billing-settings';
-import {AccountGeneralSettings} from 'src/sections/dashboard/account/account-general-settings';
-import {
-  AccountNotificationsSettings
-} from 'src/sections/dashboard/account/account-notifications-settings';
-import {AccountTeamSettings} from 'src/sections/dashboard/account/account-team-settings';
-import {AccountSecuritySettings} from 'src/sections/dashboard/account/account-security-settings';
 import Button from "@mui/material/Button";
 import SvgIcon from "@mui/material/SvgIcon";
 import PlusIcon from "@untitled-ui/icons-react/build/esm/Plus";
-import {OverviewDoneTasks} from "../../sections/dashboard/overview/overview-done-tasks";
 import Grid from "@mui/material/Unstable_Grid2";
-import {OverviewPendingIssues} from "../../sections/dashboard/overview/overview-pending-issues";
-import {OverviewOpenTickets} from "../../sections/dashboard/overview/overview-open-tickets";
-import {PersonalListingsTable} from "../../sections/dashboard/listings/personal-listings-table";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import axios from 'axios';  // Axios for API calls
+
+import { Seo } from 'src/components/seo';
+import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
+import { usePageView } from 'src/hooks/use-page-view';
+import { AccountBillingSettings } from 'src/sections/dashboard/account/account-billing-settings';
+import { AccountGeneralSettings } from 'src/sections/dashboard/account/account-general-settings';
+import { AccountNotificationsSettings } from 'src/sections/dashboard/account/account-notifications-settings';
+import { AccountTeamSettings } from 'src/sections/dashboard/account/account-team-settings';
+import { AccountSecuritySettings } from 'src/sections/dashboard/account/account-security-settings';
+import { PersonalListingsTable } from '../../sections/dashboard/listings/personal-listings-table';
+import { OverviewDoneTasks } from "../../sections/dashboard/overview/overview-done-tasks";
+import { OverviewPendingIssues } from "../../sections/dashboard/overview/overview-pending-issues";
+import { OverviewOpenTickets } from "../../sections/dashboard/overview/overview-open-tickets";
+import CircularProgress from "@mui/material/CircularProgress";
+import {GridListPlaceholder} from "../../sections/components/grid-lists/grid-list-placeholder";
+import {
+  PersonalListingsSkeletonTable
+} from "../../sections/dashboard/listings/personal-listings-skeleton-table";
+
+// The base URL of your API, adjust accordingly
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+const tabs = [
+  { label: 'General', value: 'general' },
+  { label: 'Billing', value: 'billing' },
+  { label: 'Team', value: 'team' },
+  { label: 'Notifications', value: 'notifications' },
+  { label: 'Security', value: 'security' },
+];
 
 const now = new Date();
-const dummyData = [
-  {
-    id: 1,
-    materie: 'Mathematics',
-    avatar: '/static/images/avatars/avatar_1.png',
-    totalViews: 1500,
-    promovare: true,
-    lastUpdated: '2024-09-01',
-  },
-  {
-    id: 2,
-    materie: 'Physics',
-    avatar: '/static/images/avatars/avatar_2.png',
-    totalViews: 1200,
-    promovare: false,
-    lastUpdated: '2024-08-15',
-  },
-  {
-    id: 3,
-    materie: 'Chemistry',
-    avatar: '/static/images/avatars/avatar_3.png',
-    totalViews: 800,
-    promovare: true,
-    lastUpdated: '2024-07-22',
-  },
-  {
-    id: 4,
-    materie: 'History',
-    avatar: '/static/images/avatars/avatar_4.png',
-    totalViews: 950,
-    promovare: false,
-    lastUpdated: '2024-06-30',
-  },
-  {
-    id: 5,
-    materie: 'Biology',
-    avatar: '/static/images/avatars/avatar_5.png',
-    totalViews: 1100,
-    promovare: true,
-    lastUpdated: '2024-05-10',
-  },
-  {
-    id: 6,
-    materie: 'Computer Science',
-    avatar: '/static/images/avatars/avatar_6.png',
-    totalViews: 1600,
-    promovare: false,
-    lastUpdated: '2024-04-18',
-  },
-];
-const tabs = [
-  {label: 'General', value: 'general'},
-  {label: 'Billing', value: 'billing'},
-  {label: 'Team', value: 'team'},
-  {label: 'Notifications', value: 'notifications'},
-  {label: 'Security', value: 'security'},
-];
+const STORAGE_KEY = 'accessToken';
 
 const Page = () => {
   const user = getAuthenticatedUser();
   const [currentTab, setCurrentTab] = useState('general');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [personalListings, setPersonalListings] = useState([]);  // State for listings
+  const [loading, setLoading] = useState(true);  // Loading state
+  const [error, setError] = useState(null);  // Error state
+
+  // Bearer token from authentication (assuming it's stored in localStorage)
+  const token = sessionStorage.getItem(STORAGE_KEY);
+
+  usePageView();
+
+  // Function to fetch personal listings from the backend
+  useEffect(() => {
+    const fetchPersonalListings = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${apiBaseUrl}/api/dashboard/listings`, {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Add Authorization Header
+          },
+        });
+        setPersonalListings(response.data);  // Store fetched data in state
+      } catch (err) {
+        console.error('Failed to fetch personal listings:', err);
+        setError('Failed to fetch data from server');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPersonalListings();  // Call the function when component loads
+  }, [token]);  // Re-run if the token changes
+
+  // Handle page change
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Handle rows per page change
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  usePageView();
 
   const handleTabsChange = useCallback((event, value) => {
     setCurrentTab(value);
@@ -110,7 +100,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title="Dashboard: Account"/>
+      <Seo title="Dashboard: Account" />
       <Box
         component="main"
         sx={{
@@ -119,27 +109,16 @@ const Page = () => {
         }}
       >
         <Container maxWidth="xl">
-          <Stack
-            spacing={3}
-            sx={{mb: 3}}
-          >
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              spacing={4}
-            >
+          <Stack spacing={3} sx={{ mb: 3 }}>
+            <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 {/*<Typography variant="h4">Cont</Typography>*/}
               </Stack>
-              <Stack
-                alignItems="center"
-                direction="row"
-                spacing={2}
-              >
+              <Stack alignItems="center" direction="row" spacing={2}>
                 <Button
                   startIcon={
                     <SvgIcon>
-                      <PlusIcon/>
+                      <PlusIcon />
                     </SvgIcon>
                   }
                   variant="contained"
@@ -148,96 +127,83 @@ const Page = () => {
                 </Button>
               </Stack>
             </Stack>
-            <div>
-              <Tabs
-                indicatorColor="primary"
-                onChange={handleTabsChange}
-                scrollButtons="auto"
-                textColor="primary"
-                value={currentTab}
-                variant="scrollable"
-                sx={{
-                  minHeight: '48px', // adjust the height of the Tabs component
-                }}
-              >
-                {tabs.map((tab) => (
-                  <Tab
-                    key={tab.value}
-                    label={tab.label}
-                    value={tab.value}
-                    sx={{
-                      fontSize: '16px', // adjust the font size of the Tab label
-                      minHeight: '48px', // adjust the height of each Tab
-                      padding: '12px',   // adjust the padding inside each Tab
-                    }}
-                  />
-                ))}
-              </Tabs>
 
-              <Divider/>
-            </div>
-          </Stack>
-          {currentTab === 'general' && (
-            <>
-            <Grid mb={3}
-              container
-              disableEqualOverflow
-              spacing={{
-                xs: 3,
-                lg: 4,
+            <Tabs
+              indicatorColor="primary"
+              onChange={handleTabsChange}
+              scrollButtons="auto"
+              textColor="primary"
+              value={currentTab}
+              variant="scrollable"
+              sx={{
+                minHeight: '48px', // Adjust the height of the Tabs component
               }}
             >
-              <Grid
-                xs={12}
-                md={4}
-              >
-                <OverviewDoneTasks amount={31} />
+              {tabs.map((tab) => (
+                <Tab
+                  key={tab.value}
+                  label={tab.label}
+                  value={tab.value}
+                  sx={{
+                    fontSize: '16px', // Adjust the font size of the Tab label
+                    minHeight: '48px', // Adjust the height of each Tab
+                    padding: '12px',   // Adjust the padding inside each Tab
+                  }}
+                />
+              ))}
+            </Tabs>
+
+            <Divider />
+          </Stack>
+
+          {currentTab === 'general' && (
+            <>
+              <Grid mb={3} container disableEqualOverflow spacing={{ xs: 3, lg: 4 }}>
+                <Grid xs={12} md={4}>
+                  <OverviewDoneTasks amount={31} />
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <OverviewPendingIssues amount={12} />
+                </Grid>
+                <Grid xs={12} md={4}>
+                  <OverviewOpenTickets amount={5} />
+                </Grid>
               </Grid>
-              <Grid
-                xs={12}
-                md={4}
-              >
-                <OverviewPendingIssues amount={12} />
-              </Grid>
-              <Grid
-                xs={12}
-                md={4}
-              >
-                <OverviewOpenTickets amount={5} />
-              </Grid>
-            </Grid>
+
               <Box mb={3}>
                 <Card>
                   <CardContent>
-                    <Grid
-                      container
-                      spacing={3}
-                    >
-                      <Grid
-                        xs={12}
-                        md={4}
-                      >
-                    <Typography variant="h6">Anunțuri</Typography>
+                    <Grid container spacing={3}>
+                      <Grid xs={12} md={4}>
+                        <Typography variant="h6">Anunțuri</Typography>
                       </Grid>
-                      <Grid
-                        xs={12}
-                        md={8}
-                      >
-
-                    <PersonalListingsTable
-                      count={dummyData.length}
-                      items={dummyData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
-                      page={page}
-                      rowsPerPage={rowsPerPage}
-                      onPageChange={handlePageChange}
-                      onRowsPerPageChange={handleRowsPerPageChange}
-                    />
+                      <Grid xs={12} md={8}>
+                        {loading ? (
+                          <Box sx={{position: 'relative', height: '100%'}}>
+                            <PersonalListingsSkeletonTable />
+                            <Box sx={{
+                              position: 'fixed',
+                              top: '57.5%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)'
+                            }}>
+                              <CircularProgress size={40} thickness={6} style={{opacity: 0.7}}/>
+                            </Box>
+                          </Box>                        ) : error ? (
+                          <Typography color="error">{error}</Typography>
+                        ) : (
+                          <PersonalListingsTable
+                            count={personalListings.length}
+                            items={personalListings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                            page={page}
+                            rowsPerPage={rowsPerPage}
+                            onPageChange={handlePageChange}
+                            onRowsPerPageChange={handleRowsPerPageChange}
+                          />
+                        )}
                       </Grid>
                     </Grid>
-
                   </CardContent>
-
-
                 </Card>
               </Box>
 
@@ -249,8 +215,8 @@ const Page = () => {
                 />
               </Box>
             </>
-
           )}
+
           {currentTab === 'billing' && (
             <AccountBillingSettings
               plan="standard"
@@ -291,7 +257,7 @@ const Page = () => {
               ]}
             />
           )}
-          {currentTab === 'notifications' && <AccountNotificationsSettings/>}
+          {currentTab === 'notifications' && <AccountNotificationsSettings />}
           {currentTab === 'security' && (
             <AccountSecuritySettings
               loginEvents={[

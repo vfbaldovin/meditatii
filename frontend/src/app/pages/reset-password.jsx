@@ -20,13 +20,13 @@ const ResetPasswordPage = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const { token } = useParams();
   const router = useRouter();
-  const [tokenValid, setTokenValid] = useState(null); // State to check if token is valid
-  const [loading, setLoading] = useState(true); // Loading state
+  const [tokenValid, setTokenValid] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState(null); // Email state
-  const [isResetSuccessful, setIsResetSuccessful] = useState(false); // Password reset success state
-  const [countdown, setCountdown] = useState(5); // Countdown for redirection
-  const [showConfetti, setShowConfetti] = useState(true); // Confetti control
-  const [showRetryLink, setShowRetryLink] = useState(false); // Retry link for errors
+  const [isResetSuccessful, setIsResetSuccessful] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const [showConfetti, setShowConfetti] = useState(true);
+  const [showRetryLink, setShowRetryLink] = useState(false);
 
   // Token validation logic
   useEffect(() => {
@@ -70,7 +70,7 @@ const ResetPasswordPage = () => {
           // Hide confetti after 3 seconds
           setTimeout(() => {
             setShowConfetti(false);
-          }, 3000);
+          }, 2500);
         } else {
           helpers.setErrors({ submit: 'Failed to reset password. Please try again.' });
           setShowRetryLink(true);

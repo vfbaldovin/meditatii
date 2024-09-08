@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
@@ -12,7 +12,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useFormik } from "formik";
 import { useMounted } from "../../hooks/use-mounted";
-import { useRouter } from "../../hooks/use-router";
+import { useRouter } from 'src/hooks/use-router';
 import { useSearchParams } from "../../hooks/use-search-params";
 import { useAuth } from "../../hooks/use-auth";
 import { paths } from "../../paths";
@@ -22,7 +22,6 @@ import FormHelperText from "@mui/material/FormHelperText";
 import GoogleSignInButton from "./google-sign-in";
 import { useParams } from "react-router";
 import Confetti from "react-confetti";
-
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -43,11 +42,11 @@ export const Login = () => {
   const emailFromQuery = searchParams.get('email') || '';
   const passwordRef = useRef(null);
 
-
   const [verificationStatus, setVerificationStatus] = useState(null); // Tracks success or error
   const [verificationMessage, setVerificationMessage] = useState(''); // Message to display
   const [registeredEmail, setRegisteredEmail] = useState(''); // Tracks the email from the response
   const [showConfetti, setShowConfetti] = useState(false); // Confetti state
+  const [countdown, setCountdown] = useState(5); // Countdown state for redirect
 
   // Handle account verification if token is present
   useEffect(() => {
@@ -73,7 +72,7 @@ export const Login = () => {
     if (showConfetti) {
       const timer = setTimeout(() => {
         setShowConfetti(false);
-      }, 3000); // Show confetti for 3 seconds
+      }, 2500); // Show confetti for 3 seconds
 
       return () => clearTimeout(timer);
     }
@@ -85,12 +84,44 @@ export const Login = () => {
     }
   }, [emailFromQuery]);
 
+  useEffect(() => {
+    if (verificationStatus === 'success') {
+      const intervalId = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown > 1) {
+            return prevCountdown - 1;
+          } else {
+            clearInterval(intervalId); // Clear interval once countdown reaches 1
+
+            // Use window.location.href to navigate to the login page, preserving the history stack
+            window.location.href = `/login?email=${encodeURIComponent(registeredEmail)}`;
+
+            return 1; // Ensure countdown stays at 1 and doesn't go negative
+          }
+        });
+      }, 1000);
+
+      return () => clearInterval(intervalId); // Cleanup the interval on component unmount
+    }
+  }, [registeredEmail]);
+
+
+
+
+
+  // Redirect to login page when countdown reaches 1
+  useEffect(() => {
+    if (countdown === 1) {
+      router.push(`/login?email=${registeredEmail}`);
+    }
+  }, [countdown, registeredEmail, router]);
+
   const formik = useFormik({
-      initialValues: {
-        email: emailFromQuery,  // Pre-populate email if present in query params
-        password: '',
-        submit: null,
-      },
+    initialValues: {
+      email: emailFromQuery, // Pre-populate email if present in query params
+      password: '',
+      submit: null,
+    },
     validationSchema,
     onSubmit: async (values, helpers) => {
       try {
@@ -132,6 +163,10 @@ export const Login = () => {
             <Typography variant="h6" component="div" gutterBottom sx={{ mb: 3 }}>
               Pentru a vă accesa contul, va rugăm să va autentificați.
             </Typography>
+            {/* Countdown Message */}
+            <Typography variant="h6" component="div" gutterBottom>
+              Vei fi redirecționat către pagina de autentificare în {countdown} secunde.
+            </Typography>
             <Typography variant="body1" color="text.secondary">
               Dacă întâmpinați probleme, vă rugăm să ne contactați la{" "}
               <Link href="mailto:contact@meditatiianunturi.ro" color="primary.main">
@@ -147,10 +182,8 @@ export const Login = () => {
             >
               Autentificare
             </Button>
-
           </CardContent>
         </Card>
-
       </>
     );
   }

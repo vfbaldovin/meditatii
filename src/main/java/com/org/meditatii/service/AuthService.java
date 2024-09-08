@@ -328,7 +328,7 @@ public class AuthService {
         return false;
     }
 
-    private String getUrl() {
+    public String getUrl() {
         return Objects.equals(URL, "http://localhost:3000") ? "http://localhost:8080" : "https://meditatiianunturi.ro";
     }
 

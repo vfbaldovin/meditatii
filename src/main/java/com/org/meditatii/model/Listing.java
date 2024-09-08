@@ -1,11 +1,13 @@
 package com.org.meditatii.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "listing")
 public class Listing {
@@ -14,9 +16,9 @@ public class Listing {
     @Column(name = "id")
     private Long id;
 
-     @ManyToOne
-     @JoinColumn(name = "user_id", referencedColumnName = "id")
-     private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Column(name = "subject")
     private String subjectOld;
@@ -58,7 +60,7 @@ public class Listing {
     private Boolean tutorHome;
 
     @Column(name = "views")
-    private Integer views;
+    private Long views;
 
     @Column(name = "promoted")
     private Boolean promoted;
@@ -72,5 +74,9 @@ public class Listing {
     @ManyToOne
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
     private Subject subject;
+
+    @Column(name = "refresh_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime refreshDate;
+
 
 }

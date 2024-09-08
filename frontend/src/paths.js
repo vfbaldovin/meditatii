@@ -51,6 +51,7 @@ export const paths = {
   dashboard: {
     index: '/dashboard',
     personalListings: '/dashboard/listing/:id',
+    personalListingsEdit: '/dashboard/listing/:id/edit',
     academy: {
       index: '/dashboard/academy',
       courseDetails: '/dashboard/academy/courses/:courseId',
