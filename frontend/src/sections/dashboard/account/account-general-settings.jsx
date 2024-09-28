@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
 import Camera01Icon from '@untitled-ui/icons-react/build/esm/Camera01';
 import User01Icon from '@untitled-ui/icons-react/build/esm/User01';
-import { alpha } from '@mui/system/colorManipulator';
+import {alpha} from '@mui/system/colorManipulator';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -13,8 +13,9 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress
+import CircularProgress from '@mui/material/CircularProgress';
 import heic2any from 'heic2any';
+import imageCompression from 'browser-image-compression';
 import Divider from "@mui/material/Divider";
 import Switch from "@mui/material/Switch";
 
@@ -26,7 +27,7 @@ export const AccountGeneralSettings = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(avatar);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
@@ -34,57 +35,73 @@ export const AccountGeneralSettings = (props) => {
   const token = sessionStorage.getItem(STORAGE_KEY);
 
   useEffect(() => {
-    setPreview(`${avatar}?t=${new Date().getTime()}`);  // Cache-busting timestamp
+    setPreview(`${avatar}?t=${new Date().getTime()}`); // Cache-busting timestamp
   }, [avatar]);
 
   const handleFileChange = async (event) => {
     let file = event.target.files[0];
 
-    if (file) {
-      if (!allowedTypes.includes(file.type)) {
-        setErrorMessage('Tip de fișier nevalid. Sunt permise numai JPEG, PNG, WebP și HEIC.');
-        return;
-      }
+    // Reset the error message and loading state
+    setErrorMessage('');
+    setLoading(false);
 
-      if (file.size > maxSize) {
-        setErrorMessage('Fișierul este mai mare de 5MB.');
-        return;
-      }
-
-      setLoading(true); // Set loading to true before the upload
-
-      // Convert HEIC to JPEG/PNG
-      if (file.type === 'image/heic') {
-        try {
-          const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg' });
-          file = new File([convertedBlob], file.name.replace(/\..+$/, '.jpeg'), { type: 'image/jpeg' });
-        } catch (error) {
-          setErrorMessage('Eroare la conversia fișierului HEIC. Vă rugăm să încercați alt format.');
-          setLoading(false); // Set loading to true before the upload
-          return;
-        }
-      }
-
-      setSelectedFile(file);
-      setErrorMessage('');
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result); // Display the selected file before upload
-      };
-      reader.readAsDataURL(file);
-
-      // Automatically upload after selecting the file
-      await handleUploadClick(file);
-      setLoading(false); // Set loading to false after the upload is done
-    } else {
-      setErrorMessage('Niciun fișier selectat.');
+    // Return if no file is selected
+    if (!file) {
+      setErrorMessage('No file selected.');
+      return;
     }
+
+    // **Validate file type first**
+    if (!allowedTypes.includes(file.type)) {
+      setErrorMessage('Invalid file type. Only JPEG, PNG, WebP, and HEIC are allowed.');
+      return;
+    }
+
+    // Set loading to true after validation passes
+    setLoading(true);
+
+    // Convert HEIC to JPEG/PNG if necessary
+    if (file.type === 'image/heic') {
+      try {
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg' });
+        file = new File([convertedBlob], file.name.replace(/\..+$/, '.jpeg'), { type: 'image/jpeg' });
+      } catch (error) {
+        setErrorMessage('Error converting HEIC file. Please try another format.');
+        setLoading(false);
+        return;
+      }
+    }
+
+    // **Compress the image regardless of its size**
+    const options = {
+      maxSizeMB: 0.2, // Target maximum size in MB (~200KB)
+      maxWidthOrHeight: 300, // Max width or height (suitable for avatars)
+      useWebWorker: true, // Use multi-threading for faster processing
+    };
+
+    try {
+      file = await imageCompression(file, options);
+    } catch (error) {
+      setErrorMessage('Error compressing the image.');
+      setLoading(false);
+      return;
+    }
+
+    // Set preview after compression
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Automatically upload after selecting and compressing the file
+    await handleUploadClick(file);
+    setLoading(false);
   };
 
   const handleUploadClick = async (file) => {
     if (!file) {
-      setErrorMessage('Nu există fișier de încărcat.');
+      setErrorMessage('No file to upload.');
       return;
     }
 
@@ -101,28 +118,24 @@ export const AccountGeneralSettings = (props) => {
       });
 
       if (response.data.updatedAvatarUrl) {
-        // Add a cache-busting timestamp to avoid loading cached images
         const updatedUrl = `${response.data.updatedAvatarUrl}?t=${new Date().getTime()}`;
-        setPreview(updatedUrl);  // Update the avatar preview with the new URL
-        setErrorMessage('');     // Clear any error message
+        setPreview(updatedUrl);
+
+        // Emit custom event to notify other components
+        const event = new CustomEvent('avatarChanged', { detail: updatedUrl });
+        window.dispatchEvent(event);
       } else {
-        // Server didn't return an updated URL, show an error message
-        setErrorMessage('Eroare la încărcarea avatarului. Serverul nu a returnat un URL actualizat.');
+        setErrorMessage('Error uploading avatar. Server did not return an updated URL.');
       }
 
-      setSelectedFile(null); // Clear the selected file after upload
-
+      setSelectedFile(null);
     } catch (error) {
-      // Catch errors related to the server response or request failure
       if (error.response) {
-        // Server responded with an error
-        setErrorMessage(`Eroare: ${error.response.data.error || error.response.data.message}`);
+        setErrorMessage(`Error: ${error.response.data.error || error.response.data.message}`);
       } else if (error.request) {
-        // Request was made but no response was received
-        setErrorMessage('Eroare la conexiunea cu serverul. Vă rugăm să verificați conexiunea.');
+        setErrorMessage('Error connecting to the server. Please check your connection.');
       } else {
-        // Something happened in setting up the request
-        setErrorMessage(`Eroare necunoscută: ${error.message}`);
+        setErrorMessage(`Unknown error: ${error.message}`);
       }
     }
   };
@@ -137,7 +150,7 @@ export const AccountGeneralSettings = (props) => {
         <CardContent>
           <Grid container spacing={3}>
             <Grid xs={12} md={4}>
-              <Typography variant="h6">Detalii de bază</Typography>
+              <Typography variant="h6">Basic Details</Typography>
             </Grid>
             <Grid xs={12} md={8}>
               <Stack spacing={3}>
@@ -150,11 +163,10 @@ export const AccountGeneralSettings = (props) => {
                       borderWidth: 1,
                       p: '4px',
                       cursor: 'pointer',
-                      position: 'relative', // Required for overlay
+                      position: 'relative',
                     }}
                     onClick={handleAvatarClick}
                   >
-                    {/* Avatar Box */}
                     <Box
                       sx={{
                         borderRadius: '50%',
@@ -192,7 +204,7 @@ export const AccountGeneralSettings = (props) => {
                             variant="subtitle2"
                             sx={{ fontWeight: 700 }}
                           >
-                            Selectează
+                            Select
                           </Typography>
                         </Stack>
                       </Box>
@@ -209,14 +221,13 @@ export const AccountGeneralSettings = (props) => {
                       </Avatar>
                     </Box>
 
-                    {/* Circular Progress */}
                     {loading && (
                       <Box
                         sx={{
                           position: 'absolute',
                           top: '50%',
                           left: '50%',
-                          transform: 'translate(-50%, -50%)', // Center the spinner
+                          transform: 'translate(-50%, -50%)',
                           zIndex: 2,
                         }}
                       >
@@ -238,7 +249,7 @@ export const AccountGeneralSettings = (props) => {
                     size="small"
                     onClick={handleAvatarClick}
                   >
-                    Schimbă imagine de profil
+                    Change profile picture
                   </Button>
                 </Stack>
 
@@ -349,6 +360,7 @@ export const AccountGeneralSettings = (props) => {
           </Grid>
         </CardContent>
       </Card>
+
     </Stack>
   );
 };

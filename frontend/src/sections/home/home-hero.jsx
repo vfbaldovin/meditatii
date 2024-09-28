@@ -9,7 +9,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import {useTheme} from '@mui/material/styles';
 import {CourseSearch} from 'src/sections/dashboard/academy/course-search';
-
+import StarsRoundedIcon from '@mui/icons-material/StarsRounded';
 import {RouterLink} from 'src/components/router-link';
 import {paths} from 'src/paths';
 
@@ -24,7 +24,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TypingEffect from "./TypingEffect";
 import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
 import Grid from "@mui/material/Grid";
-import {FilterLines} from "@untitled-ui/icons-react";
+import {CheckVerified02, FilterLines} from "@untitled-ui/icons-react";
 import {MultiSelect} from "../../components/multi-select";
 import {useDispatch, useSelector} from "../../store";
 import {setCurrentPage, setSort, setSubjectId} from "../../slices/home";
@@ -34,8 +34,10 @@ import Card from "@mui/material/Card";
 import Avatar from "@mui/material/Avatar";
 import Link from "@mui/material/Link";
 import { useLocation } from 'react-router-dom';
-
-
+import ReceiptCheckIcon from "@untitled-ui/icons-react/build/esm/ReceiptCheck";
+import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
+import StarsIcon from '@mui/icons-material/Stars';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 
 export const HomeHero = () => {
 
@@ -411,7 +413,36 @@ export const HomeHero = () => {
                               },
                             }}
                           >
-                            {listing.promoted && <PromotedChip />}
+                            {listing.promoted &&
+                              // <StarsIcon
+                              <WorkspacePremiumIcon
+                                sx={{
+                                  position: 'absolute',
+                                  top: 20,
+                                  right: 20,
+                                  // color: '#D4AF37',
+                                  // color: '#FFC107',
+                                  color: 'primary.main',
+                                  fontWeight: 'bold',
+                                  // background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
+                                  backgroundSize: '200% 200%',
+                                  backgroundPosition: '50% 50%',
+                                  borderRadius: '50%', // Make the box circular
+                                  width: '2rem',      // Set a specific width
+                                  height: '2rem',     // Set a specific height to match the width
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  // boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4)', // Inner and outer shadows
+                                  opacity: 0.9,
+                                  transition: 'background-position 1s ease', // Smooth transition for hover effect
+                                  '&:hover': {
+                                    backgroundPosition: '100% 0', // Hover effect for the shine
+                                  }
+                                }}
+                              />
+
+                            }
                             <Box sx={{p: 2, boxShadow: 'unset', padding: '8px 16px 16px'}}>
 
                               <Box
@@ -436,22 +467,37 @@ export const HomeHero = () => {
                                       whiteSpace: 'nowrap',
                                     }}
                                   >
-                                    {listing.title}
+                                    {listing.subject}
                                   </Link>
-                                  <Typography color="text.secondary" variant="body2">
-                                    de{' '}
-                                    <Typography component="span" color="text.primary" variant="subtitle2">
-                                      {listing.tutorName}
+                                  <Box display="flex" alignItems="center">
+                                    <Typography color="text.secondary" variant="body2">
+                                      de{' '}
+                                      <Typography component="span" color="text.primary" variant="subtitle2">
+                                        {listing.tutorName}
+                                      </Typography>
                                     </Typography>
-                                  {/*  {' '}| Actualizat acum {updatedAgo*/}
-                                  {/*  .replace('days ago','zile')*/}
-                                  {/*  .replace('months ago','luni')*/}
-                                  {/*  .replace('years ago','ani')*/}
-                                  {/*  .replace('day ago','zi')*/}
-                                  {/*  .replace('month ago','luna')*/}
-                                  {/*  .replace('year ago','an')*/}
-                                  {/*}*/}
-                                  </Typography>
+                                    <Box display="flex" alignItems="center" ml={1}>
+                                      <SvgIcon
+                                        sx={{
+                                          // color: 'background.paper',
+                                          // color: 'primary.main',
+                                          color: 'white',
+                                          '& path': {
+                                            // fill: (theme) => theme.palette.success.main,
+                                            fill: (theme) => theme.palette.primary.main,
+                                            fillOpacity: 1,
+                                          },
+                                        }}
+                                      >
+                                        <CheckVerified01 />
+                                        {/*<CheckVerified02 />*/}
+                                      </SvgIcon>
+                                      {/*<Typography color="success" noWrap variant="overline" sx={{ ml: 0.5 }}>
+                                        Verified
+                                      </Typography>*/}
+                                    </Box>
+                                  </Box>
+
 
                                 </Box>
                               </Box>
@@ -466,11 +512,14 @@ export const HomeHero = () => {
                                   maxHeight: '4rem',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
-
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 3, // Limit the text to 2 lines
+                                  WebkitBoxOrient: 'vertical',
                                 }}
                               >
                                 {listing.description}
                               </Typography>
+
                             </Box>
 
                             <Box
@@ -492,7 +541,7 @@ export const HomeHero = () => {
                                 <div>
 
                                   <Typography color="primary.main"
-                                              variant="subtitle2">{listing.subject}</Typography>
+                                              variant="subtitle2">{listing.city}</Typography>
                                 </div>
                               </Stack>
                             </Box>
@@ -655,43 +704,82 @@ export const HomeHero = () => {
 
 
 
-const PromotedChip = () => {
-  return (
-
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 20,
-        right: 20,
-        color: 'white',
-        fontWeight: 'bold',
-        background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
-        backgroundSize: '200% 200%',
-        backgroundPosition: '50% 50%',
-        borderRadius: '50%', // Make the box circular
-        width: '2rem',      // Set a specific width
-        height: '2rem',     // Set a specific height to match the width
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4)', // Inner and outer shadows
-        opacity: 0.9,
-        transition: 'background-position 1s ease', // Smooth transition for hover effect
-        '&:hover': {
-          backgroundPosition: '100% 0', // Hover effect for the shine
-        },
-      }}
-    >
-      <svg width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-           viewBox="0 0 47.94 47.94" xmlSpace="preserve">
-        <path fill="white" d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757
-          c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042
-          c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685
-          c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528
-          c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956
-          C22.602,0.567,25.338,0.567,26.285,2.486z"/>
-      </svg>
-    </Box>
-  );
-};
+// const PromotedChip = () => {
+//   return (
+// /*
+//     <Box
+//       sx={{
+//         position: 'absolute',
+//         top: 20,
+//         right: 20,
+//         color: 'white',
+//         fontWeight: 'bold',
+//         background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
+//         // backgroundSize: '200% 200%',
+//         // backgroundPosition: '50% 50%',
+//         // borderRadius: '50%', // Make the box circular
+//         // width: '3rem',      // Set a specific width
+//         // height: '3rem',     // Set a specific height to match the width
+//         // display: 'flex',
+//         // alignItems: 'center',
+//         // justifyContent: 'center',
+//         // boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4)', // Inner and outer shadows
+//         // opacity: 0.9,
+//         // transition: 'background-position 1s ease', // Smooth transition for hover effect
+//         // '&:hover': {
+//         //   backgroundPosition: '100% 0', // Hover effect for the shine
+//         // },
+//       }}
+//     >
+//     <Avatar
+//       sx={{
+//         backgroundColor: 'success.lightest',
+//         color: 'success.main',
+//         height: 20,
+//         width: 20,
+//       }}
+//     >
+//       <ReceiptCheckIcon />
+//     </Avatar>
+//     </Box>
+// */
+//     <Box
+//       sx={{
+//         position: 'absolute',
+//         top: 20,
+//         right: 20,
+//         color: 'white',
+//         fontWeight: 'bold',
+//         background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
+//         backgroundSize: '200% 200%',
+//         backgroundPosition: '50% 50%',
+//         borderRadius: '50%', // Make the box circular
+//         width: '2rem',      // Set a specific width
+//         height: '2rem',     // Set a specific height to match the width
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 10px rgba(255, 255, 255, 0.4)', // Inner and outer shadows
+//         opacity: 0.9,
+//         transition: 'background-position 1s ease', // Smooth transition for hover effect
+//         '&:hover': {
+//           backgroundPosition: '100% 0', // Hover effect for the shine
+//         },
+//       }}
+//     >
+//       {/*<svg width="20" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"*/}
+//       {/*     viewBox="0 0 47.94 47.94" xmlSpace="preserve">*/}
+//       {/*  <path fill="white" d="M26.285,2.486l5.407,10.956c0.376,0.762,1.103,1.29,1.944,1.412l12.091,1.757*/}
+//       {/*    c2.118,0.308,2.963,2.91,1.431,4.403l-8.749,8.528c-0.608,0.593-0.886,1.448-0.742,2.285l2.065,12.042*/}
+//       {/*    c0.362,2.109-1.852,3.717-3.746,2.722l-10.814-5.685c-0.752-0.395-1.651-0.395-2.403,0l-10.814,5.685*/}
+//       {/*    c-1.894,0.996-4.108-0.613-3.746-2.722l2.065-12.042c0.144-0.837-0.134-1.692-0.742-2.285l-8.749-8.528*/}
+//       {/*    c-1.532-1.494-0.687-4.096,1.431-4.403l12.091-1.757c0.841-0.122,1.568-0.65,1.944-1.412l5.407-10.956*/}
+//       {/*    C22.602,0.567,25.338,0.567,26.285,2.486z"/>*/}
+//       {/*</svg>*/}
+//       {/*<StarsIcon/>*/}
+//       <StarsRoundedIcon/>
+//
+//     </Box>
+//   );
+// };
 

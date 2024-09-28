@@ -5,8 +5,10 @@ import com.org.meditatii.exception.AppNotFoundException;
 import com.org.meditatii.model.Listing;
 import com.org.meditatii.model.User;
 import com.org.meditatii.model.UserProfileImage;
+import com.org.meditatii.model.dto.AvailableUserSubjects;
 import com.org.meditatii.model.dto.PersonalListingRow;
 import com.org.meditatii.repository.ListingRepository;
+import com.org.meditatii.repository.SubjectRepository;
 import com.org.meditatii.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -27,17 +31,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final AuthService authService;
     private final ListingRepository listingRepository;
+    private final SubjectRepository subjectRepository;
 
     private static final long MAX_IMAGE_SIZE = 5 * 1024 * 1024;
     private static final List<String> ALLOWED_TYPES = Arrays.asList(
             "image/jpeg", "image/png", "image/webp", "image/heic"
     );
 
-    @Autowired
-    public UserService(UserRepository userRepository, AuthService authService, ListingRepository listingRepository) {
+    public UserService(UserRepository userRepository, AuthService authService, ListingRepository listingRepository, SubjectRepository subjectRepository) {
         this.userRepository = userRepository;
         this.authService = authService;
         this.listingRepository = listingRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     public User findById(Long id) {
@@ -48,6 +53,15 @@ public class UserService {
     public List<PersonalListingRow> findPersonalListingsByUserId() {
         return listingRepository.findByUserId(authService.getCurrentUser().getId())
                 .stream().map(this::mapListingToPersonalListingRow).toList();
+    }
+
+
+    public List<AvailableUserSubjects> findAvailableUserSubjects() {
+        Set<Long> existingUserSubjectIDs = findById(authService.getCurrentUser().getId())
+                .getListings().stream().map(x -> x.getSubject().getId()).collect(Collectors.toSet());
+        return subjectRepository.findAll().stream().filter(subject -> !existingUserSubjectIDs.contains(subject.getId()))
+                .map(subject -> new AvailableUserSubjects(subject.getId(), subject.getName()))
+                .toList();
     }
 
     private PersonalListingRow mapListingToPersonalListingRow(Listing listing) {

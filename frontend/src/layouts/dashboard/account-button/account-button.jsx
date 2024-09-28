@@ -8,11 +8,26 @@ import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { usePopover } from 'src/hooks/use-popover';
 
 import { AccountPopover } from './account-popover';
-import React from "react";
+import React, {useEffect, useState} from "react";
 
 export const AccountButton = () => {
   const user = getAuthenticatedUser();
   const popover = usePopover();
+  const [avatar, setAvatar] = useState(user.avatar);
+
+  useEffect(() => {
+    const handleAvatarChange = (event) => {
+      setAvatar(event.detail); // Update avatar when event is triggered
+    };
+
+    // Listen for custom event
+    window.addEventListener('avatarChanged', handleAvatarChange);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('avatarChanged', handleAvatarChange);
+    };
+  }, []);
 
   return (
     <>

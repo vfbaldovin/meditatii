@@ -6,11 +6,12 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 
 @Data
 @Entity
 @Table(name = "user")
-public class User {
+public class  User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,6 +56,9 @@ public class User {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @OneToMany(mappedBy = "user")
+    private List<Listing> listings;
 
 //    @Column(name = "reset_token")
 //    private String resetToken;

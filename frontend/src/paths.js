@@ -99,6 +99,10 @@ export const paths = {
       index: '/dashboard/products',
       create: '/dashboard/products/create',
     },
+    listings: {
+      // index: '/dashboard/listings',
+      create: '/dashboard/listings/create',
+    },
     social: {
       index: '/dashboard/social',
       profile: '/dashboard/social/profile',

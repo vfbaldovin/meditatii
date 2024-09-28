@@ -15,6 +15,14 @@ import { RouterLink } from 'src/components/router-link';
 import { Scrollbar } from 'src/components/scrollbar';
 import { paths } from 'src/paths';
 import RefreshCcw01Icon from "@untitled-ui/icons-react/build/esm/RefreshCcw01";
+import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import {alpha} from "@mui/system/colorManipulator";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import ArrowsUp from "@untitled-ui/icons-react/build/esm/ArrowsUp";
+import Button from "@mui/material/Button";
+import {SeverityPill} from "../../../components/severity-pill";
 
 export const PersonalListingsTable = (props) => {
   const {
@@ -52,15 +60,65 @@ export const PersonalListingsTable = (props) => {
                     {listing.subject}
                   </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>{listing.promovare ? "Yes" : "No"}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>
+                  <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Avatar sx={{ backgroundColor: 'transparent' }}>
+                      <Box
+                        sx={{
+                          animation: 'pulse ease 750ms infinite',
+                          borderRadius: '50%',
+                          p: 0.5,
+                          '@keyframes pulse': {
+                            '0%': {
+                              boxShadow: 'none',
+                            },
+                            '100%': {
+                              boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,
+                            },
+                          },
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            backgroundColor: 'success.main',
+                            borderRadius: '50%',
+                            height: 18,
+                            width: 18,
+                          }}
+                        />
+                      </Box>
+                    </Avatar>
+                    <IconButton
+                      component={RouterLink}
+                      href={paths.dashboard.personalListingsEdit}
+                    >
+                      <SvgIcon>
+                        <ArrowsUp />
+                      </SvgIcon>
+                    </IconButton>
+                    <SeverityPill color='success'>DA</SeverityPill>
+                    <SeverityPill color='warning'>?</SeverityPill>
+                    <SeverityPill color='error'>NU</SeverityPill>
 
+                  </TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
+                    <Button
+                      // startIcon={
+                      //
+                      // }
+                      variant="contained"
+                    >
+                      <SvgIcon>
+                        <RefreshCcw01Icon />
+                      </SvgIcon>
+                      {/*Sync Data*/}
+                    </Button>
                     <IconButton>
                       <SvgIcon fontSize="small">
                         <RefreshCcw01Icon />
                       </SvgIcon>
                     </IconButton>
                   </TableCell>
+
                   <TableCell sx={{ textAlign: 'center' }} align="right">
                     <IconButton
                       component={RouterLink}

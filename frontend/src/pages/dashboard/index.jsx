@@ -32,6 +32,8 @@ import {GridListPlaceholder} from "../../sections/components/grid-lists/grid-lis
 import {
   PersonalListingsSkeletonTable
 } from "../../sections/dashboard/listings/personal-listings-skeleton-table";
+import {RouterLink} from "../../components/router-link";
+import {paths} from "../../paths";
 
 // The base URL of your API, adjust accordingly
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -45,7 +47,6 @@ const tabs = [
 ];
 
 const now = new Date();
-const STORAGE_KEY = 'accessToken';
 
 const Page = () => {
   const user = getAuthenticatedUser();
@@ -57,7 +58,7 @@ const Page = () => {
   const [error, setError] = useState(null);  // Error state
 
   // Bearer token from authentication (assuming it's stored in localStorage)
-  const token = sessionStorage.getItem(STORAGE_KEY);
+  const token = sessionStorage.getItem('accessToken');
 
   usePageView();
 
@@ -112,10 +113,14 @@ const Page = () => {
           <Stack spacing={3} sx={{ mb: 3 }}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                {/*<Typography variant="h4">Cont</Typography>*/}
+                <Typography variant="h4">
+                  Bon jur.c   EDRFTGYJKLH=Wz§
+                </Typography>
               </Stack>
               <Stack alignItems="center" direction="row" spacing={2}>
                 <Button
+                  component={RouterLink}
+                  href={paths.dashboard.listings.create}
                   startIcon={
                     <SvgIcon>
                       <PlusIcon />

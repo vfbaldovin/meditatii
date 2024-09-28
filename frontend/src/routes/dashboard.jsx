@@ -40,6 +40,9 @@ const OrderDetailPage = lazy(() => import('src/pages/dashboard/orders/detail'));
 const ProductListPage = lazy(() => import('src/pages/dashboard/products/list'));
 const ProductCreatePage = lazy(() => import('src/pages/dashboard/products/create'));
 
+// Listings
+const ListingCreatePage = lazy(() => import('src/pages/dashboard/listings/create-page'));
+
 // Social
 const SocialFeedPage = lazy(() => import('src/pages/dashboard/social/feed'));
 const SocialProfilePage = lazy(() => import('src/pages/dashboard/social/profile'));
@@ -197,6 +200,16 @@ export const dashboardRoutes = [
           },
         ],
       },
+      {
+        path: 'listings',
+        children: [
+          {
+            path: 'create',
+            element: <ListingCreatePage />,
+          },
+        ],
+      },
+
       {
         path: 'social',
         children: [

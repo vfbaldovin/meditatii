@@ -140,6 +140,13 @@ export const ProductCreateForm = (props) => {
                     value={formik.values.name}
                   />
                   <div>
+                    <TextField
+                      label="Description"
+                      multiline
+                      rows={4} // Adjust the number of rows based on the size you want
+                      fullWidth // Ensures the input takes up full width of the container
+                      variant="outlined" // You can also use "filled" or "standard"
+                    />
                     <Typography
                       color="text.secondary"
                       sx={{ mb: 2 }}

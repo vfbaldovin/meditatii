@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -151,7 +150,7 @@ public class AuthService {
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authenticate;
-        userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new AppException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new AppException(ApiHttpStatus.EMAIL_NOT_FOUND.getMessage()));
         try {
             authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
                     loginRequest.getPassword()));
@@ -168,6 +167,7 @@ public class AuthService {
                 .refreshToken(refreshTokenService.generateRefreshToken().getToken())
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .user(loginRequest.getEmail())
+                .id(user.getId())
                 .build();
     }
 

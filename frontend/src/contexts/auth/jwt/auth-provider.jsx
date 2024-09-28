@@ -34,7 +34,8 @@ const handlers = {
     };
   },
   SIGN_IN: (state, action) => {
-    const { user  } = action.payload;
+    const { user, id  } = action.payload;
+    console.log(action.payload)
     console.log('New state after SIGN_IN:', state);
     console.log('New state after SIGN_IN:', action);
     console.log('New state after SIGN_IN:', action);
@@ -43,6 +44,7 @@ const handlers = {
       ...state,
       isAuthenticated: true,
       user,
+      user_id: id
     };
   },
   SIGN_UP: (state, action) => {
@@ -172,13 +174,13 @@ export const AuthProvider = (props) => {
 
   const signIn = useCallback(async (email, password) => {
     try {
-      const { accessToken, refreshToken, expiresAt, user } = await authApi.signIn({ email, password });
+      const { accessToken, refreshToken, expiresAt, user, id } = await authApi.signIn({ email, password });
       sessionStorage.setItem('accessToken', accessToken);
       sessionStorage.setItem('refreshToken', refreshToken);
       sessionStorage.setItem('expiresAt', expiresAt);
       dispatch({
         type: ActionType.SIGN_IN,
-        payload: { user },
+        payload: { user, id },
       });
     } catch (err) {
       console.error(err);
