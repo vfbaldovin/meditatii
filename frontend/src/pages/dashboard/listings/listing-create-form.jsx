@@ -48,9 +48,11 @@ StepIcon.propTypes = {
   icon: PropTypes.node.isRequired,
 };
 
-export const ListingCreateForm = () => {
+export const ListingCreateForm = ({ onSubjectSelect }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [selectedSubject, setSelectedSubject] = useState(null); // Store the selected subject
+  const [description, setDescription] = useState(''); // Store the description here
 
   const handleNext = useCallback(() => {
     setActiveStep((prevState) => prevState + 1);
@@ -64,14 +66,22 @@ export const ListingCreateForm = () => {
     setIsComplete(true);
   }, []);
 
+  // Handle subject selection
+  const handleSubjectSelect = (subject) => {
+    setSelectedSubject(subject); // Store the selected subject in state
+    onSubjectSelect(subject); // Pass it to the parent for display in the title
+  };
+
   const steps = useMemo(() => {
     return [
       {
         label: 'Materie',
         content: (
           <ChooseSubject
+            selectedSubject={selectedSubject} // Pass the selected subject to ChooseSubject
             onBack={handleBack}
             onNext={handleNext}
+            onSubjectSelect={handleSubjectSelect} // Pass the subject select handler
           />
         ),
       },
@@ -79,6 +89,9 @@ export const ListingCreateForm = () => {
         label: 'Descriere',
         content: (
           <ChooseDescription
+            selectedSubject={selectedSubject} // Pass the selected subject to ChooseDescription
+            description={description} // Pass description state
+            setDescription={setDescription} // Pass setDescription function
             onBack={handleBack}
             onNext={handleNext}
           />
@@ -88,13 +101,14 @@ export const ListingCreateForm = () => {
         label: 'Preț',
         content: (
           <PriceStep
+            selectedSubject={selectedSubject} // Pass the selected subject to PriceStep
             onBack={handleBack}
             onNext={handleComplete}
           />
         ),
       },
     ];
-  }, [handleBack, handleNext, handleComplete]);
+  }, [handleBack, handleNext, handleComplete, selectedSubject, description]);
 
   if (isComplete) {
     return <JobPreview />;

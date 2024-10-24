@@ -2,12 +2,16 @@ package com.org.meditatii.rest;
 
 import com.org.meditatii.model.dto.AvailableUserSubjects;
 import com.org.meditatii.model.dto.PersonalListingRow;
+import com.org.meditatii.schedulers.ListingPriceScheduler;
 import com.org.meditatii.service.AuthService;
+import com.org.meditatii.service.ListingService;
 import com.org.meditatii.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,10 +22,12 @@ import java.util.Map;
 public class DashboardController {
     private final UserService userService;
     private final AuthService authService;
+    private final ListingService listingService;
 
-    public DashboardController(UserService userService, AuthService authService) {
+    public DashboardController(UserService userService, AuthService authService, ListingService listingService) {
         this.userService = userService;
         this.authService = authService;
+        this.listingService = listingService;
     }
 
     @GetMapping("/listings")
@@ -32,6 +38,17 @@ public class DashboardController {
     @GetMapping("/subjects/available")
     public ResponseEntity<List<AvailableUserSubjects>> getUserAvailableSubjects() {
         return ResponseEntity.ok(userService.findAvailableUserSubjects());
+    }
+
+    @GetMapping("/subjects/{subjectId}/description")
+    public void getListingDescription(@PathVariable Long subjectId, HttpServletResponse response) throws IOException {
+        listingService.streamDescription(subjectId, response);
+    }
+
+
+    @GetMapping("/subjects/{subjectId}/price")
+    public ResponseEntity<Map<String, Integer>> getListingDescription(@PathVariable Long subjectId) {
+        return ResponseEntity.ok(Map.of("id", ListingPriceScheduler.medianPricesBySubject.get(subjectId)));
     }
 
     @PostMapping("/update-avatar")

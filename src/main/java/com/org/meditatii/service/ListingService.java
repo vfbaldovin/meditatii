@@ -2,29 +2,38 @@ package com.org.meditatii.service;
 
 import com.org.meditatii.exception.AppNotFoundException;
 import com.org.meditatii.model.Listing;
+import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.ListingCard;
 import com.org.meditatii.model.dto.ListingResponse;
+import com.org.meditatii.repository.ListingDescriptionRepository;
 import com.org.meditatii.repository.ListingRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class ListingService {
 
-    Logger log = LoggerFactory.getLogger(ListingService.class);
+    private final Logger log = LoggerFactory.getLogger(ListingService.class);
     private final ListingRepository repository;
+    private final ListingDescriptionRepository descriptionRepository;
+    private final AuthService authService;
 
-    @Autowired
-    public ListingService(ListingRepository repository) {
+    public ListingService(ListingRepository repository, ListingDescriptionRepository descriptionRepository, AuthService authService) {
         this.repository = repository;
+        this.descriptionRepository = descriptionRepository;
+        this.authService = authService;
     }
 
     public List<Listing> findAll() {
@@ -65,6 +74,35 @@ public class ListingService {
         Page<Listing> listings = repository.findBySubjectId(subjectId, pageRequest);
 
         return listings.map(this::listingsCard);
+    }
+
+    public void streamDescription(Long subjectId, HttpServletResponse response) throws IOException {
+        User user = authService.getCurrentUser();
+        String description = descriptionRepository.findRandomBySubjectId(subjectId)
+                .replace("{name}", user.getFullName())
+                .replace("{experience}", user.getExperience());
+
+        // Set the response content type (with UTF-8 charset)
+        response.setContentType("text/plain; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        // Fetch the OutputStream
+        try (OutputStream outputStream = response.getOutputStream()) {
+            byte[] utf8Bytes = description.getBytes(StandardCharsets.UTF_8); // Convert string to UTF-8 bytes
+
+            // Stream the description byte by byte or in small chunks (UTF-8 safe)
+            for (byte utf8Byte : utf8Bytes) {
+                outputStream.write(utf8Byte);
+                outputStream.flush();  // Flush the output after writing each byte
+                try {
+                    Thread.sleep(new Random().nextInt(25));  // Simulate some delay
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
     }
 
     private void addOtherSorts(String priceSortDirection, List<Sort.Order> sortOrders) {

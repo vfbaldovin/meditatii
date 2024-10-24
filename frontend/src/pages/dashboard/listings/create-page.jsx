@@ -11,8 +11,8 @@ import { ListingCreateForm } from "./listing-create-form";
 const Page = () => {
   usePageView();
 
-  // Array of wallpaper URLs
   const wallpapers = [
+    'url(/assets/writing.webp)',
     'url(/assets/abstract_wallpaper_1.webp)',
     'url(/assets/abstract_wallpaper.png)',
     'url(/assets/abstract_wallpaper_3.webp)',
@@ -20,14 +20,26 @@ const Page = () => {
     'url(/assets/abstract_wallpaper_10.webp)'
   ];
 
-  // State to track the current wallpaper index
   const [currentWallpaperIndex, setCurrentWallpaperIndex] = useState(0);
+  const [selectedSubject, setSelectedSubject] = useState({ name: '', id: '' }); // State for both name and id
 
-  // Function to cycle through wallpapers
   const handleBackgroundChange = () => {
     setCurrentWallpaperIndex((prevIndex) =>
-      (prevIndex + 1) % wallpapers.length  // Increment and reset index when reaching the end of the array
+      (prevIndex + 1) % wallpapers.length
     );
+  };
+
+  const handleSubjectSelect = (subject) => {
+    if (subject && subject.name && subject.id) {
+      // Update both subject name and id
+      setSelectedSubject({
+        name: subject.name,
+        id: subject.id
+      });
+    } else {
+      // Reset if no subject is selected
+      setSelectedSubject({ name: '', id: '' });
+    }
   };
 
   return (
@@ -49,7 +61,7 @@ const Page = () => {
             sm={4}
             onClick={handleBackgroundChange}
             sx={{
-              backgroundImage: wallpapers[currentWallpaperIndex],  // Use the current wallpaper based on the state index
+              backgroundImage: wallpapers[currentWallpaperIndex],
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
               backgroundSize: 'cover',
@@ -57,7 +69,7 @@ const Page = () => {
                 xs: 'none',
                 md: 'block',
               },
-              cursor: 'pointer', // Add a pointer cursor to indicate clickability
+              cursor: 'pointer',
             }}
           />
           <Grid
@@ -75,8 +87,10 @@ const Page = () => {
               maxWidth="sm"
               spacing={3}
             >
-              <Typography variant="h4">Creează anunț</Typography>
-              <ListingCreateForm />
+              <Typography variant="h4">
+                Creează anunț {selectedSubject.name && `• ${selectedSubject.name}`}
+              </Typography>
+              <ListingCreateForm onSubjectSelect={handleSubjectSelect} />
             </Stack>
           </Grid>
         </Grid>

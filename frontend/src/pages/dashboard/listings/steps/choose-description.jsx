@@ -1,282 +1,131 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
-import IconButton from "@mui/material/IconButton";
 import AnimatedAssistantIcon from "../animated-assistant-icon";
-import PlusIcon from "@untitled-ui/icons-react/build/esm/Plus";
-import Tooltip from "@mui/material/Tooltip";
 
 export const ChooseDescription = (props) => {
-  const { onBack, onNext, ...other } = props;
-  const [tag, setTag] = useState('');
-  const [tags, setTags] = useState([]);
-  const [startDate, setStartDate] = useState(new Date('2022-09-22T11:41:50'));
-  const [endDate, setEndDate] = useState(new Date('2023-01-11T12:41:50'));
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const { onBack, onNext, selectedSubject, description, setDescription, ...other } = props;
 
-  const handleStartDateChange = useCallback((date) => {
-    setStartDate(date);
-  }, []);
+  const [loading, setLoading] = useState(false); // Local loading state
+  const [errorMessage, setErrorMessage] = useState(''); // State for validation message
+  const controllerRef = useRef(null); // Ref to store the AbortController
 
-  const handleEndDateChange = useCallback((date) => {
-    setEndDate(date);
-  }, []);
+  // Create a ref to access the TextField DOM element
+  const textFieldRef = useRef(null);
 
-  const handleTagAdd = useCallback((tag) => {
-    setTags((prevState) => {
-      return [...prevState, tag];
-    });
-  }, []);
+  // Maximum number of characters allowed
+  const MAX_CHARACTERS = 5000;
 
-  const handleTagDelete = useCallback((tag) => {
-    setTags((prevState) => {
-      return prevState.filter((t) => t !== tag);
-    });
-  }, []);
+  // Function to generate description as a stream
+  const generateDescription = async () => {
+    if (!selectedSubject || !selectedSubject.id) {
+      return; // Do nothing if no subject is selected
+    }
 
-  const [open, setOpen] = useState(false);
+    // Clear the previous description before generating a new one
+    setDescription('');  // Reset the description
+    setErrorMessage(''); // Clear any error message
 
+    setLoading(true); // Set loading state
+
+    // Create an AbortController to cancel the request if necessary
+    controllerRef.current = new AbortController();
+    const { signal } = controllerRef.current;
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/dashboard/subjects/${selectedSubject.id}/description`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
+        },
+        signal, // Attach the signal to the request
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder('utf-8');  // Specify 'utf-8' explicitly
+
+      let done = false;
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+
+        if (value) {
+          // Decode the UTF-8 response and append it to the description
+          const chunk = decoder.decode(value, { stream: true });
+          setDescription(prevDescription => prevDescription + chunk);
+          setErrorMessage(''); // Clear error if any text is generated
+
+          // Scroll the textarea to the bottom after updating the description
+          if (textFieldRef.current) {
+            const textAreaElement = textFieldRef.current.querySelector('textarea');
+            if (textAreaElement) {
+              textAreaElement.scrollTop = textAreaElement.scrollHeight;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        console.log('Fetch aborted'); // Catch if the fetch was aborted
+      } else {
+        console.error('Error generating description:', err);
+      }
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
+
+  const handleNext = () => {
+    // Abort the API call when "Înainte" is pressed
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+    }
+
+    // Validate the description length
+    if (description.length < 100) {
+      setErrorMessage('Descrierea trebuie să conțină cel puțin 100 de caractere.');
+      return; // Prevent the user from going forward
+    }
+
+    setErrorMessage(''); // Clear error message if validation passes
+    onNext(); // Continue with the next step
+  };
+
+  const handleBack = () => {
+    // Abort the API call when "Înapoi" is pressed
+    if (controllerRef.current) {
+      controllerRef.current.abort();
+    }
+    onBack(); // Continue with the previous step
+  };
+
+  // Clear error message when the description changes
   useEffect(() => {
-    // Open the tooltip after a delay when the component loads
-    const timer = setTimeout(() => {
-      setOpen(true);
-    }, 500); // Delay the tooltip by 500ms (optional)
-
-    // Close the tooltip automatically after 3 seconds
-    const closeTimer = setTimeout(() => {
-      setOpen(false);
-    }, 3500); // Keeps the tooltip visible for 3 seconds
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(closeTimer); // Clear timers on unmount
-    };
-  }, []);
+    if (errorMessage && description.length > 0) {
+      setErrorMessage(''); // Clear error message when the user types
+    }
+  }, [description]); // Listen for changes to `description`
 
   return (
     <Stack
       spacing={3}
       {...other}
     >
-      {/*<div>*/}
-      {/*  <Typography variant="h6">Alege o descriere</Typography>*/}
-      {/*</div>*/}
-      {/*<Button
-        color="inherit"
-        startIcon={
-          <>
-            <svg width="0" height="0">
-              <defs>
-                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#1E56CC" />
-                  <stop offset="25%" stopColor="#2970FF" />
-                  <stop offset="50%" stopColor="#6366F1" />
-                  <stop offset="75%" stopColor="#9E77ED" />
-                  <stop offset="100%" stopColor="#B695F6" />
-                </linearGradient>
-              </defs>
-            </svg>
-              <AnimatedAssistantIcon fontSize="medium" />
-          </>
-        }
-        variant="outlined"
-        sx={{
-          width: 'fit-content', // Ensure the button width fits the content
-          minWidth: 0,          // Override the default minWidth
-          // padding: '7px 10px',   // Adjust padding to make the button more compact
-          display: 'inline-flex', // Ensure the button stays inline and doesn't stretch
-          justifyContent: 'center', // Center content
-          alignItems: 'center',     // Center content vertically
-        }}
-      >
-        Generează
-      </Button>*/}
-
       <Stack spacing={3}>
-        {/*<div*/}
-        {/*  style={{*/}
-        {/*    display: 'flex',       // Enables Flexbox to align items horizontally*/}
-        {/*    alignItems: 'stretch', // Stretch items to be the same height*/}
-        {/*    gap: '10px',           // Adds space between the TextField and Button*/}
-        {/*  }}*/}
-        {/*>*/}
-        <Tooltip
-          title="Nou"
-          arrow
-          open={open} // Controls tooltip visibility
-          placement="right" // You can adjust this to the desired position
-        >
-          <Button
-            color="inherit"
-            /*
-                      endIcon={
-                        <Chip
-                          color="primary"
-                          label="nou"
-                          size="small"
-                          sx={{
-                            fontSize: '70%',      // Reduce font size for the label
-                            height: '16px',         // Small height for the Chip
-                            padding: '0 2px',       // Small padding to reduce width
-                            borderRadius: '8px',    // Smaller border radius to match size
-                            '& .MuiChip-label': {   // Target the Chip label specifically
-                              fontSize: '70%',      // Reduce font size for the label
-                              paddingLeft: '2px',   // Smaller padding around the label
-                              paddingRight: '2px',
-                            },
-                          }}
-                        />}
-            */
-            startIcon={
-              <>
-                <svg width="0" height="0">
-                  <defs>
-                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#1E56CC" />
-                      <stop offset="25%" stopColor="#2970FF" />
-                      <stop offset="50%" stopColor="#6366F1" />
-                      <stop offset="75%" stopColor="#9E77ED" />
-                      <stop offset="100%" stopColor="#B695F6" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <AnimatedAssistantIcon fontSize="medium" />
-              </>
-            }
-            variant="outlined"
-            sx={{
-              width: 'fit-content', // Ensure the button width fits the content
-              // minWidth: '100%',          // Override the default minWidth
-              // padding: '7px 10px',   // Adjust padding to make the button more compact
-              display: 'inline-flex', // Ensure the button stays inline and doesn't stretch
-              justifyContent: 'center', // Center content
-              alignItems: 'center',     // Center content vertically
-            }}
-          >
-            Generează
-          </Button>
-        </Tooltip>
-          <TextField
-            label="Descriere"
-            multiline
-            rows={4}
-            fullWidth
-            variant="outlined"
-            inputProps={{
-              maxLength: 5000, // Set maximum number of characters to 5000
-            }}
-            InputProps={{
-              sx: {
-                "& .MuiInputBase-input": {
-                  fontSize: 'unset !important', // Override the font size
-                },
-                "& .MuiOutlinedInput-input": {
-                  fontSize: 'unset !important', // Ensure font size is overridden
-                },
-              },
-              // endAdornment: (
-              //   <InputAdornment position="end">
-              //     <svg width="0" height="0">
-              //       <defs>
-              //         <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-              //           <stop offset="0%" stopColor="#1E56CC"/>
-              //           <stop offset="25%" stopColor="#2970FF"/>
-              //           <stop offset="50%" stopColor="#6366F1"/>
-              //           <stop offset="75%" stopColor="#9E77ED"/>
-              //           <stop offset="100%" stopColor="#B695F6"/>
-              //         </linearGradient>
-              //       </defs>
-              //     </svg>
-              //     <IconButton
-              //       onClick={() => {}} // Define your click handler function
-              //       aria-label="assistant-icon-button"
-              //     >
-              //       <AnimatedAssistantIcon fontSize="large" />
-              //     </IconButton>
-              //   </InputAdornment>
-              // ),
-            }}
-            sx={{
-              position: 'relative',
-            }}
-          />
-{/*          <Button
-            color="inherit"
-            startIcon={
-              <>
-                <svg width="0" height="0">
-                  <defs>
-                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#1E56CC"/>
-                      <stop offset="25%" stopColor="#2970FF"/>
-                      <stop offset="50%" stopColor="#6366F1"/>
-                      <stop offset="75%" stopColor="#9E77ED"/>
-                      <stop offset="100%" stopColor="#B695F6"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <AnimatedAssistantIcon fontSize="medium"/>
-              </>
-            }
-            variant="outlined"
-            sx={{
-              alignSelf: 'stretch',  // This makes the button stretch to match TextField height
-              minWidth: 0,           // Prevent default minimum width
-              display: 'inline-flex', // Align the content inline
-              justifyContent: 'center', // Center content horizontally
-              alignItems: 'center',     // Center content vertically
-              padding: '0 2rem',        // Ensure the button has padding for its content
-            }}
-          >
-            Generează
-          </Button>
-        </div>*/}
-
-      </Stack>
-
-
-      <Stack
-        alignItems="center"
-        direction="row"
-        spacing={2}
-      >
-        {/*<Tooltip
-          title="Nou"
-          arrow
-          open={open} // Controls tooltip visibility
-          placement="bottom" // You can adjust this to the desired position
-        >
-          <Button
+        <Button
           color="inherit"
-          endIcon={
-          <Chip
-            color="primary"
-            label="nou"
-            size="small"
-            sx={{
-              fontSize: '70%',      // Reduce font size for the label
-              height: '16px',         // Small height for the Chip
-              padding: '0 2px',       // Small padding to reduce width
-              borderRadius: '8px',    // Smaller border radius to match size
-              '& .MuiChip-label': {   // Target the Chip label specifically
-                fontSize: '70%',      // Reduce font size for the label
-                paddingLeft: '2px',   // Smaller padding around the label
-                paddingRight: '2px',
-              },
-            }}
-          />}
+          onClick={generateDescription}
           startIcon={
             <>
               <svg width="0" height="0">
                 <defs>
-                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%">
                     <stop offset="0%" stopColor="#1E56CC" />
                     <stop offset="25%" stopColor="#2970FF" />
                     <stop offset="50%" stopColor="#6366F1" />
@@ -289,33 +138,74 @@ export const ChooseDescription = (props) => {
             </>
           }
           variant="outlined"
+          disabled={loading} // Disable button while loading
           sx={{
-            width: 'fit-content', // Ensure the button width fits the content
-            minWidth: 0,          // Override the default minWidth
-            // padding: '7px 10px',   // Adjust padding to make the button more compact
-            display: 'inline-flex', // Ensure the button stays inline and doesn't stretch
-            justifyContent: 'center', // Center content
-            alignItems: 'center',     // Center content vertically
+            width: 'fit-content',
+            display: 'inline-flex',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          Generează
+          {loading ? 'Generare...' : 'Generează'}
         </Button>
-        </Tooltip>*/}
+
+        {/* TextField with error message in helperText */}
+        <TextField
+          label="Descriere"
+          multiline
+          rows={6}
+          fullWidth
+          variant="outlined"
+          value={description} // Bind the TextField value to description state
+          onChange={(e) => setDescription(e.target.value)} // Allow manual input
+          helperText={
+            errorMessage ? errorMessage : (
+              <div style={{ textAlign: 'right' }}>
+                {`${description.length}/${MAX_CHARACTERS}`}
+              </div>
+            )
+          } // Show error or character count aligned to the right
+          inputProps={{
+            maxLength: MAX_CHARACTERS, // Set maximum number of characters to 5000
+          }}
+          InputProps={{
+            sx: {
+              "& .MuiInputBase-input": {
+                fontSize: 'unset !important', // Override the font size
+              },
+              "& .MuiOutlinedInput-input": {
+                fontSize: 'unset !important', // Ensure font size is overridden
+              },
+            },
+          }}
+          ref={textFieldRef} // Attach the ref to the TextField
+          sx={{
+            position: 'relative',
+          }}
+          error={!!errorMessage} // Apply error state when there's an error
+        />
+      </Stack>
+
+      <Stack
+        alignItems="center"
+        direction="row"
+        spacing={2}
+      >
         <Button
           color="inherit"
           endIcon={
             <SvgIcon>
-              <ArrowRightIcon/>
+              <ArrowRightIcon />
             </SvgIcon>
           }
-          onClick={onNext}
+          onClick={handleNext} // Use handleNext to abort and proceed
           variant="outlined"
         >
           Înainte
         </Button>
         <Button
           color="inherit"
-          onClick={onBack}
+          onClick={handleBack} // Use handleBack to abort and go back
         >
           Înapoi
         </Button>
@@ -327,4 +217,7 @@ export const ChooseDescription = (props) => {
 ChooseDescription.propTypes = {
   onBack: PropTypes.func,
   onNext: PropTypes.func,
+  selectedSubject: PropTypes.object,
+  description: PropTypes.string.isRequired, // Add prop type for description
+  setDescription: PropTypes.func.isRequired, // Add prop type for setDescription
 };

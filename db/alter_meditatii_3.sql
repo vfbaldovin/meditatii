@@ -1,25 +1,56 @@
 use meditatii;
 
 UPDATE listing
-SET experience = '1-4'
-WHERE experience IN ('mai putin de un an', 'un an', 'doi ani', 'trei ani', 'patru ani');
+SET experience = '1'
+WHERE experience IN ('mai putin de un an', 'un an');
 
 UPDATE listing
-SET experience = '5+'
-WHERE experience IN ('cinci ani', 'sase ani', 'sapte ani', 'opt ani', 'noua ani');
+SET experience = '2'
+WHERE experience = 'doi ani';
 
 UPDATE listing
-SET experience = '10+'
-WHERE experience IN ('zece ani', 'cincisprezece ani', 'cincisprezece an');
+SET experience = '3'
+WHERE experience = 'trei ani';
 
 UPDATE listing
-SET experience = '20+'
+SET experience = '4'
+WHERE experience = 'patru ani';
+
+UPDATE listing
+SET experience = '5'
+WHERE experience = 'cinci ani';
+
+UPDATE listing
+SET experience = '6'
+WHERE experience = 'sase ani';
+
+UPDATE listing
+SET experience = '7'
+WHERE experience = 'sapte ani';
+
+UPDATE listing
+SET experience = '8'
+WHERE experience = 'opt ani';
+
+UPDATE listing
+SET experience = '9'
+WHERE experience = 'noua ani';
+
+UPDATE listing
+SET experience = '10'
+WHERE experience = 'zece ani';
+
+UPDATE listing
+SET experience = '15'
+WHERE experience IN ('cincisprezece ani', 'cincisprezece an');
+
+UPDATE listing
+SET experience = '20'
 WHERE experience IN ('douazeci de ani', 'douazeci si cinci de ani');
 
 UPDATE listing
-SET experience = '30+'
+SET experience = '30'
 WHERE experience = 'mai mult de douazeci si cinci de ani';
-
 
 
 

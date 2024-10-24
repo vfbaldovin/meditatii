@@ -402,7 +402,7 @@ export const HomeHero = () => {
                             id={listing.id}
                             sx={{
                               boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-                              borderRadius: '20px',
+                              borderRadius: '0.5rem',
                               cursor: 'pointer',
                               position: 'relative',
                               // padding: '1rem',
@@ -421,8 +421,8 @@ export const HomeHero = () => {
                                   top: 20,
                                   right: 20,
                                   // color: '#D4AF37',
-                                  // color: '#FFC107',
-                                  color: 'primary.main',
+                                  color: '#FFC107',
+                                  // color: 'primary.main',
                                   fontWeight: 'bold',
                                   // background: 'linear-gradient(135deg, #D4AF37, #FFD700)', // Shiny gradient background
                                   backgroundSize: '200% 200%',

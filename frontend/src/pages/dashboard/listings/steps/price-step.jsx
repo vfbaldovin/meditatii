@@ -1,25 +1,55 @@
-import {useCallback, useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import ArrowRightIcon from '@untitled-ui/icons-react/build/esm/ArrowRight';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
-
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
-import {PriceRecommendation} from "./price-recommendation";
-import Slider from "@mui/material/Slider";
-import Box from "@mui/material/Box";
-import AnimatedAssistantIcon from "../animated-assistant-icon";
+import Typography from "@mui/material/Typography";
+import Chip from '@mui/material/Chip';
+import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
+import {InfoCircle} from "@untitled-ui/icons-react";
 
 export const PriceStep = (props) => {
-  const { onBack, onNext, ...other } = props;
-  const [content, setContent] = useState('');
+  const { onBack, onNext, selectedSubject, ...other } = props;
+  const [price, setPrice] = useState(''); // State to hold the price input
+  const [recommendedPrice, setRecommendedPrice] = useState(null); // State to store the recommended price
 
-  const handleContentChange = useCallback((value) => {
-    setContent(value);
-  }, []);
+  // Function to fetch the recommended price for the selected subject
+  const fetchRecommendedPrice = async (subjectId) => {
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/dashboard/subjects/${subjectId}/price`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.id) {
+          setRecommendedPrice(data.id); // Set the recommended price if available
+        } else {
+          setRecommendedPrice(null); // No price returned, clear recommended price
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching recommended price:', error);
+      setRecommendedPrice(null); // Handle errors gracefully by clearing the recommended price
+    }
+  };
+
+  // Fetch the recommended price whenever the selectedSubject changes
+  useEffect(() => {
+    if (selectedSubject && selectedSubject.id) {
+      fetchRecommendedPrice(selectedSubject.id);
+    } else {
+      setRecommendedPrice(null); // Clear recommended price if no subject is selected
+    }
+  }, [selectedSubject]);
 
   const handleInputChange = (event) => {
     let value = event.target.value;
@@ -32,109 +62,84 @@ export const PriceStep = (props) => {
       positiveIntegerValue = positiveIntegerValue.slice(0, 10);
     }
 
-    event.target.value = positiveIntegerValue; // Set the field to only allow positive integers up to 10 digits
+    setPrice(positiveIntegerValue); // Update the price input state
   };
-  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    // Open the tooltip after a delay when the component loads
-    const timer = setTimeout(() => {
-      setOpen(true);
-    }, 500); // Delay the tooltip by 500ms (optional)
-
-    // Close the tooltip automatically after 3 seconds
-    const closeTimer = setTimeout(() => {
-      setOpen(false);
-    }, 3500); // Keeps the tooltip visible for 3 seconds
-
-    return () => {
-      clearTimeout(timer);
-      clearTimeout(closeTimer); // Clear timers on unmount
-    };
-  }, []);
+  const handleChipClick = () => {
+    if (recommendedPrice) {
+      setPrice(recommendedPrice); // Populate the price input with the recommended price when Chip is clicked
+    }
+  };
 
   return (
     <Stack
       spacing={3}
       {...other}
     >
-     {/* <div>
-        <Typography variant="h6">Alege un preț pe oră</Typography>
-      </div>*/}
 
-      <Tooltip
-        title="Nou"
-        arrow
-        open={open} // Controls tooltip visibility
-        placement="right" // You can adjust this to the desired position
-      >
-        <Button
-          color="inherit"
-          /*
-                    endIcon={
-                      <Chip
-                        color="primary"
-                        label="nou"
-                        size="small"
-                        sx={{
-                          fontSize: '70%',      // Reduce font size for the label
-                          height: '16px',         // Small height for the Chip
-                          padding: '0 2px',       // Small padding to reduce width
-                          borderRadius: '8px',    // Smaller border radius to match size
-                          '& .MuiChip-label': {   // Target the Chip label specifically
-                            fontSize: '70%',      // Reduce font size for the label
-                            paddingLeft: '2px',   // Smaller padding around the label
-                            paddingRight: '2px',
-                          },
-                        }}
-                      />}
-          */
-          startIcon={
-            <>
-              <svg width="0" height="0">
-                <defs>
-                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#1E56CC" />
-                    <stop offset="25%" stopColor="#2970FF" />
-                    <stop offset="50%" stopColor="#6366F1" />
-                    <stop offset="75%" stopColor="#9E77ED" />
-                    <stop offset="100%" stopColor="#B695F6" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <AnimatedAssistantIcon fontSize="medium" />
-            </>
-          }
-          variant="outlined"
-          sx={{
-            width: 'fit-content', // Ensure the button width fits the content
-            // minWidth: '100%',          // Override the default minWidth
-            // padding: '7px 10px',   // Adjust padding to make the button more compact
-            display: 'inline-flex', // Ensure the button stays inline and doesn't stretch
-            justifyContent: 'center', // Center content
-            alignItems: 'center',     // Center content vertically
-          }}
-        >
-          Recomandă
-        </Button>
-      </Tooltip>
+      {recommendedPrice && (
+        <Stack spacing={1}>
+          {/* First row with the label and the info icon */}
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography
+              color="text.secondary"
+              variant="h6"
+            >
+              Recomandarea noastră
+            </Typography>
+            <Tooltip
+              title={
+                <Typography sx={{ fontSize: '0.95rem' }}>
+                  Prețul recomandat este calculat în funcție de media aritmetică a celorlalte anunțuri.
+                </Typography>
+              }
+              placement="top"
+            >
+              <IconButton size="small">
+                <InfoCircle fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+
+          {/* Second row with the Chip */}
+          <Stack direction="row">
+            <Chip
+              label={`${recommendedPrice} lei / oră`}
+              clickable
+              onClick={handleChipClick}
+              sx={{
+                fontSize: '0.9rem',
+                height: 24,
+                padding: '0 8px',
+                color: 'primary.main',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            />
+          </Stack>
+        </Stack>
+      )}
 
 
       <TextField
         fullWidth
-        label="Preț"
+        label={`Preț pe oră`} // Label remains independent of recommended price
         name="price"
         variant="outlined"
+        value={price} // Bind the price state to the input field
+        onInput={handleInputChange} // Ensure positive integers up to 10 digits
         InputProps={{
           endAdornment: <InputAdornment position="end">lei / oră</InputAdornment>,
         }}
-        onInput={handleInputChange} // Ensure positive integers up to 10 digits
         inputProps={{
           min: 0, // Prevent negative input
           pattern: "[0-9]*", // Restrict input to digits only
-          maxLength: 10, // Restrict maximum length to 10 digits
+          maxLength: 3, // Restrict maximum length to 10 digits
         }}
+
       />
+
       <Stack
         alignItems="center"
         direction="row"
@@ -166,4 +171,5 @@ export const PriceStep = (props) => {
 PriceStep.propTypes = {
   onBack: PropTypes.func,
   onNext: PropTypes.func,
+  selectedSubject: PropTypes.object, // Add selectedSubject to prop types
 };

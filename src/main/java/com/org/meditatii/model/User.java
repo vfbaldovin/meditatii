@@ -45,6 +45,9 @@ public class  User {
     @Column(name = "education")
     private String education;
 
+    @Column(name = "experience")
+    private String experience;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserProfileImage userProfileImage;
 
@@ -74,7 +77,7 @@ public class  User {
                 (lastName != null && !lastName.isEmpty() ? " " + lastName.charAt(0) + "." : "");
     }
 
-    public String getTutorNameFull() {
+    public String getFullName() {
         if (firstName == null) {
             return "Unknown";
         }

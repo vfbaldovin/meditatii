@@ -75,7 +75,7 @@ public class AuthController {
                 UserResponse.builder()
                         .id(currentUser.getId())
                         .email(currentUser.getEmail())
-                        .fullName(currentUser.getTutorNameFull())
+                        .fullName(currentUser.getFullName())
                         .build()
         );
     }
