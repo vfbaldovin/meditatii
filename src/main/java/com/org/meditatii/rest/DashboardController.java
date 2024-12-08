@@ -1,6 +1,9 @@
 package com.org.meditatii.rest;
 
+import com.org.meditatii.model.Listing;
+import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.AvailableUserSubjects;
+import com.org.meditatii.model.dto.ListingCreateRequest;
 import com.org.meditatii.model.dto.PersonalListingRow;
 import com.org.meditatii.schedulers.ListingPriceScheduler;
 import com.org.meditatii.service.AuthService;
@@ -35,6 +38,16 @@ public class DashboardController {
         return ResponseEntity.ok(userService.findPersonalListingsByUserId());
     }
 
+    @GetMapping("/listings/{id}")
+    public ResponseEntity<?> getListing(@PathVariable Long id) {
+        return ResponseEntity.ok(listingService.findById(id));
+    }
+
+    @PostMapping("/listings/create")
+    public ResponseEntity<?> createListing(@RequestBody ListingCreateRequest listingRequest) {
+        return ResponseEntity.ok(Map.of("id",listingService.createListing(listingRequest)));
+    }
+
     @GetMapping("/subjects/available")
     public ResponseEntity<List<AvailableUserSubjects>> getUserAvailableSubjects() {
         return ResponseEntity.ok(userService.findAvailableUserSubjects());
@@ -48,7 +61,9 @@ public class DashboardController {
 
     @GetMapping("/subjects/{subjectId}/price")
     public ResponseEntity<Map<String, Integer>> getListingDescription(@PathVariable Long subjectId) {
-        return ResponseEntity.ok(Map.of("id", ListingPriceScheduler.medianPricesBySubject.get(subjectId)));
+        Map<String, Integer> response = new HashMap<>();
+        response.put("id", ListingPriceScheduler.medianPricesBySubject.get(subjectId));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/update-avatar")

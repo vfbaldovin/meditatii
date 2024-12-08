@@ -41,9 +41,6 @@ public class Listing {
     @Column(name = "county")
     private String county;
 
-    @Column(name = "city")
-    private String city;
-
     @Column(name = "area")
     private String area;
 
@@ -77,6 +74,5 @@ public class Listing {
 
     @Column(name = "refresh_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime refreshDate;
-
 
 }

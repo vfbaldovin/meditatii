@@ -165,7 +165,7 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .accessToken(token)
                 .refreshToken(refreshTokenService.generateRefreshToken().getToken())
-                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationDays()))
                 .user(loginRequest.getEmail())
                 .id(user.getId())
                 .build();
@@ -209,7 +209,7 @@ public class AuthService {
                 return AuthenticationResponse.builder()
                         .accessToken(token)
                         .refreshToken(refreshTokenService.generateRefreshToken().getToken())
-                        .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                        .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationDays()))
                         .user(email)
                         .build();
             } else {
@@ -266,7 +266,7 @@ public class AuthService {
         return AuthenticationResponse.builder()
                 .accessToken(token)
                 .refreshToken(refreshTokenRequest.getRefreshToken())
-                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationDays()))
                 .user(refreshTokenRequest.getUsername())
                 .build();
     }

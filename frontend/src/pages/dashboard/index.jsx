@@ -34,9 +34,8 @@ import {
 } from "../../sections/dashboard/listings/personal-listings-skeleton-table";
 import {RouterLink} from "../../components/router-link";
 import {paths} from "../../paths";
+import {useAuth} from "../../hooks/use-auth";
 
-// The base URL of your API, adjust accordingly
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const tabs = [
   { label: 'General', value: 'general' },
@@ -59,6 +58,7 @@ const Page = () => {
 
   // Bearer token from authentication (assuming it's stored in localStorage)
   const token = sessionStorage.getItem('accessToken');
+  const { fetchWithAuth } = useAuth(); // Destructure fetchWithAuth from useAuth
 
   usePageView();
 
@@ -67,12 +67,16 @@ const Page = () => {
     const fetchPersonalListings = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${apiBaseUrl}/api/dashboard/listings`, {
-          headers: {
-            Authorization: `Bearer ${token}`,  // Add Authorization Header
-          },
-        });
-        setPersonalListings(response.data);  // Store fetched data in state
+        // Use fetchWithAuth instead of axios
+        const response = await fetchWithAuth(`/api/dashboard/listings`);
+
+        // Check if response is OK (status 200-299)
+        if (!response.ok) {
+          throw new Error('Failed to fetch data from server');
+        }
+
+        const data = await response.json();
+        setPersonalListings(data); // Store fetched data in state
       } catch (err) {
         console.error('Failed to fetch personal listings:', err);
         setError('Failed to fetch data from server');
@@ -81,8 +85,9 @@ const Page = () => {
       }
     };
 
-    fetchPersonalListings();  // Call the function when component loads
-  }, [token]);  // Re-run if the token changes
+    fetchPersonalListings();
+  }, [fetchWithAuth]);
+
 
   // Handle page change
   const handlePageChange = (event, newPage) => {

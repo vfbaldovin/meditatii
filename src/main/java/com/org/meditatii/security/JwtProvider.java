@@ -11,6 +11,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class JwtProvider {
 
     private final JwtEncoder jwtEncoder;
     @Value("${jwt.expiration.time}")
-    private Long jwtExpirationInMillis;
+    private Long jwtExpirationDays;
 
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
@@ -30,7 +31,7 @@ public class JwtProvider {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusMillis(jwtExpirationInMillis))
+                .expiresAt(Instant.now().plus(jwtExpirationDays, ChronoUnit.DAYS))
                 .subject(username)
                 .claim("scope", "ROLE_USER")
                 .build();

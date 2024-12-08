@@ -1,46 +1,33 @@
 import { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import CheckIcon from '@untitled-ui/icons-react/build/esm/Check';
-import Avatar from '@mui/material/Avatar';
 import Step from '@mui/material/Step';
 import StepContent from '@mui/material/StepContent';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
-import SvgIcon from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
 import { ChooseSubject } from './steps/choose-subject';
-import { PriceStep } from './steps/price-step';
+import { ChoosePrice } from './steps/choose-price';
 import { ChooseDescription } from './steps/choose-description';
-import { JobPreview } from './steps/job-preview';
+import { ListingPreview } from './steps/listing-preview';
+import { useAuth } from '../../../hooks/use-auth';
+import Avatar from "@mui/material/Avatar";
+import SvgIcon from "@mui/material/SvgIcon";
+import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
+import confetti from "canvas-confetti";
 
-const StepIcon = (props) => {
-  const { active, completed, icon } = props;
-
-  const highlight = active || completed;
-
-  return (
-    <Avatar
-      sx={{
-        height: 40,
-        width: 40,
-        ...(highlight && {
-          backgroundColor: 'primary.main',
-          color: 'primary.contrastText',
-        }),
-      }}
-      variant="rounded"
-    >
-      {completed ? (
-        <SvgIcon>
-          <CheckIcon />
-        </SvgIcon>
-      ) : (
-        icon
-      )}
-    </Avatar>
-  );
-};
+const StepIcon = ({ active, completed, icon }) => (
+  <Avatar
+    sx={{
+      height: 40,
+      width: 40,
+      ...(active || completed ? { backgroundColor: 'primary.main', color: 'primary.contrastText' } : {}),
+    }}
+    variant="rounded"
+  >
+    {completed ? <SvgIcon><CheckIcon /></SvgIcon> : icon}
+  </Avatar>
+);
 
 StepIcon.propTypes = {
   active: PropTypes.bool,
@@ -51,109 +38,107 @@ StepIcon.propTypes = {
 export const ListingCreateForm = ({ onSubjectSelect }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState(null); // Store the selected subject
-  const [description, setDescription] = useState(''); // Store the description here
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [listingId, setListingId] = useState(null);
 
-  const handleNext = useCallback(() => {
-    setActiveStep((prevState) => prevState + 1);
-  }, []);
+  const { fetchWithAuth } = useAuth();
 
-  const handleBack = useCallback(() => {
-    setActiveStep((prevState) => prevState - 1);
-  }, []);
+  const handleNext = useCallback(() => setActiveStep((prevState) => prevState + 1), []);
+  const handleBack = useCallback(() => setActiveStep((prevState) => prevState - 1), []);
 
-  const handleComplete = useCallback(() => {
-    setIsComplete(true);
-  }, []);
+  const handleComplete = useCallback(async () => {
+    try {
+      const payload = { subjectId: selectedSubject?.id, description, price };
 
-  // Handle subject selection
+      const response = await fetchWithAuth('/api/dashboard/listings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Listing created successfully:', data);
+        setListingId(data.id); // Only store listing ID
+        setIsComplete(true);
+        confetti({
+          particleCount: 200,   // Increase number of pieces
+          spread: 120,          // Wider area
+          startVelocity: 40,    // Faster initial speed
+          scalar: 1.5,          // Larger confetti size
+          origin: { x: 0.5, y: 0.5 }, // Center of screen
+        });
+      } else {
+        console.error('Failed to create listing:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error creating listing:', error);
+    }
+  }, [fetchWithAuth, selectedSubject, description, price]);
+
   const handleSubjectSelect = (subject) => {
-    setSelectedSubject(subject); // Store the selected subject in state
-    onSubjectSelect(subject); // Pass it to the parent for display in the title
+    setSelectedSubject(subject);
+    onSubjectSelect(subject);
   };
 
-  const steps = useMemo(() => {
-    return [
-      {
-        label: 'Materie',
-        content: (
-          <ChooseSubject
-            selectedSubject={selectedSubject} // Pass the selected subject to ChooseSubject
-            onBack={handleBack}
-            onNext={handleNext}
-            onSubjectSelect={handleSubjectSelect} // Pass the subject select handler
-          />
-        ),
-      },
-      {
-        label: 'Descriere',
-        content: (
-          <ChooseDescription
-            selectedSubject={selectedSubject} // Pass the selected subject to ChooseDescription
-            description={description} // Pass description state
-            setDescription={setDescription} // Pass setDescription function
-            onBack={handleBack}
-            onNext={handleNext}
-          />
-        ),
-      },
-      {
-        label: 'Preț',
-        content: (
-          <PriceStep
-            selectedSubject={selectedSubject} // Pass the selected subject to PriceStep
-            onBack={handleBack}
-            onNext={handleComplete}
-          />
-        ),
-      },
-    ];
-  }, [handleBack, handleNext, handleComplete, selectedSubject, description]);
+  const steps = useMemo(() => [
+    {
+      label: 'Materie',
+      content: (
+        <ChooseSubject
+          selectedSubject={selectedSubject}
+          onBack={handleBack}
+          onNext={handleNext}
+          onSubjectSelect={handleSubjectSelect}
+        />
+      ),
+    },
+    {
+      label: 'Descriere',
+      content: (
+        <ChooseDescription
+          selectedSubject={selectedSubject}
+          description={description}
+          setDescription={setDescription}
+          onBack={handleBack}
+          onNext={handleNext}
+        />
+      ),
+    },
+    {
+      label: 'Preț',
+      content: (
+        <ChoosePrice
+          selectedSubject={selectedSubject}
+          price={price}
+          setPrice={setPrice}
+          onBack={handleBack}
+          onNext={handleComplete}
+        />
+      ),
+    },
+  ], [handleBack, handleNext, handleComplete, selectedSubject, description, price]);
 
   if (isComplete) {
-    return <JobPreview />;
+    return (
+      <ListingPreview
+        listingId={listingId} // Only pass the listing ID to ListingPreview
+      />
+    );
   }
 
   return (
-    <Stepper
-      activeStep={activeStep}
-      orientation="vertical"
-      sx={{
-        '& .MuiStepConnector-line': {
-          borderLeftColor: 'divider',
-          borderLeftWidth: 2,
-          ml: 1,
-        },
-      }}
-    >
-      {steps.map((step, index) => {
-        const isCurrentStep = activeStep === index;
-
-        return (
-          <Step key={step.label}>
-            <StepLabel StepIconComponent={StepIcon}>
-              <Typography
-                sx={{ ml: 2 }}
-                variant="overline"
-              >
-                {step.label}
-              </Typography>
-            </StepLabel>
-            <StepContent
-              sx={{
-                borderLeftColor: 'divider',
-                borderLeftWidth: 2,
-                ml: '20px',
-                ...(isCurrentStep && {
-                  py: 4,
-                }),
-              }}
-            >
-              {step.content}
-            </StepContent>
-          </Step>
-        );
-      })}
+    <Stepper activeStep={activeStep} orientation="vertical">
+      {steps.map((step, index) => (
+        <Step key={step.label}>
+          <StepLabel StepIconComponent={StepIcon}>
+            <Typography variant="overline">{step.label}</Typography>
+          </StepLabel>
+          <StepContent>{step.content}</StepContent>
+        </Step>
+      ))}
     </Stepper>
   );
 };

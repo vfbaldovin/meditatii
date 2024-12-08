@@ -4,9 +4,11 @@ import com.org.meditatii.exception.AppNotFoundException;
 import com.org.meditatii.model.Listing;
 import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.ListingCard;
+import com.org.meditatii.model.dto.ListingCreateRequest;
 import com.org.meditatii.model.dto.ListingResponse;
 import com.org.meditatii.repository.ListingDescriptionRepository;
 import com.org.meditatii.repository.ListingRepository;
+import com.org.meditatii.repository.SubjectRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +31,13 @@ public class ListingService {
     private final ListingRepository repository;
     private final ListingDescriptionRepository descriptionRepository;
     private final AuthService authService;
+    private final SubjectRepository subjectRepository;
 
-    public ListingService(ListingRepository repository, ListingDescriptionRepository descriptionRepository, AuthService authService) {
+    public ListingService(ListingRepository repository, ListingDescriptionRepository descriptionRepository, AuthService authService, SubjectRepository subjectRepository) {
         this.repository = repository;
         this.descriptionRepository = descriptionRepository;
         this.authService = authService;
+        this.subjectRepository = subjectRepository;
     }
 
     public List<Listing> findAll() {
@@ -47,6 +51,19 @@ public class ListingService {
 
     public Listing save(Listing listing) {
         return repository.save(listing);
+    }
+
+    public Long createListing(ListingCreateRequest request) {
+        User user = authService.getCurrentUser();
+        Listing listing = new Listing();
+        listing.setUser(user);
+        listing.setSubject(subjectRepository.findById(request.subjectId()).orElseThrow(
+                () -> new AppNotFoundException("Subject not found with id: " + request.subjectId())
+        ));
+        listing.setDescription(request.description());
+        listing.setPrice(request.price());
+
+        return save(listing).getId();
     }
 
     public Listing update(Long id, Listing listingDetails) {
@@ -101,7 +118,7 @@ public class ListingService {
                 }
             }
         } catch (IOException e) {
-            log.error(e.getMessage());
+//            log.error(e.getMessage());
         }
     }
 
@@ -128,7 +145,7 @@ public class ListingService {
                     .createdDate(listing.getCreatedDate())
                     .price(listing.getPrice())
                     .promoted(listing.getPromoted())
-                    .city(listing.getCity())
+                    .city(listing.getUser().getCity())
                     .subject(listing.getSubject().getName())
                     .tutorId(listing.getUser().getId())
                     .tutorName(listing.getUser().getTutorName())
@@ -149,7 +166,7 @@ public class ListingService {
                     .createdDate(listing.getCreatedDate())
                     .price(listing.getPrice())
                     .promoted(listing.getPromoted())
-                    .city(listing.getCity())
+                    .city(listing.getUser().getCity())
                     .county(listing.getCounty())
                     .area(listing.getArea())
                     .experience(listing.getExperience())

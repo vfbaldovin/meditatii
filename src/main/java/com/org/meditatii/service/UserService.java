@@ -10,7 +10,6 @@ import com.org.meditatii.model.dto.PersonalListingRow;
 import com.org.meditatii.repository.ListingRepository;
 import com.org.meditatii.repository.SubjectRepository;
 import com.org.meditatii.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,7 +66,7 @@ public class UserService {
     private PersonalListingRow mapListingToPersonalListingRow(Listing listing) {
         return new PersonalListingRow(
                 listing.getId(),
-                listing.getSubjectOld(),
+                listing.getSubject().getName(),
                 listing.getViews(),
                 listing.getPromoted(),
                 listing.getRefreshDate()

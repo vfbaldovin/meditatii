@@ -7,10 +7,14 @@ import SvgIcon from '@mui/material/SvgIcon';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import AnimatedAssistantIcon from "../animated-assistant-icon";
+import {useAuth} from "../../../../hooks/use-auth";
+import StopCircle from "@untitled-ui/icons-react/build/esm/StopCircle";
 
 export const ChooseDescription = (props) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const { onBack, onNext, selectedSubject, description, setDescription, ...other } = props;
+
+  const { fetchWithAuth } = useAuth(); // Destructure fetchWithAuth from useAuth
 
   const [loading, setLoading] = useState(false); // Local loading state
   const [errorMessage, setErrorMessage] = useState(''); // State for validation message
@@ -39,13 +43,13 @@ export const ChooseDescription = (props) => {
     const { signal } = controllerRef.current;
 
     try {
-      const response = await fetch(`${apiBaseUrl}/api/dashboard/subjects/${selectedSubject.id}/description`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem('accessToken')}`,
-        },
-        signal, // Attach the signal to the request
-      });
+      const response = await fetchWithAuth(
+        `/api/dashboard/subjects/${selectedSubject.id}/description`,
+        {
+          method: 'GET',
+          signal, // Attach the signal to the request for cancellation
+        }
+      );
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');  // Specify 'utf-8' explicitly
@@ -75,6 +79,7 @@ export const ChooseDescription = (props) => {
         console.log('Fetch aborted'); // Catch if the fetch was aborted
       } else {
         console.error('Error generating description:', err);
+        setErrorMessage('Error generating description');
       }
     } finally {
       setLoading(false); // Reset loading state
@@ -118,36 +123,69 @@ export const ChooseDescription = (props) => {
       {...other}
     >
       <Stack spacing={3}>
-        <Button
-          color="inherit"
-          onClick={generateDescription}
-          startIcon={
-            <>
-              <svg width="0" height="0">
-                <defs>
-                  <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%">
-                    <stop offset="0%" stopColor="#1E56CC" />
-                    <stop offset="25%" stopColor="#2970FF" />
-                    <stop offset="50%" stopColor="#6366F1" />
-                    <stop offset="75%" stopColor="#9E77ED" />
-                    <stop offset="100%" stopColor="#B695F6" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <AnimatedAssistantIcon fontSize="medium" />
-            </>
-          }
-          variant="outlined"
-          disabled={loading} // Disable button while loading
+        <Stack
+          spacing={3}
+          direction="row"
           sx={{
-            width: 'fit-content',
-            display: 'inline-flex',
-            justifyContent: 'center',
+            display: 'flex',
             alignItems: 'center',
           }}
         >
-          {loading ? 'Generare...' : 'Generează'}
-        </Button>
+          {/* Generate Button */}
+          <Button
+            color="inherit"
+            onClick={generateDescription}
+            startIcon={
+              <>
+                <svg width="0" height="0">
+                  <defs>
+                    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%">
+                      <stop offset="0%" stopColor="#1E56CC" />
+                      <stop offset="25%" stopColor="#2970FF" />
+                      <stop offset="50%" stopColor="#6366F1" />
+                      <stop offset="75%" stopColor="#9E77ED" />
+                      <stop offset="100%" stopColor="#B695F6" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <AnimatedAssistantIcon fontSize="medium" />
+              </>
+            }
+            variant="outlined"
+            disabled={loading} // Disable when loading
+            sx={{
+              width: 'fit-content',
+              display: 'inline-flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            {loading ? 'Generare...' : 'Generează'}
+          </Button>
+
+          {/* Stop Button */}
+          {loading && (
+            <Button
+              color="inherit"
+              onClick={() => controllerRef.current?.abort()}
+              startIcon={
+                <StopCircle style={{ color: '#d32f2f' }} /> // Use a red hex color
+              }
+              variant="outlined"
+              sx={{
+                width: 'fit-content',
+                display: 'inline-flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              Oprește
+            </Button>
+
+
+          )}
+        </Stack>
+
 
         {/* TextField with error message in helperText */}
         <TextField
@@ -156,34 +194,41 @@ export const ChooseDescription = (props) => {
           rows={6}
           fullWidth
           variant="outlined"
-          value={description} // Bind the TextField value to description state
-          onChange={(e) => setDescription(e.target.value)} // Allow manual input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           helperText={
-            errorMessage ? errorMessage : (
-              <div style={{ textAlign: 'right' }}>
-                {`${description.length}/${MAX_CHARACTERS}`}
-              </div>
-            )
-          } // Show error or character count aligned to the right
+            <span style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+      {/* Left-aligned error message */}
+              <span style={{ color: errorMessage ? 'red' : 'inherit' }}>
+        {errorMessage || ''}
+      </span>
+
+              {/* Right-aligned character count */}
+              <span>
+        {`${description.length}/${MAX_CHARACTERS}`}
+      </span>
+    </span>
+          }
           inputProps={{
-            maxLength: MAX_CHARACTERS, // Set maximum number of characters to 5000
+            maxLength: MAX_CHARACTERS,
           }}
           InputProps={{
             sx: {
               "& .MuiInputBase-input": {
-                fontSize: 'unset !important', // Override the font size
+                fontSize: 'unset !important',
               },
               "& .MuiOutlinedInput-input": {
-                fontSize: 'unset !important', // Ensure font size is overridden
+                fontSize: 'unset !important',
               },
             },
           }}
-          ref={textFieldRef} // Attach the ref to the TextField
+          ref={textFieldRef}
           sx={{
             position: 'relative',
           }}
-          error={!!errorMessage} // Apply error state when there's an error
+          error={!!errorMessage}
         />
+
       </Stack>
 
       <Stack

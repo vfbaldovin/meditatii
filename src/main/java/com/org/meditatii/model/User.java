@@ -48,6 +48,9 @@ public class  User {
     @Column(name = "experience")
     private String experience;
 
+    @Column(name = "city")
+    private String city;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserProfileImage userProfileImage;
 

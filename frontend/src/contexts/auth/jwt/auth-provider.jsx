@@ -5,6 +5,7 @@ import { authApi } from 'src/api/auth';
 import { Issuer } from 'src/utils/auth';
 import { AuthContext, initialState } from './auth-context';
 import {useAuth} from "../../../hooks/use-auth";
+import {useNavigate} from "react-router-dom";
 
 const STORAGE_KEY = 'accessToken';
 
@@ -71,6 +72,7 @@ const reducer = (state, action) =>
 export const AuthProvider = (props) => {
   const { children } = props;
   const [state, dispatch] = useReducer(reducer, initialState);
+  const navigate = useNavigate(); // Access navigate here once
 
   const initialize = useCallback(async () => {
     console.log("AUTH PROVIDER LOADED")
@@ -197,6 +199,68 @@ export const AuthProvider = (props) => {
     await authApi.changePassword({ token, password });
   }, []);
 
+  const signOut = useCallback(async () => {
+    try {
+      // Assuming you have the accessToken stored in sessionStorage
+      const refreshToken = sessionStorage.getItem('refreshToken');
+
+      // Call to backend to invalidate the accessToken
+
+      // Remove tokens and other auth-related data from sessionStorage
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('expiresAt');
+
+      // Dispatch sign out action to update local state
+      dispatch({ type: ActionType.SIGN_OUT });
+      await authApi.signOut({ refreshToken });
+
+    } catch (err) {
+      console.error(err);
+      // Optionally handle errors (e.g., logging out user locally even if backend call fails)
+      dispatch({ type: ActionType.SIGN_OUT });
+    }
+  }, [dispatch]);
+
+
+  const fetchWithAuth = useCallback(async (endpoint, options = {}) => {
+    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}`;
+    console.log(url);
+    let accessToken = sessionStorage.getItem('accessToken');
+    let refreshToken = sessionStorage.getItem('refreshToken');
+    let expiresAt = sessionStorage.getItem('expiresAt');
+    const now = Date.now();
+
+    // Refresh token if expired
+    if (expiresAt && now >= expiresAt) {
+      accessToken = await refreshAccessToken(refreshToken);
+      if (!accessToken) {
+        await signOut();
+        console.log('xx zzz azz azz azz azz azz azz azz azz azz azz azz azz azz aa')
+        navigate('/login'); // Redirect to login page if refresh fails
+        return; // Exit if refresh fails
+      }
+    }
+
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const response = await fetch(url, options);
+
+    // Handle unauthorized response
+    if (response.status === 401) {
+      await signOut();
+      dispatch({ type: ActionType.SIGN_OUT });
+      console.log("PIZZAPIZZAPIZZAPIZZAPIZZAPIZZAPIZZAPIZZAPIZZA")
+      navigate('/login'); // Redirect to login page if unauthorized
+      return; // Exit if 401 encountered
+    }
+
+    return response;
+  }, [signOut, dispatch]);
+
 
 
   /*
@@ -246,31 +310,6 @@ export const AuthProvider = (props) => {
   );
 
 
-  const signOut = useCallback(async () => {
-    try {
-      // Assuming you have the accessToken stored in sessionStorage
-      const refreshToken = sessionStorage.getItem('refreshToken');
-
-      // Call to backend to invalidate the accessToken
-
-      // Remove tokens and other auth-related data from sessionStorage
-      console.log("MARISU")
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      sessionStorage.removeItem('expiresAt');
-
-      // Dispatch sign out action to update local state
-      dispatch({ type: ActionType.SIGN_OUT });
-      await authApi.signOut({ refreshToken });
-
-    } catch (err) {
-      console.error(err);
-      // Optionally handle errors (e.g., logging out user locally even if backend call fails)
-      dispatch({ type: ActionType.SIGN_OUT });
-    }
-  }, [dispatch]);
-
-
   return (
     <AuthContext.Provider
       value={{
@@ -281,6 +320,7 @@ export const AuthProvider = (props) => {
         signOut,
         resetPassword,
         changePassword,
+        fetchWithAuth,
       }}
     >
       {children}
