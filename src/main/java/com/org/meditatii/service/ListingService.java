@@ -44,9 +44,16 @@ public class ListingService {
         return repository.findAll();
     }
 
+    public ListingResponse findById(Long id, String username) {
+            Listing listing = repository.findByIdAndUsername(id, username)
+                    .orElseThrow(() -> new AppNotFoundException("Listing not found or access denied for id: " + id));
+            return listingResponse(listing);
+    }
+
     public ListingResponse findById(Long id) {
-        return this.listingResponse(repository.findById(id)
-                .orElseThrow(() -> new AppNotFoundException("Listing not found with id: " + id)));
+        Listing listing = repository.findById(id)
+                .orElseThrow(() -> new AppNotFoundException("Listing not found or access denied for id: " + id));
+        return listingResponse(listing);
     }
 
     public Listing save(Listing listing) {

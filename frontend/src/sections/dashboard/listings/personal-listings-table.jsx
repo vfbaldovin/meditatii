@@ -23,6 +23,8 @@ import Card from "@mui/material/Card";
 import ArrowsUp from "@untitled-ui/icons-react/build/esm/ArrowsUp";
 import Button from "@mui/material/Button";
 import {SeverityPill} from "../../../components/severity-pill";
+import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
+import React from "react";
 
 export const PersonalListingsTable = (props) => {
   const {
@@ -98,7 +100,18 @@ export const PersonalListingsTable = (props) => {
                     <SeverityPill color='success'>DA</SeverityPill>
                     <SeverityPill color='warning'>?</SeverityPill>
                     <SeverityPill color='error'>NU</SeverityPill>
-
+                    <Avatar
+                      sx={{
+                        backgroundColor: 'success.main',
+                        color: 'success.contrastText',
+                        height: 40,
+                        width: 40,
+                      }}
+                    >
+                      <SvgIcon>
+                        <CheckIcon />
+                      </SvgIcon>
+                    </Avatar>
                   </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>
                     <Button

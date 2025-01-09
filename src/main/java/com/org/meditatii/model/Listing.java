@@ -32,9 +32,6 @@ public class Listing {
     @Column(name = "session_duration")
     private String sessionDuration;
 
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
-
     @Column(name = "price")
     private Integer price;
 
@@ -74,5 +71,8 @@ public class Listing {
 
     @Column(name = "refresh_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime refreshDate;
+
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdDate;
 
 }

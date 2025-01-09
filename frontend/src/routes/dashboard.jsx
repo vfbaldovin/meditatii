@@ -42,6 +42,7 @@ const ProductCreatePage = lazy(() => import('src/pages/dashboard/products/create
 
 // Listings
 const ListingCreatePage = lazy(() => import('src/pages/dashboard/listings/create-page'));
+const ListingPreviewPage = lazy(() => import('src/pages/dashboard/listings/preview-page'));
 
 // Social
 const SocialFeedPage = lazy(() => import('src/pages/dashboard/social/feed'));
@@ -206,6 +207,10 @@ export const dashboardRoutes = [
           {
             path: 'create',
             element: <ListingCreatePage />,
+          },
+          {
+            path: ':id',
+            element: <ListingPreviewPage />,
           },
         ],
       },

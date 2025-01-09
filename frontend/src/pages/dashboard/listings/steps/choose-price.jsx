@@ -42,9 +42,28 @@ export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, 
   }, [selectedSubject]);
 
   const handleInputChange = (event) => {
-    const value = event.target.value.replace(/[^0-9]/g, '').slice(0, 10); // Ensure only integers up to 10 digits
-    setPrice(String(value)); // Update the price input state as a string
-    if (value) setError(''); // Clear error if valid input
+    // Remove non-digits and limit to 3 digits
+    let value = event.target.value
+      .replace(/[^0-9]/g, '')  // Keep only digits
+      .slice(0, 3);            // Limit to 3 digits
+
+    // If value is empty or zero, don't update the input
+    if (!value || value === '0') {
+      value = '';
+    }
+
+    setPrice(value);
+    if (value) setError('');
+  };
+
+  const handleNext = () => {
+    const numericPrice = Number(price);
+    if (!price || numericPrice <= 0 || numericPrice > 999) {
+      setError('Te rugăm să introduci un preț între 1 și 999 lei.');
+    } else {
+      setError('');
+      onNext();
+    }
   };
 
   const handleChipClick = () => {
@@ -54,14 +73,6 @@ export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, 
     }
   };
 
-  const handleNext = () => {
-    if (!price || isNaN(Number(price)) || Number(price) <= 0) {
-      setError('Te rugăm să introduci un preț pentru a finaliza.');
-    } else {
-      setError(''); // Clear error if validation passes
-      onNext(); // Proceed to the next step
-    }
-  };
 
   return (
     <Stack spacing={3} {...other}>
@@ -106,15 +117,17 @@ export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, 
         variant="outlined"
         value={price}
         onChange={handleInputChange}
-        error={!!error} // Show error styling if error exists
-        helperText={error} // Display error message as helper text
+        error={!!error}
+        helperText={error}
         InputProps={{
           endAdornment: <InputAdornment position="end">lei / oră</InputAdornment>,
         }}
         inputProps={{
-          min: 0,
-          pattern: '[0-9]*',
-          maxLength: 10,
+          min: 1,
+          max: 999,
+          pattern: '[1-9][0-9]{0,2}',
+          maxLength: 3,
+          inputMode: 'numeric',
         }}
       />
 

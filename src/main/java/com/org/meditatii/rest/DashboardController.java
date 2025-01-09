@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,8 +40,8 @@ public class DashboardController {
     }
 
     @GetMapping("/listings/{id}")
-    public ResponseEntity<?> getListing(@PathVariable Long id) {
-        return ResponseEntity.ok(listingService.findById(id));
+    public ResponseEntity<?> getListing(@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(listingService.findById(id, principal.getName()));
     }
 
     @PostMapping("/listings/create")

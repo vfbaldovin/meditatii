@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Card from '@mui/material/Card';
 import Avatar from '@mui/material/Avatar';
@@ -10,8 +10,9 @@ import Link from '@mui/material/Link';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import Skeleton from '@mui/material/Skeleton';
 import { useAuth } from '../../../../hooks/use-auth';
+import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 
-export const ListingCard = ({ listingId }) => {
+export const ListingCard = ({ listingId, isHovered }) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const { fetchWithAuth } = useAuth();
   const [listing, setListing] = useState(null);
@@ -95,7 +96,7 @@ export const ListingCard = ({ listingId }) => {
         },
       }}
     >
-      {listing.promoted && (
+      {isHovered && (
         <WorkspacePremiumIcon
           sx={{
             position: 'absolute',
@@ -161,13 +162,15 @@ export const ListingCard = ({ listingId }) => {
                   sx={{
                     color: 'white',
                     '& path': {
-                      fill: (theme) => theme.palette.primary.main,
-                      fillOpacity: 1,
+                      fill: 'none', // Remove inner color
+                      stroke: (theme) => theme.palette.primary.main, // Set the outline color
+                      strokeWidth: 2, // Adjust the thickness of the outline
                     },
                   }}
-                >
-                  {/* Your Verified Icon */}
+                >{isHovered && (
+                  <CheckVerified01 />)}
                 </SvgIcon>
+
               </Box>
             </Box>
           </Box>

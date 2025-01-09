@@ -9,15 +9,11 @@ import { usePageView } from 'src/hooks/use-page-view';
 import { ListingCreateForm } from "./listing-create-form";
 
 const Page = () => {
-  usePageView();
+  // usePageView();
 
   const wallpapers = [
-    'url(/assets/writing.webp)',
-    'url(/assets/abstract_wallpaper_1.webp)',
-    'url(/assets/abstract_wallpaper.png)',
-    'url(/assets/abstract_wallpaper_3.webp)',
-    'url(/assets/abstract_wallpaper_9.webp)',
-    'url(/assets/abstract_wallpaper_10.webp)'
+    // 'url(/assets/writing.webp)',
+    'url(/assets/oai_arco_thumbnail.jpg)',
   ];
 
   const [currentWallpaperIndex, setCurrentWallpaperIndex] = useState(0);
@@ -59,7 +55,7 @@ const Page = () => {
           <Grid
             xs={12}
             sm={4}
-            onClick={handleBackgroundChange}
+            // onClick={handleBackgroundChange}
             sx={{
               backgroundImage: wallpapers[currentWallpaperIndex],
               backgroundPosition: 'center',
@@ -69,7 +65,7 @@ const Page = () => {
                 xs: 'none',
                 md: 'block',
               },
-              cursor: 'pointer',
+              // cursor: 'pointer',
             }}
           />
           <Grid

@@ -9,12 +9,12 @@ import Typography from '@mui/material/Typography';
 import { ChooseSubject } from './steps/choose-subject';
 import { ChoosePrice } from './steps/choose-price';
 import { ChooseDescription } from './steps/choose-description';
-import { ListingPreview } from './steps/listing-preview';
 import { useAuth } from '../../../hooks/use-auth';
 import Avatar from "@mui/material/Avatar";
 import SvgIcon from "@mui/material/SvgIcon";
 import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
 import confetti from "canvas-confetti";
+import {useNavigate} from "react-router-dom";
 
 const StepIcon = ({ active, completed, icon }) => (
   <Avatar
@@ -42,6 +42,7 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [listingId, setListingId] = useState(null);
+  const navigate = useNavigate(); // Access navigate here once
 
   const { fetchWithAuth } = useAuth();
 
@@ -64,12 +65,21 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
         setListingId(data.id); // Only store listing ID
         setIsComplete(true);
         confetti({
-          particleCount: 200,   // Increase number of pieces
+          particleCount: 400,   // Increase number of pieces
           spread: 120,          // Wider area
-          startVelocity: 40,    // Faster initial speed
+          startVelocity: 80,    // Faster initial speed
           scalar: 1.5,          // Larger confetti size
-          origin: { x: 0.5, y: 0.5 }, // Center of screen
+          origin: { x: 1, y: 0.5 } // Center of screen
         });
+        confetti({
+          particleCount: 400,   // Increase number of pieces
+          spread:120,          // Wider area
+          startVelocity: 80,    // Faster initial speed
+          scalar: 1.5,          // Larger confetti size
+          origin: { x: 0, y: 0.5 } // Center of screen
+        });
+        navigate(`/dashboard/listings/${data.id}?s=new`);
+
       } else {
         console.error('Failed to create listing:', response.statusText);
       }
@@ -121,13 +131,6 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
     },
   ], [handleBack, handleNext, handleComplete, selectedSubject, description, price]);
 
-  if (isComplete) {
-    return (
-      <ListingPreview
-        listingId={listingId} // Only pass the listing ID to ListingPreview
-      />
-    );
-  }
 
   return (
     <Stepper activeStep={activeStep} orientation="vertical">

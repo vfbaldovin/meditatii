@@ -28,13 +28,14 @@ import { OverviewDoneTasks } from "../../sections/dashboard/overview/overview-do
 import { OverviewPendingIssues } from "../../sections/dashboard/overview/overview-pending-issues";
 import { OverviewOpenTickets } from "../../sections/dashboard/overview/overview-open-tickets";
 import CircularProgress from "@mui/material/CircularProgress";
-import {GridListPlaceholder} from "../../sections/components/grid-lists/grid-list-placeholder";
 import {
   PersonalListingsSkeletonTable
 } from "../../sections/dashboard/listings/personal-listings-skeleton-table";
 import {RouterLink} from "../../components/router-link";
 import {paths} from "../../paths";
 import {useAuth} from "../../hooks/use-auth";
+import Chip from "@mui/material/Chip";
+import {AccountAvatar} from "../../sections/dashboard/account/account-avatar";
 
 
 const tabs = [
@@ -118,9 +119,28 @@ const Page = () => {
           <Stack spacing={3} sx={{ mb: 3 }}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">
-                  Bon jur.c   EDRFTGYJKLH=Wz§
-                </Typography>
+                <Stack
+                  alignItems="center"
+                  direction="row"
+                  spacing={2}
+                >
+                  <AccountAvatar avatar={user.avatar}></AccountAvatar>
+
+                  <Stack spacing={1}>
+                    <Typography variant="h4">{user.email}</Typography>
+                    <Stack
+                      alignItems="center"
+                      direction="row"
+                      spacing={1}
+                    >
+                      <Typography variant="subtitle2">user_id:</Typography>
+                      <Chip
+                        label={user.email}
+                        size="small"
+                      />
+                    </Stack>
+                  </Stack>
+                </Stack>
               </Stack>
               <Stack alignItems="center" direction="row" spacing={2}>
                 <Button

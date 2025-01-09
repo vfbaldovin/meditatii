@@ -385,7 +385,7 @@ export const HomeHero = () => {
                     spacing={3}
                   >
                     {projects.map((listing) => {
-                      const updatedAgo = formatDistanceToNowStrict(parseISO(listing.createdDate), {addSuffix: true});
+                      // const updatedAgo = formatDistanceToNowStrict(parseISO(listing.createdDate), {addSuffix: true});
 
                       return (
                         <Grid
@@ -479,19 +479,17 @@ export const HomeHero = () => {
                                     <Box display="flex" alignItems="center" ml={1}>
                                       <SvgIcon
                                         sx={{
-                                          // color: 'background.paper',
-                                          // color: 'primary.main',
                                           color: 'white',
                                           '& path': {
-                                            // fill: (theme) => theme.palette.success.main,
-                                            fill: (theme) => theme.palette.primary.main,
-                                            fillOpacity: 1,
+                                            fill: 'none', // Remove inner color
+                                            stroke: (theme) => theme.palette.primary.main, // Set the outline color
+                                            strokeWidth: 2, // Adjust the thickness of the outline
                                           },
                                         }}
                                       >
                                         <CheckVerified01 />
-                                        {/*<CheckVerified02 />*/}
                                       </SvgIcon>
+
                                       {/*<Typography color="success" noWrap variant="overline" sx={{ ml: 0.5 }}>
                                         Verified
                                       </Typography>*/}
