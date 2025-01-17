@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import { subDays, subHours, subMinutes, subMonths } from 'date-fns';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -36,8 +36,48 @@ import {paths} from "../../paths";
 import {useAuth} from "../../hooks/use-auth";
 import Chip from "@mui/material/Chip";
 import {AccountAvatar} from "../../sections/dashboard/account/account-avatar";
+import {InvoiceListSidebar} from "../../sections/dashboard/invoice/invoice-list-sidebar";
+import {InvoiceListContainer} from "../../sections/dashboard/invoice/invoice-list-container";
+import FilterFunnel01Icon from "@untitled-ui/icons-react/build/esm/FilterFunnel01";
+import {InvoiceListSummary} from "../../sections/dashboard/invoice/invoice-list-summary";
+import {InvoiceListTable} from "../../sections/dashboard/invoice/invoice-list-table";
+import {customer as invoicesSearch} from "../../api/customers/data";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import {useMounted} from "../../hooks/use-mounted";
+import {invoicesApi} from "../../api/invoices";
+import IconButton from "@mui/material/IconButton";
+import XIcon from "@untitled-ui/icons-react/build/esm/X";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
+import FormLabel from "@mui/material/FormLabel";
+import {DatePicker} from "@mui/x-date-pickers/DatePicker";
+import {Scrollbar} from "../../components/scrollbar";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Switch from "@mui/material/Switch";
+import * as filters from "../../api/customers/data";
+import {CustomerBasicDetails} from "../../sections/dashboard/customer/customer-basic-details";
+import {CustomerPayment} from "../../sections/dashboard/customer/customer-payment";
+import {CustomerEmailsSummary} from "../../sections/dashboard/customer/customer-emails-summary";
+import {CustomerDataManagement} from "../../sections/dashboard/customer/customer-data-management";
+import CardHeader from "@mui/material/CardHeader";
+import Avatar from "@mui/material/Avatar";
+import {getInitials} from "../../utils/get-initials";
+import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
+import ChevronDownIcon from "@untitled-ui/icons-react/build/esm/ChevronDown";
+import {ProfileCompleteProgress} from "../../sections/dashboard/academy/profile-complete-progress";
+import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 
-
+const customers = [
+  'Blind Spots Inc.',
+  'Dispatcher Inc.',
+  'ACME SRL',
+  'Novelty I.S',
+  'Beauty Clinic SRL',
+  'Division Inc.',
+];
 const tabs = [
   { label: 'General', value: 'general' },
   { label: 'Billing', value: 'billing' },
@@ -56,6 +96,7 @@ const Page = () => {
   const [personalListings, setPersonalListings] = useState([]);  // State for listings
   const [loading, setLoading] = useState(true);  // Loading state
   const [error, setError] = useState(null);  // Error state
+  const isSmallScreen = useMediaQuery('(max-width:1200px)'); // Check if screen width is less than 1200px
 
   // Bearer token from authentication (assuming it's stored in localStorage)
   const token = sessionStorage.getItem('accessToken');
@@ -115,9 +156,18 @@ const Page = () => {
           py: 8,
         }}
       >
+
         <Container maxWidth="xl">
-          <Stack spacing={3} sx={{ mb: 3 }}>
-            <Stack direction="row" justifyContent="space-between" spacing={4}>
+          <Stack spacing={3} sx={{mb: 3}}>
+            <Stack
+              alignItems="flex-start"
+              direction={{
+                xs: 'column',
+                md: 'row',
+              }}
+              justifyContent="space-between"
+              spacing={4}
+            >
               <Stack spacing={1}>
                 <Stack
                   alignItems="center"
@@ -127,7 +177,36 @@ const Page = () => {
                   <AccountAvatar avatar={user.avatar}></AccountAvatar>
 
                   <Stack spacing={1}>
-                    <Typography variant="h4">{user.email}</Typography>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between', // Ensures even spacing between the header and button
+                        alignItems: 'center',           // Vertically aligns items on the same line
+                        // padding: 2,                     // Adds some padding for layout
+                      }}
+                    >
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }, // Responsive font sizes
+                      }}
+                    >
+                      {user.email}
+                    </Typography>
+                    <SvgIcon
+                      sx={{
+                        ml:1,
+                        color: 'white',
+                        '& path': {
+                          fill: 'none', // Remove inner color
+                          stroke: (theme) => theme.palette.primary.main, // Set the outline color
+                          strokeWidth: 2, // Adjust the thickness of the outline
+                        },
+                      }}
+                    >
+                       <CheckVerified01></CheckVerified01>
+                    </SvgIcon>
+                    </Box>
                     <Stack
                       alignItems="center"
                       direction="row"
@@ -142,20 +221,25 @@ const Page = () => {
                   </Stack>
                 </Stack>
               </Stack>
-              <Stack alignItems="center" direction="row" spacing={2}>
-                <Button
-                  component={RouterLink}
-                  href={paths.dashboard.listings.create}
-                  startIcon={
-                    <SvgIcon>
-                      <PlusIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                >
-                  Adaugă anunț
-                </Button>
-              </Stack>
+
+              {/*<Stack*/}
+              {/*  alignItems="center"*/}
+              {/*  direction="row"*/}
+              {/*  spacing={2}*/}
+              {/*>*/}
+              {/*  <Button*/}
+              {/*    component={RouterLink}*/}
+              {/*    href={paths.dashboard.listings.create}*/}
+              {/*    startIcon={*/}
+              {/*      <SvgIcon>*/}
+              {/*        <PlusIcon/>*/}
+              {/*      </SvgIcon>*/}
+              {/*    }*/}
+              {/*    variant="contained"*/}
+              {/*  >*/}
+              {/*    Adaugă anunț*/}
+              {/*  </Button>*/}
+              {/*</Stack>*/}
             </Stack>
 
             <Tabs
@@ -188,39 +272,88 @@ const Page = () => {
 
           {currentTab === 'general' && (
             <>
-              <Grid mb={3} container disableEqualOverflow spacing={{ xs: 3, lg: 4 }}>
-                <Grid xs={12} md={4}>
-                  <OverviewDoneTasks amount={31} />
+              <Grid container spacing={4}>
+                {/* CustomerBasicDetails */}
+                <Grid
+                  xs={12}
+                  lg={4}
+                  sx={{
+                    order: isSmallScreen ? 2 : 1, // Dynamically set order
+                  }}
+                >
+                  <CustomerBasicDetails
+                    address1="abc"
+                    address2="abc"
+                    country="abc"
+                    email={user.email}
+                    isVerified="abc"
+                    phone="abc"
+                    state="abc"
+                  />
                 </Grid>
-                <Grid xs={12} md={4}>
-                  <OverviewPendingIssues amount={12} />
-                </Grid>
-                <Grid xs={12} md={4}>
-                  <OverviewOpenTickets amount={5} />
-                </Grid>
-              </Grid>
 
-              <Box mb={3}>
-                <Card>
-                  <CardContent>
-                    <Grid container spacing={3}>
-                      <Grid xs={12} md={4}>
-                        <Typography variant="h6">Anunțuri</Typography>
-                      </Grid>
-                      <Grid xs={12} md={8}>
+                {/* Anunțuri Card and ProfileCompleteProgress */}
+                <Grid
+                  xs={12}
+                  lg={8}
+                  sx={{
+                    order: isSmallScreen ? 1 : 2, // Dynamically set order
+                  }}
+                >
+                  <Stack spacing={4}>
+                    <Card>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between', // Even spacing
+                          alignItems: 'center', // Align items vertically
+                          padding: 2, // Padding for layout
+                        }}
+                      >
+                        <CardHeader title="Anunțuri" sx={{ p: 1 }} />
+                        <Button
+                          component={RouterLink}
+                          href={paths.dashboard.listings.create}
+                          startIcon={
+                            <SvgIcon>
+                              <PlusIcon />
+                            </SvgIcon>
+                          }
+                          variant="contained"
+                        >
+                          Adaugă anunț
+                        </Button>
+                      </Box>
+                      <CardContent>
                         {loading ? (
-                          <Box sx={{position: 'relative', height: '100%'}}>
+                          <Box sx={{ position: 'relative', height: '100%' }}>
                             <PersonalListingsSkeletonTable />
-                            <Box sx={{
-                              position: 'fixed',
-                              top: '57.5%',
-                              left: '50%',
-                              transform: 'translate(-50%, -50%)'
-                            }}>
-                              <CircularProgress size={40} thickness={6} style={{opacity: 0.7}}/>
+                            <Box
+                              sx={{
+                                position: 'fixed',
+                                top: '57.5%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                              }}
+                            >
+                              <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }} />
                             </Box>
-                          </Box>                        ) : error ? (
+                          </Box>
+                        ) : error ? (
                           <Typography color="error">{error}</Typography>
+                        ) : personalListings.length === 0 ? (
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              height: '100%',
+                              gap: 2,
+                            }}
+                          >
+                            <Typography variant="h6">Nu există anunțuri publicate.</Typography>
+                          </Box>
                         ) : (
                           <PersonalListingsTable
                             count={personalListings.length}
@@ -231,19 +364,24 @@ const Page = () => {
                             onRowsPerPageChange={handleRowsPerPageChange}
                           />
                         )}
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </Box>
+                      </CardContent>
+                    </Card>
 
-              <Box mb={3}>
-                <AccountGeneralSettings
-                  avatar={user.avatar || ''}
-                  email={user.email || ''}
-                  name={user.name || ''}
-                />
-              </Box>
+                    <Box
+                      sx={{
+                        flex: { xs: '0 0 auto', md: '0 0 auto' },
+                        display: 'flex',
+                        justifyContent: { xs: 'flex-start', md: 'flex-start' },
+                      }}
+                    >
+                      <ProfileCompleteProgress
+                        timeCurrent={80}
+                        timeGoal={100}
+                      />
+                    </Box>
+                  </Stack>
+                </Grid>
+              </Grid>
             </>
           )}
 

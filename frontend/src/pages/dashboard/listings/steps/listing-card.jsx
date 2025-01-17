@@ -11,6 +11,7 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import Skeleton from '@mui/material/Skeleton';
 import { useAuth } from '../../../../hooks/use-auth';
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
+import Tooltip from "@mui/material/Tooltip";
 
 export const ListingCard = ({ listingId, isHovered }) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -92,11 +93,12 @@ export const ListingCard = ({ listingId, isHovered }) => {
         border: (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
         '&:hover': {
           border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
-          borderRadius: '20px',
+          borderRadius: '0.5rem',
         },
       }}
     >
       {isHovered && (
+        <Tooltip title="Insignă anunț promovat" arrow open={isHovered} placement="bottom-end">
         <WorkspacePremiumIcon
           sx={{
             position: 'absolute',
@@ -119,6 +121,7 @@ export const ListingCard = ({ listingId, isHovered }) => {
             },
           }}
         />
+        </Tooltip>
       )}
       <Box sx={{ p: 2, boxShadow: 'unset', padding: '8px 16px 16px' }}>
         <Box
@@ -158,18 +161,22 @@ export const ListingCard = ({ listingId, isHovered }) => {
                 </Typography>
               </Typography>
               <Box display="flex" alignItems="center" ml={1}>
-                <SvgIcon
-                  sx={{
-                    color: 'white',
-                    '& path': {
-                      fill: 'none', // Remove inner color
-                      stroke: (theme) => theme.palette.primary.main, // Set the outline color
-                      strokeWidth: 2, // Adjust the thickness of the outline
-                    },
-                  }}
-                >{isHovered && (
-                  <CheckVerified01 />)}
-                </SvgIcon>
+
+                <Tooltip title="Insignă meditator verificat (diponibilă permanent)" arrow open={isHovered} placement="top-start">
+                  <SvgIcon
+                    sx={{
+                      color: 'white',
+                      '& path': {
+                        fill: 'none', // Remove inner color
+                        stroke: (theme) => theme.palette.primary.main, // Set the outline color
+                        strokeWidth: 2, // Adjust the thickness of the outline
+                      },
+                    }}
+                  >
+                    {isHovered && <CheckVerified01 />}
+                  </SvgIcon>
+                </Tooltip>
+
 
               </Box>
             </Box>

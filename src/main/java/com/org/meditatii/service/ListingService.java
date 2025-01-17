@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -69,7 +70,9 @@ public class ListingService {
         ));
         listing.setDescription(request.description());
         listing.setPrice(request.price());
-
+        listing.setViews(0L);
+        listing.setPromoted(false);
+        listing.setRefreshDate(LocalDateTime.now());
         return save(listing).getId();
     }
 
@@ -176,7 +179,7 @@ public class ListingService {
                     .city(listing.getUser().getCity())
                     .county(listing.getCounty())
                     .area(listing.getArea())
-                    .experience(listing.getExperience())
+                    .experience(listing.getUser().getExperience())
                     .online(listing.getOnline())
                     .studentHome(listing.getStudentHome())
                     .tutorHome(listing.getTutorHome())

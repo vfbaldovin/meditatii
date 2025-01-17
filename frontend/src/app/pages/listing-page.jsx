@@ -222,7 +222,7 @@ const Page = () => {
                   <Chip
                     label={
                       <span>
-                    <strong>Experiență:</strong> {listing.experience}
+                    <strong>Experiență:</strong> {listing.experience} ani
                   </span>
                     }
                     key='experience'

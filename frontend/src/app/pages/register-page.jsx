@@ -160,7 +160,7 @@ const Page = () => {
             </CardContent>
           </Card>
         ) : (
-            <Card elevation={16} sx={{ textAlign: 'center', padding: 3 }}>
+            <Card elevation={16} sx={{ textAlign: 'center', padding: 3}}>
             <CardContent>
               <Typography variant="h4" component="div" gutterBottom sx={{ mb: 3 }}>
                 Hooray! 🎉
@@ -172,7 +172,7 @@ const Page = () => {
                 a fost înregistrat.
               </Typography>
               <Typography variant="h6" component="div" gutterBottom sx={{ mb: 3 }}>
-                Verificați adresa de email în inbox și spam pentru activarea contului.
+                Verificați adresa de email în inbox și spam pentru activare.
               </Typography>
 
               <Typography variant="body1" color="text.secondary">

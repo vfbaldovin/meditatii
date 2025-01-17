@@ -25,6 +25,7 @@ import Button from "@mui/material/Button";
 import {SeverityPill} from "../../../components/severity-pill";
 import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
 import React from "react";
+import ArrowRightIcon from "@untitled-ui/icons-react/build/esm/ArrowRight";
 
 export const PersonalListingsTable = (props) => {
   const {
@@ -44,9 +45,10 @@ export const PersonalListingsTable = (props) => {
             <TableRow>
               <TableCell sx={{ backgroundColor: 'transparent !important' }}>Materie</TableCell>
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Vizualizari</TableCell>
-              <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovare</TableCell>
+              {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovare</TableCell>*/}
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Actualizare</TableCell>
-              <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }} align="right">Modifica</TableCell>
+              {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Modifica</TableCell>*/}
+              <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }} align="right">Detalii</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -62,69 +64,69 @@ export const PersonalListingsTable = (props) => {
                     {listing.subject}
                   </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>
-                  <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Avatar sx={{ backgroundColor: 'transparent' }}>
-                      <Box
-                        sx={{
-                          animation: 'pulse ease 750ms infinite',
-                          borderRadius: '50%',
-                          p: 0.5,
-                          '@keyframes pulse': {
-                            '0%': {
-                              boxShadow: 'none',
-                            },
-                            '100%': {
-                              boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,
-                            },
-                          },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            backgroundColor: 'success.main',
-                            borderRadius: '50%',
-                            height: 18,
-                            width: 18,
-                          }}
-                        />
-                      </Box>
-                    </Avatar>
-                    <IconButton
-                      component={RouterLink}
-                      href={paths.dashboard.personalListingsEdit}
-                    >
-                      <SvgIcon>
-                        <ArrowsUp />
-                      </SvgIcon>
-                    </IconButton>
-                    <SeverityPill color='success'>DA</SeverityPill>
-                    <SeverityPill color='warning'>?</SeverityPill>
-                    <SeverityPill color='error'>NU</SeverityPill>
-                    <Avatar
-                      sx={{
-                        backgroundColor: 'success.main',
-                        color: 'success.contrastText',
-                        height: 40,
-                        width: 40,
-                      }}
-                    >
-                      <SvgIcon>
-                        <CheckIcon />
-                      </SvgIcon>
-                    </Avatar>
-                  </TableCell>
+                  {/*<TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>*/}
+                  {/*  <Avatar sx={{ backgroundColor: 'transparent' }}>*/}
+                  {/*    <Box*/}
+                  {/*      sx={{*/}
+                  {/*        animation: 'pulse ease 750ms infinite',*/}
+                  {/*        borderRadius: '50%',*/}
+                  {/*        p: 0.5,*/}
+                  {/*        '@keyframes pulse': {*/}
+                  {/*          '0%': {*/}
+                  {/*            boxShadow: 'none',*/}
+                  {/*          },*/}
+                  {/*          '100%': {*/}
+                  {/*            boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,*/}
+                  {/*          },*/}
+                  {/*        },*/}
+                  {/*      }}*/}
+                  {/*    >*/}
+                  {/*      <Box*/}
+                  {/*        sx={{*/}
+                  {/*          backgroundColor: 'success.main',*/}
+                  {/*          borderRadius: '50%',*/}
+                  {/*          height: 18,*/}
+                  {/*          width: 18,*/}
+                  {/*        }}*/}
+                  {/*      />*/}
+                  {/*    </Box>*/}
+                  {/*  </Avatar>*/}
+                  {/*  <IconButton*/}
+                  {/*    component={RouterLink}*/}
+                  {/*    href={paths.dashboard.personalListingsEdit}*/}
+                  {/*  >*/}
+                  {/*    <SvgIcon>*/}
+                  {/*      <ArrowsUp />*/}
+                  {/*    </SvgIcon>*/}
+                  {/*  </IconButton>*/}
+                  {/*  <SeverityPill color='success'>DA</SeverityPill>*/}
+                  {/*  /!*<SeverityPill color='warning'>?</SeverityPill>*!/*/}
+                  {/*  <SeverityPill color='error'>NU</SeverityPill>*/}
+                  {/*  /!*<Avatar*!/*/}
+                  {/*  /!*  sx={{*!/*/}
+                  {/*  /!*    backgroundColor: 'success.main',*!/*/}
+                  {/*  /!*    color: 'success.contrastText',*!/*/}
+                  {/*  /!*    height: 40,*!/*/}
+                  {/*  /!*    width: 40,*!/*/}
+                  {/*  /!*  }}*!/*/}
+                  {/*  /!*>*!/*/}
+                  {/*  /!*  <SvgIcon>*!/*/}
+                  {/*  /!*    <CheckIcon />*!/*/}
+                  {/*  /!*  </SvgIcon>*!/*/}
+                  {/*  /!*</Avatar>*!/*/}
+                  {/*</TableCell>*/}
                   <TableCell sx={{ textAlign: 'center' }}>
-                    <Button
-                      // startIcon={
-                      //
-                      // }
-                      variant="contained"
-                    >
-                      <SvgIcon>
-                        <RefreshCcw01Icon />
-                      </SvgIcon>
-                      {/*Sync Data*/}
-                    </Button>
+                    {/*<Button*/}
+                    {/*  // startIcon={*/}
+                    {/*  //*/}
+                    {/*  // }*/}
+                    {/*  variant="contained"*/}
+                    {/*>*/}
+                    {/*  <SvgIcon>*/}
+                    {/*    <RefreshCcw01Icon />*/}
+                    {/*  </SvgIcon>*/}
+                    {/*  /!*Sync Data*!/*/}
+                    {/*</Button>*/}
                     <IconButton>
                       <SvgIcon fontSize="small">
                         <RefreshCcw01Icon />
@@ -132,13 +134,24 @@ export const PersonalListingsTable = (props) => {
                     </IconButton>
                   </TableCell>
 
+                  {/*<TableCell sx={{ textAlign: 'center' }}>*/}
+                  {/*  <IconButton*/}
+                  {/*    component={RouterLink}*/}
+                  {/*    href={paths.dashboard.personalListingsEdit}*/}
+                  {/*  >*/}
+                  {/*    <SvgIcon>*/}
+                  {/*      <Edit02Icon />*/}
+                  {/*    </SvgIcon>*/}
+                  {/*  </IconButton>*/}
+                  {/*</TableCell>*/}
+
                   <TableCell sx={{ textAlign: 'center' }} align="right">
                     <IconButton
                       component={RouterLink}
-                      href={paths.dashboard.personalListingsEdit}
+                      href={paths.dashboard.personalListingDetails.replace(':id', listing.id)}
                     >
                       <SvgIcon>
-                        <Edit02Icon />
+                        <ArrowRightIcon />
                       </SvgIcon>
                     </IconButton>
                   </TableCell>
@@ -148,15 +161,18 @@ export const PersonalListingsTable = (props) => {
           </TableBody>
         </Table>
       </Scrollbar>
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
+      {count > 5 && ( // Only show pagination if count is greater than 5
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          rowsPerPage={5} // Hardcoded to 5
+          onPageChange={onPageChange}
+          labelDisplayedRows={({ page }) => `Pagina ${page + 1} din ${Math.ceil(count / 5)}`} // Custom text
+          rowsPerPageOptions={[]} // Disable rows per page dropdown
+        />
+      )}
+
     </Box>
   );
 };

@@ -74,7 +74,7 @@ public class  User {
 
     public String getTutorName() {
         if (firstName == null) {
-            return "Unknown";
+            return email.substring(0, email.indexOf("@"));
         }
         return firstName +
                 (lastName != null && !lastName.isEmpty() ? " " + lastName.charAt(0) + "." : "");
@@ -82,7 +82,7 @@ public class  User {
 
     public String getFullName() {
         if (firstName == null) {
-            return "Unknown";
+            return email.substring(0, email.indexOf("@"));
         }
         return firstName +
                 (lastName != null && !lastName.isEmpty() ? " " + lastName : "");
@@ -93,6 +93,10 @@ public class  User {
             return 42;
         }
         return Period.between(dateOfBirth, LocalDate.now()).getYears();
+    }
+
+    public String getExperience() {
+        return experience != null ? experience : "5";
     }
 
     @Override

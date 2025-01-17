@@ -10,6 +10,8 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import heic2any from 'heic2any';
 import imageCompression from 'browser-image-compression';
+import Stack from "@mui/material/Stack";
+import SvgIcon from "@mui/material/SvgIcon";
 
 const STORAGE_KEY = 'accessToken';
 
@@ -154,13 +156,42 @@ export const AccountAvatar = ({ avatar }) => {
       >
         <Camera01Icon />
       </Avatar>
+
+      {/* Hover Overlay */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black background
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: 0, // Initially hidden
+          transition: 'opacity 0.3s', // Smooth transition
+          '&:hover': {
+            opacity: 1, // Show on hover
+          },
+        }}
+      >
+        <Stack alignItems="center" direction="row" >
+          <SvgIcon color="inherit"
+                   sx={{
+                     color: '#fff', // Icon color
+                   }}>
+            <Camera01Icon />
+          </SvgIcon>
+        </Stack>
+      </Box>
       {loading && (
         <Box
           sx={{
             position: 'absolute',
             top: '50%',
             left: '50%',
-            transform: 'translate(-50%, -50%)',
+            transform: 'translate(-50%, -45%)',
             zIndex: 2,
           }}
         >

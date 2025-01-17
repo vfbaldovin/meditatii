@@ -52,6 +52,7 @@ export const paths = {
     index: '/dashboard',
     personalListings: '/dashboard/listing/:id',
     personalListingsEdit: '/dashboard/listing/:id/edit',
+    personalListingDetails: '/dashboard/listings/:id',
     academy: {
       index: '/dashboard/academy',
       courseDetails: '/dashboard/academy/courses/:courseId',

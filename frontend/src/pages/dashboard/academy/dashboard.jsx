@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import {Seo} from 'src/components/seo';
 import {usePageView} from 'src/hooks/use-page-view';
 import {useSettings} from 'src/hooks/use-settings';
-import {AcademyDailyProgress} from 'src/sections/dashboard/academy/academy-daily-progress';
+import {ProfileCompleteProgress} from 'src/sections/dashboard/academy/profile-complete-progress';
 import {AcademyFind} from 'src/sections/dashboard/academy/academy-find';
 import {CourseCard} from 'src/sections/dashboard/academy/course-card';
 import {CourseSearch} from 'src/sections/dashboard/academy/course-search';
@@ -103,7 +103,7 @@ const Page = () => {
                 xs={12}
                 md={9}
               >
-                <AcademyDailyProgress
+                <ProfileCompleteProgress
                   timeCurrent={20}
                   timeGoal={35}
                 />

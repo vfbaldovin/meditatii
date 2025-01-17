@@ -7,6 +7,11 @@ import Typography from '@mui/material/Typography';
 import { Seo } from 'src/components/seo';
 import { usePageView } from 'src/hooks/use-page-view';
 import { ListingCreateForm } from "./listing-create-form";
+import Link from "@mui/material/Link";
+import {RouterLink} from "../../../components/router-link";
+import {paths} from "../../../paths";
+import SvgIcon from "@mui/material/SvgIcon";
+import ArrowLeftIcon from "@untitled-ui/icons-react/build/esm/ArrowLeft";
 
 const Page = () => {
   // usePageView();
@@ -81,12 +86,29 @@ const Page = () => {
           >
             <Stack
               maxWidth="sm"
-              spacing={3}
+              spacing={2}
             >
-              <Typography variant="h4">
+              <div>
+                <Link
+                  color="text.primary"
+                  component={RouterLink}
+                  href={paths.dashboard.index}
+                  sx={{
+                    alignItems: 'center',
+                    display: 'inline-flex',
+                  }}
+                  underline="hover"
+                >
+                  <SvgIcon sx={{mr: 1}}>
+                    <ArrowLeftIcon/>
+                  </SvgIcon>
+                  <Typography variant="subtitle2">Înapoi</Typography>
+                </Link>
+              </div>
+              <Typography variant="h4" sx={{mt:0}}>
                 Creează anunț {selectedSubject.name && `• ${selectedSubject.name}`}
               </Typography>
-              <ListingCreateForm onSubjectSelect={handleSubjectSelect} />
+              <ListingCreateForm onSubjectSelect={handleSubjectSelect}/>
             </Stack>
           </Grid>
         </Grid>
@@ -95,4 +117,4 @@ const Page = () => {
   );
 };
 
-export default  Page;
+export default Page;
