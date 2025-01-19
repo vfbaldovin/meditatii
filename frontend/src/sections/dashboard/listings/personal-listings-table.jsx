@@ -26,6 +26,7 @@ import {SeverityPill} from "../../../components/severity-pill";
 import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
 import React from "react";
 import ArrowRightIcon from "@untitled-ui/icons-react/build/esm/ArrowRight";
+import {useNavigate} from "react-router-dom";
 
 export const PersonalListingsTable = (props) => {
   const {
@@ -36,6 +37,7 @@ export const PersonalListingsTable = (props) => {
     page = 0,
     rowsPerPage = 5,  // Default to 5 instead of 0 to avoid warning
   } = props;
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ position: 'relative' }}>
@@ -48,7 +50,7 @@ export const PersonalListingsTable = (props) => {
               {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovare</TableCell>*/}
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Actualizare</TableCell>
               {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Modifica</TableCell>*/}
-              <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }} align="right">Detalii</TableCell>
+              {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }} align="right">Detalii</TableCell>*/}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -59,6 +61,9 @@ export const PersonalListingsTable = (props) => {
                 <TableRow
                   hover
                   key={listing.id}
+                  style={{ cursor: 'pointer' }}
+
+                  onClick={() => navigate(paths.dashboard.personalListingDetails.replace(':id', listing.id))}
                 >
                   <TableCell >
                     {listing.subject}
@@ -145,16 +150,16 @@ export const PersonalListingsTable = (props) => {
                   {/*  </IconButton>*/}
                   {/*</TableCell>*/}
 
-                  <TableCell sx={{ textAlign: 'center' }} align="right">
-                    <IconButton
-                      component={RouterLink}
-                      href={paths.dashboard.personalListingDetails.replace(':id', listing.id)}
-                    >
-                      <SvgIcon>
-                        <ArrowRightIcon />
-                      </SvgIcon>
-                    </IconButton>
-                  </TableCell>
+                  {/*<TableCell sx={{ textAlign: 'center' }} align="right">*/}
+                  {/*  <IconButton*/}
+                  {/*    component={RouterLink}*/}
+                  {/*    href={paths.dashboard.personalListingDetails.replace(':id', listing.id)}*/}
+                  {/*  >*/}
+                  {/*    <SvgIcon>*/}
+                  {/*      <ArrowRightIcon />*/}
+                  {/*    </SvgIcon>*/}
+                  {/*  </IconButton>*/}
+                  {/*</TableCell>*/}
                 </TableRow>
               );
             })}

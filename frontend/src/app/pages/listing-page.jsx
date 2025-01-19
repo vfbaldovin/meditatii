@@ -91,7 +91,7 @@ const Page = () => {
 
   return (
     <>
-      <Seo title={listing.title}/>
+      <Seo title={`Anunț - ${listing?.subject}`}/>
       <Box
         sx={{
           backgroundColor: (theme) =>
@@ -193,67 +193,74 @@ const Page = () => {
                 <Grid
                   container
                   spacing={4}
+                  direction="column"
                   className="largeScreenAvatar2"
                 >
                   <Grid xs={12} lg={9}>
                     <Typography variant="h4">
-                      {listing.title}
+                      {listing.subject}
                     </Typography>
                   </Grid>
-                  <Grid xs={12} lg={9}
-                        sx={{
-                          paddingTop: 'unset'
-                        }}>
-                  <Chip
-                    label={
-                      <span>
-                    <strong>Preț:</strong> {listing.price} lei
-                  </span>
-                    }
-                    key='price'
+                  <Grid
+                    xs={12}
+                    lg={9}
                     sx={{
-                      '&:hover': {
-                        backgroundColor: 'grey.400',
-                      },
-                      marginRight: 1,
+                      paddingTop: 'unset',
                     }}
-                  />
-
-                  <Chip
-                    label={
-                      <span>
-                    <strong>Experiență:</strong> {listing.experience} ani
-                  </span>
-                    }
-                    key='experience'
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: 'grey.400',
-                      },
-                      marginRight: 1,
-                    }}
-                  />
+                  >
                     <Chip
                       label={
                         <span>
-                    <strong>Vârstă:</strong> {listing.age} ani
-                  </span>
+        <strong>Preț:</strong> {listing.price} lei
+      </span>
                       }
-                      key='age'
+                      key="price"
                       sx={{
                         '&:hover': {
                           backgroundColor: 'grey.400',
                         },
+                        marginRight: 1,
+                        marginBottom: 1, // Add vertical spacing
                       }}
                     />
-                  <Typography
-                    variant="body1"
-                    sx={{padding: 2, whiteSpace: 'pre-wrap'}}
-                  >
 
-                    {listing.description}
-                  </Typography>
+                    <Chip
+                      label={
+                        <span>
+        <strong>Experiență:</strong> {listing.experience} ani
+      </span>
+                      }
+                      key="experience"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'grey.400',
+                        },
+                        marginRight: 1,
+                        marginBottom: 1, // Add vertical spacing
+                      }}
+                    />
 
+                    <Chip
+                      label={
+                        <span>
+        <strong>Vârstă:</strong> {listing.age} ani
+      </span>
+                      }
+                      key="age"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'grey.400',
+                        },
+                        marginBottom: 1, // Add vertical spacing
+                      }}
+                    />
+
+                    <Typography
+                      variant="body1"
+                      sx={{ padding: 2, whiteSpace: 'pre-wrap' }}
+                    >
+                      {listing.description}
+                    </Typography>
                   </Grid>
                 </Grid>
 

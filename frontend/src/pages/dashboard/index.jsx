@@ -70,14 +70,7 @@ import ChevronDownIcon from "@untitled-ui/icons-react/build/esm/ChevronDown";
 import {ProfileCompleteProgress} from "../../sections/dashboard/academy/profile-complete-progress";
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 
-const customers = [
-  'Blind Spots Inc.',
-  'Dispatcher Inc.',
-  'ACME SRL',
-  'Novelty I.S',
-  'Beauty Clinic SRL',
-  'Division Inc.',
-];
+
 const tabs = [
   { label: 'General', value: 'general' },
   { label: 'Billing', value: 'billing' },
@@ -97,6 +90,7 @@ const Page = () => {
   const [loading, setLoading] = useState(true);  // Loading state
   const [error, setError] = useState(null);  // Error state
   const isSmallScreen = useMediaQuery('(max-width:1200px)'); // Check if screen width is less than 1200px
+  const [completionPercentage, setCompletionPercentage] = useState(0);
 
   // Bearer token from authentication (assuming it's stored in localStorage)
   const token = sessionStorage.getItem('accessToken');
@@ -282,13 +276,7 @@ const Page = () => {
                   }}
                 >
                   <CustomerBasicDetails
-                    address1="abc"
-                    address2="abc"
-                    country="abc"
-                    email={user.email}
-                    isVerified="abc"
-                    phone="abc"
-                    state="abc"
+                    onCompletionPercentage={(percentage) => setCompletionPercentage(percentage)}
                   />
                 </Grid>
 
@@ -301,85 +289,171 @@ const Page = () => {
                   }}
                 >
                   <Stack spacing={4}>
-                    <Card>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between', // Even spacing
-                          alignItems: 'center', // Align items vertically
-                          padding: 2, // Padding for layout
-                        }}
-                      >
-                        <CardHeader title="Anunțuri" sx={{ p: 1 }} />
-                        <Button
-                          component={RouterLink}
-                          href={paths.dashboard.listings.create}
-                          startIcon={
-                            <SvgIcon>
-                              <PlusIcon />
-                            </SvgIcon>
-                          }
-                          variant="contained"
-                        >
-                          Adaugă anunț
-                        </Button>
-                      </Box>
-                      <CardContent>
-                        {loading ? (
-                          <Box sx={{ position: 'relative', height: '100%' }}>
-                            <PersonalListingsSkeletonTable />
-                            <Box
-                              sx={{
-                                position: 'fixed',
-                                top: '57.5%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                              }}
-                            >
-                              <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }} />
-                            </Box>
-                          </Box>
-                        ) : error ? (
-                          <Typography color="error">{error}</Typography>
-                        ) : personalListings.length === 0 ? (
+                    {isSmallScreen ? (
+                      <>
+                        <Card>
                           <Box
                             sx={{
                               display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              height: '100%',
-                              gap: 2,
+                              justifyContent: 'space-between', // Even spacing
+                              alignItems: 'center', // Align items vertically
+                              padding: 2, // Padding for layout
                             }}
                           >
-                            <Typography variant="h6">Nu există anunțuri publicate.</Typography>
+                            <CardHeader title="Anunțuri" sx={{ p: 1 }} />
+                            <Button
+                              component={RouterLink}
+                              href={paths.dashboard.listings.create}
+                              startIcon={
+                                <SvgIcon>
+                                  <PlusIcon />
+                                </SvgIcon>
+                              }
+                              variant="contained"
+                            >
+                              Adaugă anunț
+                            </Button>
                           </Box>
-                        ) : (
-                          <PersonalListingsTable
-                            count={personalListings.length}
-                            items={personalListings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
-                            page={page}
-                            rowsPerPage={rowsPerPage}
-                            onPageChange={handlePageChange}
-                            onRowsPerPageChange={handleRowsPerPageChange}
-                          />
-                        )}
-                      </CardContent>
-                    </Card>
+                          <CardContent>
+                            {loading ? (
+                              <Box sx={{ position: 'relative', height: '100%' }}>
+                                <PersonalListingsSkeletonTable />
+                                <Box
+                                  sx={{
+                                    position: 'fixed',
+                                    top: '57.5%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                  }}
+                                >
+                                  <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }} />
+                                </Box>
+                              </Box>
+                            ) : error ? (
+                              <Typography color="error">{error}</Typography>
+                            ) : personalListings.length === 0 ? (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  gap: 2,
+                                }}
+                              >
+                                <Typography variant="h6">Nu există anunțuri publicate.</Typography>
+                              </Box>
+                            ) : (
+                              <PersonalListingsTable
+                                count={personalListings.length}
+                                items={personalListings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                                page={page}
+                                rowsPerPage={rowsPerPage}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleRowsPerPageChange}
+                              />
+                            )}
+                          </CardContent>
+                        </Card>
 
-                    <Box
-                      sx={{
-                        flex: { xs: '0 0 auto', md: '0 0 auto' },
-                        display: 'flex',
-                        justifyContent: { xs: 'flex-start', md: 'flex-start' },
-                      }}
-                    >
-                      <ProfileCompleteProgress
-                        timeCurrent={80}
-                        timeGoal={100}
-                      />
-                    </Box>
+                        <Box
+                          sx={{
+                            flex: { xs: '0 0 auto', md: '0 0 auto' },
+                            display: 'flex',
+                            justifyContent: { xs: 'flex-start', md: 'flex-start' },
+                          }}
+                        >
+                          <ProfileCompleteProgress
+                            timeCurrent={completionPercentage}
+                            timeGoal={100}
+                          />
+                        </Box>
+                      </>
+                    ) : (
+                      <>
+                        <Box
+                          sx={{
+                            flex: { xs: '0 0 auto', md: '0 0 auto' },
+                            display: 'flex',
+                            justifyContent: { xs: 'flex-start', md: 'flex-start' },
+                          }}
+                        >
+                          <ProfileCompleteProgress
+                            timeCurrent={completionPercentage}
+                            timeGoal={100}
+                          />
+                        </Box>
+
+                        <Card>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between', // Even spacing
+                              alignItems: 'center', // Align items vertically
+                              padding: 2, // Padding for layout
+                            }}
+                          >
+                            <CardHeader title="Anunțuri" sx={{ p: 1 }} />
+                            <Button
+                              component={RouterLink}
+                              href={paths.dashboard.listings.create}
+                              startIcon={
+                                <SvgIcon>
+                                  <PlusIcon />
+                                </SvgIcon>
+                              }
+                              variant="contained"
+                            >
+                              Adaugă anunț
+                            </Button>
+                          </Box>
+                          <CardContent>
+                            {loading ? (
+                              <Box sx={{ position: 'relative', height: '100%' }}>
+                                <PersonalListingsSkeletonTable />
+                                <Box
+                                  sx={{
+                                    position: 'fixed',
+                                    top: '57.5%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                  }}
+                                >
+                                  <CircularProgress size={40} thickness={6} style={{ opacity: 0.7 }} />
+                                </Box>
+                              </Box>
+                            ) : error ? (
+                              <Typography color="error">{error}</Typography>
+                            ) : personalListings.length === 0 ? (
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  height: '100%',
+                                  gap: 2,
+                                }}
+                              >
+                                <Typography variant="h6">Nu există anunțuri publicate.</Typography>
+                              </Box>
+                            ) : (
+                              <PersonalListingsTable
+                                count={personalListings.length}
+                                items={personalListings.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                                page={page}
+                                rowsPerPage={rowsPerPage}
+                                onPageChange={handlePageChange}
+                                onRowsPerPageChange={handleRowsPerPageChange}
+                              />
+                            )}
+                          </CardContent>
+                        </Card>
+                      </>
+                    )}
                   </Stack>
+
                 </Grid>
               </Grid>
             </>

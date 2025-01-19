@@ -7,6 +7,7 @@ import com.org.meditatii.model.User;
 import com.org.meditatii.model.UserProfileImage;
 import com.org.meditatii.model.dto.AvailableUserSubjects;
 import com.org.meditatii.model.dto.PersonalListingRow;
+import com.org.meditatii.model.dto.UserPersonalInfoResponse;
 import com.org.meditatii.repository.ListingRepository;
 import com.org.meditatii.repository.SubjectRepository;
 import com.org.meditatii.repository.UserRepository;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -154,5 +156,32 @@ public class UserService {
     // Helper method to remove file extension
     private String removeExtension(String fileName) {
         return fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+
+    public UserPersonalInfoResponse getPersonalInfo() {
+        User user = authService.getCurrentUser();
+        return new UserPersonalInfoResponse(
+                user.getFirstName(),
+                user.getLastName(),
+                user.getOccupation(),
+                user.getEducation(),
+                user.getExperience(),
+                user.getPhone(),
+                user.getCity(),
+                user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null
+        );
+    }
+
+    public void savePersonalInfo(UserPersonalInfoResponse personalInfo) {
+        User user = authService.getCurrentUser();
+        user.setFirstName(personalInfo.firstName());
+        user.setLastName(personalInfo.lastName());
+        user.setOccupation(personalInfo.occupation());
+        user.setEducation(personalInfo.education());
+        user.setExperience(personalInfo.experience());
+        user.setPhone(personalInfo.phone());
+        user.setCity(personalInfo.city());
+        user.setDateOfBirth(personalInfo.dateOfBirth() != null ? ZonedDateTime.parse(personalInfo.dateOfBirth()).toLocalDate() : null);
+        userRepository.save(user);
     }
 }

@@ -47,7 +47,13 @@ export const ListingBio = ({ listing: listing }) => {
           <ListItemText
             disableTypography
             primary={
-              <Typography color="text.primary" href="#" variant="body1">
+              <Typography color="text.primary" href="#" variant="body1"
+                          sx={{
+                            display: 'block', // Ensures the text spans multiple lines
+                            wordBreak: 'break-word', // Breaks long words if necessary
+                            overflow: 'visible', // Allow content to extend beyond if needed
+                            whiteSpace: 'normal', // Allow text to wrap to the next line
+                          }}>
                 {listing.occupation}
               </Typography>
             }
@@ -65,7 +71,13 @@ export const ListingBio = ({ listing: listing }) => {
           <ListItemText
             disableTypography
             primary={
-              <Typography color="text.primary" href="#" variant="body1">
+              <Typography color="text.primary" href="#" variant="body1"
+                          sx={{
+                            display: 'block', // Ensures the text spans multiple lines
+                            wordBreak: 'break-word', // Breaks long words if necessary
+                            overflow: 'visible', // Allow content to extend beyond if needed
+                            whiteSpace: 'normal', // Allow text to wrap to the next line
+                          }}>
                 {listing.county}
               </Typography>
             }
@@ -82,7 +94,13 @@ export const ListingBio = ({ listing: listing }) => {
           </ListItemAvatar>
           <ListItemText
             primary={
-              <Typography color="text.primary" href="#" variant="body1">
+              <Typography color="text.primary" href="#" variant="body1"
+                          sx={{
+                            display: 'block', // Ensures the text spans multiple lines
+                            wordBreak: 'break-word', // Breaks long words if necessary
+                            overflow: 'visible', // Allow content to extend beyond if needed
+                            whiteSpace: 'normal', // Allow text to wrap to the next line
+                          }}>
                 {listing.education}
               </Typography>
             }
@@ -104,9 +122,13 @@ export const ListingBio = ({ listing: listing }) => {
                 color="text.primary"
                 variant="body1"
                 sx={{
+                  display: 'block', // Ensures the text spans multiple lines
+                  wordBreak: 'break-word', // Breaks long words if necessary
+                  overflow: 'visible', // Allow content to extend beyond if needed
+                  whiteSpace: 'normal', // Allow text to wrap to the next line
                   cursor: 'pointer',
                   userSelect: 'none',
-                  display: 'inline-flex', // Ensures the text aligns correctly
+                  // display: 'inline-flex', // Ensures the text aligns correctly
                 }}
               >
                 {visiblePart}

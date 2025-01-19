@@ -9,10 +9,6 @@ import { useTheme } from '@mui/material/styles';
 import { Chart } from 'src/components/chart';
 import CardHeader from "@mui/material/CardHeader";
 import React, {useEffect, useRef} from "react";
-import {RouterLink} from "../../../components/router-link";
-import SvgIcon from "@mui/material/SvgIcon";
-import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
-import {paths} from "../../../paths";
 
 const useChartOptions = (timeLeft, currentProgress) => {
   const theme = useTheme();
@@ -150,19 +146,19 @@ export const ProfileCompleteProgress = (props) => {
             type="radialBar"
           />
         </Box>
-        <Typography variant="h6" sx={{
-          mt: 7,
-          // textAlign: 'center'
-        }}>
-          Completează profilul pentru a crește vizibilitatea!
+        <Typography variant="h6" sx={{ mt: 7 }}>
+          {currentProgress === 100
+            ? 'Felicitări, profilul tău este complet! 😊'
+            : 'Completează profilul pentru a crește vizibilitatea!'}
         </Typography>
-        <Typography color="text.secondary" variant="body2"
-                    sx={{
-                      maxWidth: '24rem',
-                      // textAlign: 'center',
-                      mt: 0
-        }}>
-          Modifică detaliile personale și adaugă cât mai multe informații.
+        <Typography
+          color="text.secondary"
+          variant="body2"
+          sx={{ maxWidth: '24rem', mt: 0 }}
+        >
+          {currentProgress === 100
+            ? 'Asigură-te că informațiile tale sunt corecte.'
+            : 'Modifică detaliile personale și adaugă cât mai multe informații.'}
         </Typography>
       </CardContent>
     </Card>

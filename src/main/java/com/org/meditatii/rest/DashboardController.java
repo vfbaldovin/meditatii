@@ -1,15 +1,15 @@
 package com.org.meditatii.rest;
 
-import com.org.meditatii.model.Listing;
-import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.AvailableUserSubjects;
 import com.org.meditatii.model.dto.ListingCreateRequest;
 import com.org.meditatii.model.dto.PersonalListingRow;
+import com.org.meditatii.model.dto.UserPersonalInfoResponse;
 import com.org.meditatii.schedulers.ListingPriceScheduler;
 import com.org.meditatii.service.AuthService;
 import com.org.meditatii.service.ListingService;
 import com.org.meditatii.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,5 +83,14 @@ public class DashboardController {
         }
     }
 
+    @GetMapping("/profile/info")
+    public ResponseEntity<UserPersonalInfoResponse> getPersonalInfo() {
+        return ResponseEntity.ok(userService.getPersonalInfo());
+    }
 
+    @PostMapping("/profile/info/save")
+    public ResponseEntity<?> saveProfileInfo(@RequestBody UserPersonalInfoResponse personalInfo) {
+        userService.savePersonalInfo(personalInfo);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

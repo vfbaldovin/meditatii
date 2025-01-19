@@ -107,7 +107,7 @@ public class ListingService {
         User user = authService.getCurrentUser();
         String description = descriptionRepository.findRandomBySubjectId(subjectId)
                 .replace("{name}", user.getFullName())
-                .replace("{experience}", user.getExperience());
+                .replace("{experience}", user.getExperience() == null ? "5" : user.getExperience());
 
         // Set the response content type (with UTF-8 charset)
         response.setContentType("text/plain; charset=UTF-8");

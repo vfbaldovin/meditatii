@@ -73,19 +73,27 @@ public class  User {
 //    private LocalDateTime expiryDate;
 
     public String getTutorName() {
-        if (firstName == null) {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        } else {
             return email.substring(0, email.indexOf("@"));
         }
-        return firstName +
-                (lastName != null && !lastName.isEmpty() ? " " + lastName.charAt(0) + "." : "");
     }
 
     public String getFullName() {
-        if (firstName == null) {
+        if (firstName != null && lastName != null) {
+            return firstName + " " + lastName;
+        } else if (firstName != null) {
+            return firstName;
+        } else if (lastName != null) {
+            return lastName;
+        } else {
             return email.substring(0, email.indexOf("@"));
         }
-        return firstName +
-                (lastName != null && !lastName.isEmpty() ? " " + lastName : "");
     }
 
     public int getAge() {
@@ -93,10 +101,6 @@ public class  User {
             return 42;
         }
         return Period.between(dateOfBirth, LocalDate.now()).getYears();
-    }
-
-    public String getExperience() {
-        return experience != null ? experience : "5";
     }
 
     @Override
