@@ -134,7 +134,7 @@ const Page = () => {
           py: 8,
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth="sm">
           <div>
             <Link
               color="text.primary"
@@ -158,7 +158,7 @@ const Page = () => {
           >
 
             <Card>
-              <CardHeader title="Modifică detalii personale"/>
+              <CardHeader title="Modifică profil personal"/>
               <CardContent sx={{pt: 0}}>
                 <Grid
                   container
@@ -205,70 +205,6 @@ const Page = () => {
                     md={6}
                   >
                     <TextField
-                      error={!!(formik.touched.occupation && formik.errors.occupation)}
-                      fullWidth
-                      helperText={formik.touched.occupation && formik.errors.occupation}
-                      label="Profesie"
-                      name="occupation"
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      value={formik.values.occupation}
-                      inputProps={{
-                        maxLength: 70,
-                      }}
-                    />
-                  </Grid>
-                  <Grid
-                    xs={12}
-                    md={6}
-                  >
-                    <TextField
-                      error={!!(formik.touched.education && formik.errors.education)}
-                      fullWidth
-                      helperText={formik.touched.education && formik.errors.education}
-                      label="Studii"
-                      name="education"
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      value={formik.values.education}
-                      inputProps={{
-                        maxLength: 100,
-                      }}
-                    />
-                  </Grid>
-                  <Grid
-                    xs={12}
-                    md={6}
-                  >
-                    <TextField
-                      select
-                      error={!!(formik.touched.experience && formik.errors.experience)}
-                      fullWidth
-                      helperText={formik.touched.experience && formik.errors.experience}
-                      label="Experiență"
-                      name="experience"
-                      onBlur={formik.handleBlur}
-                      onChange={(event) => {
-                        const value = event.target.value === '' ? null : event.target.value;
-                        formik.setFieldValue('experience', value);
-                      }}
-                      value={formik.values.experience || ''}
-                    >
-                      <MenuItem value="">necompletat</MenuItem> {/* Empty option */}
-                      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '15', '20', '30'].map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option} {option === '1' ? 'an' : 'ani'}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-
-
-                  </Grid>
-                  <Grid
-                    xs={12}
-                    md={6}
-                  >
-                    <TextField
                       error={!!(formik.touched.phone && formik.errors.phone)}
                       fullWidth
                       helperText={formik.touched.phone && formik.errors.phone}
@@ -288,6 +224,27 @@ const Page = () => {
                           .replace(/^(?!\+|\d).*$/, ''); // Ensure the first character is + or a digit
                       }}
                     />
+                  </Grid>
+
+                  <Grid
+                    xs={12}
+                    md={6}
+                  >
+                    <DatePicker
+                      format="dd/MM/yyyy"
+                      label="Data nașterii"
+                      maxDate={new Date()} // Set maximum date to today
+                      onChange={(value) => formik.setFieldValue('dateOfBirth', value)}
+                      value={formik.values.dateOfBirth}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          error: !!(formik.touched.dateOfBirth && formik.errors.dateOfBirth),
+                          helperText: formik.touched.dateOfBirth && formik.errors.dateOfBirth,
+                        },
+                      }}
+                    />
+
                   </Grid>
                   <Grid
                     xs={12}
@@ -321,25 +278,70 @@ const Page = () => {
                       ))}
                     </TextField>
                   </Grid>
+
                   <Grid
                     xs={12}
                     md={6}
                   >
-                    <DatePicker
-                      format="dd/MM/yyyy"
-                      label="Data nașterii"
-                      maxDate={new Date()} // Set maximum date to today
-                      onChange={(value) => formik.setFieldValue('dateOfBirth', value)}
-                      value={formik.values.dateOfBirth}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          error: !!(formik.touched.dateOfBirth && formik.errors.dateOfBirth),
-                          helperText: formik.touched.dateOfBirth && formik.errors.dateOfBirth,
-                        },
+                    <TextField
+                      select
+                      error={!!(formik.touched.experience && formik.errors.experience)}
+                      fullWidth
+                      helperText={formik.touched.experience && formik.errors.experience}
+                      label="Experiență"
+                      name="experience"
+                      onBlur={formik.handleBlur}
+                      onChange={(event) => {
+                        const value = event.target.value === '' ? null : event.target.value;
+                        formik.setFieldValue('experience', value);
+                      }}
+                      value={formik.values.experience || ''}
+                    >
+                      <MenuItem value="">necompletat</MenuItem> {/* Empty option */}
+                      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '15', '20', '30'].map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option} {option === '1' ? 'an' : 'ani'}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+
+                  </Grid>
+                  <Grid
+                    xs={12}
+                    md={12}
+                  >
+                    <TextField
+                      error={!!(formik.touched.occupation && formik.errors.occupation)}
+                      fullWidth
+                      helperText={formik.touched.occupation && formik.errors.occupation}
+                      label="Profesie"
+                      name="occupation"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      value={formik.values.occupation}
+                      inputProps={{
+                        maxLength: 70,
                       }}
                     />
-
+                  </Grid>
+                  <Grid
+                    xs={12}
+                    md={12}
+                  >
+                    <TextField
+                      error={!!(formik.touched.education && formik.errors.education)}
+                      fullWidth
+                      helperText={formik.touched.education && formik.errors.education}
+                      label="Studii"
+                      name="education"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      value={formik.values.education}
+                      inputProps={{
+                        maxLength: 100,
+                      }}
+                    />
                   </Grid>
                 </Grid>
               </CardContent>
@@ -356,6 +358,10 @@ const Page = () => {
                   disabled={formik.isSubmitting || !formik.dirty}
                   type="submit"
                   variant="contained"
+                  // variant="outlined"
+                  sx={{
+                    width: '100%'
+                  }}
                 >
                   Salvează
                 </Button>

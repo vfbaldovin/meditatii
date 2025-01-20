@@ -48,7 +48,7 @@ public class  User {
     @Column(name = "experience")
     private String experience;
 
-    @Column(name = "city")
+    @Column(name = "county")
     private String city;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

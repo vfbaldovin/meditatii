@@ -28,7 +28,7 @@ const validationSchema = Yup.object({
     .email('Adresa email nu este validă')
     .max(255)
     .required('Adresa email este obligatorie'),
-  password: Yup.string().max(255).required('Password is required'),
+  password: Yup.string().max(255).required('Parola este obligatorie'),
 });
 
 export const Login = () => {

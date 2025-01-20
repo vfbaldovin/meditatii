@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 public class LoginRequest {
     @NotBlank(message = "Username is required")
     private String email;
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Parola este obligatorie")
     private String password;
 }

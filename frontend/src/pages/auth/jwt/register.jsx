@@ -33,7 +33,7 @@ const initialValues = {
 const validationSchema = Yup.object({
   email: Yup.string().email('Adresa email nu este validă').max(255).required('Adresa email este obligatorie'),
   name: Yup.string().max(255).required('Name is required'),
-  password: Yup.string().min(7).max(255).required('Password is required'),
+  password: Yup.string().min(7).max(255).required('Parola este obligatorie'),
   policy: Yup.boolean().oneOf([true], 'This field must be checked'),
 });
 

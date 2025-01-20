@@ -9,7 +9,7 @@ import { PropertyAccountItem } from '../account/property-account-item';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import Briefcase01Icon from '@untitled-ui/icons-react/build/esm/Briefcase01';
 import BookOpen01Icon from '@untitled-ui/icons-react/build/esm/BookOpen01';
-import {BarChart05, PhoneCall01, Star01, User01} from "@untitled-ui/icons-react";
+import { PhoneCall01, Star01 } from "@untitled-ui/icons-react";
 import Home02Icon from '@untitled-ui/icons-react/build/esm/Home02';
 import CalendarIcon from '@untitled-ui/icons-react/build/esm/Calendar';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -19,6 +19,8 @@ import { useAuth } from '../../../hooks/use-auth';
 import Typography from "@mui/material/Typography";
 
 export const CustomerBasicDetails = (props) => {
+  const { onCompletionPercentage, ...rest } = props; // Remove `onCompletionPercentage`
+
   const { fetchWithAuth } = useAuth();
   const [personalInfo, setPersonalInfo] = useState({
     nume: 'necompletat',
@@ -30,7 +32,7 @@ export const CustomerBasicDetails = (props) => {
     dataNasterii: 'necompletat',
   });
 
-  // Fetch data din backend
+  // Fetch data from backend
   useEffect(() => {
     const fetchPersonalInfo = async () => {
       try {
@@ -64,12 +66,41 @@ export const CustomerBasicDetails = (props) => {
     return Math.round((completedFields / totalFields) * 100);
   };
 
-  // Pass percentage to props callback if provided
-  useEffect(() => {
-    if (props.onCompletionPercentage) {
-      props.onCompletionPercentage(calculateCompletionPercentage());
+  // Calculate age based on data nașterii
+// Calculate age in years based on data nașterii
+  const calculateAge = (dateOfBirth) => {
+    if (dateOfBirth === 'necompletat') {
+      return 'necompletat';
     }
-  }, [personalInfo, props]);
+
+    const birthDate = new Date(dateOfBirth);
+    if (isNaN(birthDate)) {
+      return 'necompletat'; // Handle invalid date format
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    // Adjust if the birthday hasn't occurred yet this year
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age -= 1;
+    }
+
+    return `${age} ani`; // Append " ani" after the age
+  };
+
+  // Pass percentage to props callback if provided
+  // useEffect(() => {
+  //   if (props.onCompletionPercentage) {
+  //     props.onCompletionPercentage(calculateCompletionPercentage());
+  //   }
+  // }, [personalInfo, props]);
+  useEffect(() => {
+    if (onCompletionPercentage) {
+      onCompletionPercentage(calculateCompletionPercentage());
+    }
+  }, [personalInfo, onCompletionPercentage]);
 
   const renderValue = (value) => (
     <Typography
@@ -82,9 +113,8 @@ export const CustomerBasicDetails = (props) => {
     </Typography>
   );
 
-
   return (
-    <Card {...props}>
+    <Card {...rest}>
       <Box
         sx={{
           display: 'flex',
@@ -114,14 +144,20 @@ export const CustomerBasicDetails = (props) => {
           value={renderValue(personalInfo.nume)}
         />
         <PropertyAccountItem
-          icon={<Briefcase01Icon />}
-          label="Profesie"
-          value={renderValue(personalInfo.profesie)}
+          icon={<PhoneCall01 />}
+          label="Telefon"
+          value={renderValue(personalInfo.telefon)}
         />
         <PropertyAccountItem
-          icon={<BookOpen01Icon />}
-          label="Studii"
-          value={renderValue(personalInfo.studii)}
+          icon={<CalendarIcon />}
+          label="Vârstă"
+          value={renderValue(calculateAge(personalInfo.dataNasterii))}
+          noDivider
+        />
+        <PropertyAccountItem
+          icon={<Home02Icon />}
+          label="Locație"
+          value={renderValue(personalInfo.locatie)}
         />
         <PropertyAccountItem
           icon={<Star01 />}
@@ -136,35 +172,27 @@ export const CustomerBasicDetails = (props) => {
               )
           }
         />
-
         <PropertyAccountItem
-          icon={<PhoneCall01 />}
-          label="Telefon"
-          value={renderValue(personalInfo.telefon)}
+          icon={<Briefcase01Icon />}
+          label="Profesie"
+          value={renderValue(personalInfo.profesie)}
         />
         <PropertyAccountItem
-          icon={<Home02Icon />}
-          label="Locație"
-          value={renderValue(personalInfo.locatie)}
-        />
-        <PropertyAccountItem
-          icon={<CalendarIcon />}
-          label="Data nașterii"
-          value={renderValue(personalInfo.dataNasterii)}
-          noDivider
+          icon={<BookOpen01Icon />}
+          label="Studii"
+          value={renderValue(personalInfo.studii)}
         />
       </PropertyList>
     </Card>
   );
-
 };
 
 CustomerBasicDetails.propTypes = {
-  address1: PropTypes.string,
-  address2: PropTypes.string,
-  country: PropTypes.string,
-  email: PropTypes.string.isRequired,
-  isVerified: PropTypes.bool.isRequired,
-  phone: PropTypes.string,
-  state: PropTypes.string,
+  // address1: PropTypes.string,
+  // address2: PropTypes.string,
+  // country: PropTypes.string,
+  // email: PropTypes.string.isRequired,
+  // isVerified: PropTypes.bool.isRequired,
+  // phone: PropTypes.string,
+  // state: PropTypes.string,
 };

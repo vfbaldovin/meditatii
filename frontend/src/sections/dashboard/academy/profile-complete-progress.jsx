@@ -125,7 +125,8 @@ export const ProfileCompleteProgress = (props) => {
           padding: 2,
         }}
       >
-        <CardHeader title="Profil complet" sx={{ p: 1 }} />
+        <CardHeader title="Profil complet" sx={{ p: 1 }}
+        />
       </Box>
       <CardContent>
         <Box

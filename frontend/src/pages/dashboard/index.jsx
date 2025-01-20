@@ -69,6 +69,7 @@ import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
 import ChevronDownIcon from "@untitled-ui/icons-react/build/esm/ChevronDown";
 import {ProfileCompleteProgress} from "../../sections/dashboard/academy/profile-complete-progress";
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
+import {PromoteCard} from "./profile/promote-card";
 
 
 const tabs = [
@@ -179,14 +180,19 @@ const Page = () => {
                         // padding: 2,                     // Adds some padding for layout
                       }}
                     >
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }, // Responsive font sizes
-                      }}
-                    >
-                      {user.email}
-                    </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }, // Responsive font sizes
+                          overflow: 'hidden', // Ensure no overflow
+                          textOverflow: 'ellipsis', // Add ellipsis if text overflows
+                          whiteSpace: 'nowrap', // Prevent text wrapping
+                          width: '100%', // Occupy full width of the parent container
+                          maxWidth: '60vw', // Prevent exceeding the viewport width
+                        }}
+                      >
+                        {user.email}
+                      </Typography>
                     <SvgIcon
                       sx={{
                         ml:1,
@@ -201,17 +207,17 @@ const Page = () => {
                        <CheckVerified01></CheckVerified01>
                     </SvgIcon>
                     </Box>
-                    <Stack
-                      alignItems="center"
-                      direction="row"
-                      spacing={1}
-                    >
-                      <Typography variant="subtitle2">user_id:</Typography>
-                      <Chip
-                        label={user.email}
-                        size="small"
-                      />
-                    </Stack>
+                    {/*<Stack*/}
+                    {/*  alignItems="center"*/}
+                    {/*  direction="row"*/}
+                    {/*  spacing={1}*/}
+                    {/*>*/}
+                    {/*  <Typography variant="subtitle2">user_id:</Typography>*/}
+                    {/*  <Chip*/}
+                    {/*    label={user.email}*/}
+                    {/*    size="small"*/}
+                    {/*  />*/}
+                    {/*</Stack>*/}
                   </Stack>
                 </Stack>
               </Stack>
@@ -359,30 +365,38 @@ const Page = () => {
 
                         <Box
                           sx={{
-                            flex: { xs: '0 0 auto', md: '0 0 auto' },
                             display: 'flex',
-                            justifyContent: { xs: 'flex-start', md: 'flex-start' },
+                            flexDirection: { xs: 'column', md: 'row' }, // Stack pe verticală pentru ecrane mici, orizontală pentru ecrane mari
+                            alignItems: 'center', // Aliniere verticală
+                            justifyContent: { xs: 'flex-start' }, // Spațiere pentru ecrane mari
+                            gap: 4, // Spațiu între elemente
                           }}
                         >
+                          <PromoteCard />
+
                           <ProfileCompleteProgress
                             timeCurrent={completionPercentage}
                             timeGoal={100}
                           />
                         </Box>
+
                       </>
                     ) : (
                       <>
                         <Box
                           sx={{
-                            flex: { xs: '0 0 auto', md: '0 0 auto' },
                             display: 'flex',
-                            justifyContent: { xs: 'flex-start', md: 'flex-start' },
+                            flexDirection: { xs: 'column', md: 'row' }, // Stack pe verticală pentru ecrane mici, orizontală pentru ecrane mari
+                            alignItems: 'center', // Aliniere verticală
+                            justifyContent: { xs: 'flex-start' }, // Spațiere pentru ecrane mari
+                            gap: 4, // Spațiu între elemente
                           }}
                         >
                           <ProfileCompleteProgress
                             timeCurrent={completionPercentage}
                             timeGoal={100}
                           />
+                          <PromoteCard />
                         </Box>
 
                         <Card>

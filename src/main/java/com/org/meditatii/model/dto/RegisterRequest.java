@@ -14,7 +14,7 @@ public class RegisterRequest {
     @Email
     @NotEmpty(message = "Email is required")
     private String email;
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Parola este obligatorie")
     private String password;
 
 }

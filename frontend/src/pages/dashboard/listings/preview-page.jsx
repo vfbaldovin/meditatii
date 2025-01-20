@@ -182,17 +182,17 @@ const PreviewPage = () => {
                 </Typography>
 
               )}
-              <Typography variant="h5">
-                Promovare
-              </Typography>
-              <Box sx={{mt: 0}}>
-                <Typography variant="h6" sx={{margin: 0}}>
-                  Promovează-ți anunțul pentru vizibilitate maximă.
-                </Typography>
-                {/*<Typography variant="body1" sx={{ margin: 0 }}>*/}
-                {/*  Apare pe prima pagină a site-ului și este vizibil înainte ca utilizatorii să înceapă căutarea.*/}
-                {/*</Typography>*/}
-              </Box>
+              {/*<Typography variant="h5">*/}
+              {/*  Promovare*/}
+              {/*</Typography>*/}
+              {/*<Box sx={{mt: 0}}>*/}
+              {/*  <Typography variant="h6" sx={{margin: 0}}>*/}
+              {/*    Promovează-ți anunțul pentru vizibilitate maximă.*/}
+              {/*  </Typography>*/}
+              {/*  /!*<Typography variant="body1" sx={{ margin: 0 }}>*!/*/}
+              {/*  /!*  Apare pe prima pagină a site-ului și este vizibil înainte ca utilizatorii să înceapă căutarea.*!/*/}
+              {/*  /!*</Typography>*!/*/}
+              {/*</Box>*/}
               <Grid container spacing={2}>
                 {/* First Card */}
                 <Grid item container alignItems="center">
@@ -200,12 +200,13 @@ const PreviewPage = () => {
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
                     sx={{
-                      borderColor: 'inherit',
-                      borderWidth: 1,
+                      // borderColor: 'inherit',
+                      // borderWidth: 1,
                       // cursor: 'pointer',
-                      // border: (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '2px solid rgb(47, 79, 79)'),
+                      boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.1)',
+                      border: (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
                       '&:hover': {
-                        boxShadow: '0px 2px 15px rgba(0, 0, 0, 0.25)', // Add a shadow effect on hover
+                        boxShadow: (theme) => (theme.palette.mode === 'light' ? '0px 2px 15px rgba(0, 0, 0, 0.25)' : "0px 2px 15px rgba(256, 256, 256, 0.25)"), // Add a shadow effect on hover
 
                         // border: (theme) => (theme.palette.mode === 'light' ? '1px solid ' + theme.palette.primary.main : '2px solid whitesmoke'),
                         // borderRadius: '20px',
@@ -213,7 +214,20 @@ const PreviewPage = () => {
                     }}
                     variant="outlined"
                   >
-                    <CardContent>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingTop: 2,
+                        paddingLeft: 2,
+                      }}
+                    >
+                      <CardHeader title="Promovare" sx={{ p: 1 }}
+                                    // subheader="se aplică pentru toate anunțurile"
+                      />
+                    </Box>
+                    <CardContent sx={{pl:5, pr: 5, pt: 0, pb: 0}}>
                       <Box
                         sx={{
                           display: "flex", // Arrange children horizontally
@@ -302,33 +316,24 @@ const PreviewPage = () => {
                           </Typography>
                         </Box>
                       </Box>
-                      {/*<Typography*/}
-                      {/*  color="text.secondary"*/}
-                      {/*  sx={{ mt: 1 }}*/}
-                      {/*  variant="body2"*/}
-                      {/*>*/}
-                      {/*  Promovează-ți anunțul pentru vizibilitate maximă! 🏆*/}
-                      {/*</Typography>*/}
                       <Grid item container alignItems="center" sx={{mt: 1}}>
                         <Box>
                           <Box display="flex" alignItems="center">
-                            <CheckIcon sx={{color: 'success.main', mr: 1}}/>
-                            <Typography variant="body2">poziție prioritară</Typography>
+                            <CheckIcon sx={{ color: 'success.main', mr: 1 }} />
+                            <Typography variant="body2">
+                              poziție prioritară <span style={{ fontWeight: 'bold' }}>toate anunțurile</span>
+                            </Typography>
                           </Box>
                           <Box display="flex" alignItems="center">
-                            <CheckIcon sx={{color: 'success.main', mr: 1}}/>
-                            <Typography variant="body2">reactualizări automate</Typography>
+                            <CheckIcon sx={{ color: 'success.main', mr: 1 }} />
+                            <Typography variant="body2">
+                              actualizări automate <span style={{ fontWeight: 'bold' }}>toate anunțurile</span>
+                            </Typography>
                           </Box>
-                          {/*<Box display="flex" alignItems="center">*/}
-                          {/*  <CheckIcon sx={{color: 'success.main', mr: 1}}/>*/}
-                          {/*  <Typography variant="body2">*/}
-                          {/*    recomandare către elevii noi*/}
-                          {/*  </Typography>*/}
-                          {/*</Box>*/}
                           <Box display="flex" alignItems="center">
                             <CheckIcon sx={{color: 'success.main', mr: 1}}/>
                             <Typography variant="body2">
-                              meditator verificat permanent
+                              meditator verificat <span style={{ fontWeight: 'bold' }}>permanent</span>
                             </Typography>
                           </Box>
                         </Box>
@@ -349,10 +354,11 @@ const PreviewPage = () => {
                             </SvgIcon>
                           }
                           variant="outlined"
+                          sx={{width: '100%'}}
                         >
                           Plată card&nbsp;
                           <svg
-                            style={{zoom: '70%'}}
+                            style={{zoom: '60%'}}
 
                             xmlns="http://www.w3.org/2000/svg" width="145.341"
                             height="24.675" viewBox="0 0 145.341 24.675">
@@ -418,8 +424,16 @@ const PreviewPage = () => {
                         {/*  Apare pe prima pagină a site-ului și este vizibil înainte ca utilizatorii să înceapă căutarea.*/}
                         {/*</Typography>*/}
                       </Box>
-                      <Box sx={{mt: 1}}>
-
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column', // Pentru a păstra structura verticală
+                          alignItems: 'center', // Centrează pe orizontală
+                          justifyContent: 'center', // Centrează pe verticală
+                          mt: 1,
+                          textAlign: 'center', // Asigură alinierea textului
+                        }}
+                      >
                         <Typography variant="body1" sx={{margin: 0, maxWidth: '20rem'}}>
                           Plată securizată prin platforma&nbsp;
                           <a href="https://stripe.com" target="_blank" rel="noopener noreferrer">

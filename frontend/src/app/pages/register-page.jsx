@@ -33,7 +33,7 @@ const initialValues = {
 
 const validationSchema = Yup.object({
   email: Yup.string().email('Adresa email nu este validă').max(255).required('Adresa email este obligatorie'),
-  password: Yup.string().min(7).max(255).required('Setați o parolă'),
+  password: Yup.string().min(7).max(255).required('Parola este obligatorie'),
 });
 
 const Page = () => {

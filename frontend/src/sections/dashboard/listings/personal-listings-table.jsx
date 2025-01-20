@@ -27,6 +27,7 @@ import CheckIcon from "@untitled-ui/icons-react/build/esm/Check";
 import React from "react";
 import ArrowRightIcon from "@untitled-ui/icons-react/build/esm/ArrowRight";
 import {useNavigate} from "react-router-dom";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 
 export const PersonalListingsTable = (props) => {
   const {
@@ -47,7 +48,7 @@ export const PersonalListingsTable = (props) => {
             <TableRow>
               <TableCell sx={{ backgroundColor: 'transparent !important' }}>Materie</TableCell>
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Vizualizari</TableCell>
-              {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovare</TableCell>*/}
+              <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovat</TableCell>
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Actualizare</TableCell>
               {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Modifica</TableCell>*/}
               {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }} align="right">Detalii</TableCell>*/}
@@ -69,57 +70,65 @@ export const PersonalListingsTable = (props) => {
                     {listing.subject}
                   </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>
-                  {/*<TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>*/}
-                  {/*  <Avatar sx={{ backgroundColor: 'transparent' }}>*/}
-                  {/*    <Box*/}
-                  {/*      sx={{*/}
-                  {/*        animation: 'pulse ease 750ms infinite',*/}
-                  {/*        borderRadius: '50%',*/}
-                  {/*        p: 0.5,*/}
-                  {/*        '@keyframes pulse': {*/}
-                  {/*          '0%': {*/}
-                  {/*            boxShadow: 'none',*/}
-                  {/*          },*/}
-                  {/*          '100%': {*/}
-                  {/*            boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,*/}
-                  {/*          },*/}
-                  {/*        },*/}
-                  {/*      }}*/}
-                  {/*    >*/}
-                  {/*      <Box*/}
-                  {/*        sx={{*/}
-                  {/*          backgroundColor: 'success.main',*/}
-                  {/*          borderRadius: '50%',*/}
-                  {/*          height: 18,*/}
-                  {/*          width: 18,*/}
-                  {/*        }}*/}
-                  {/*      />*/}
-                  {/*    </Box>*/}
-                  {/*  </Avatar>*/}
-                  {/*  <IconButton*/}
-                  {/*    component={RouterLink}*/}
-                  {/*    href={paths.dashboard.personalListingsEdit}*/}
-                  {/*  >*/}
-                  {/*    <SvgIcon>*/}
-                  {/*      <ArrowsUp />*/}
-                  {/*    </SvgIcon>*/}
-                  {/*  </IconButton>*/}
-                  {/*  <SeverityPill color='success'>DA</SeverityPill>*/}
-                  {/*  /!*<SeverityPill color='warning'>?</SeverityPill>*!/*/}
-                  {/*  <SeverityPill color='error'>NU</SeverityPill>*/}
-                  {/*  /!*<Avatar*!/*/}
-                  {/*  /!*  sx={{*!/*/}
-                  {/*  /!*    backgroundColor: 'success.main',*!/*/}
-                  {/*  /!*    color: 'success.contrastText',*!/*/}
-                  {/*  /!*    height: 40,*!/*/}
-                  {/*  /!*    width: 40,*!/*/}
-                  {/*  /!*  }}*!/*/}
-                  {/*  /!*>*!/*/}
-                  {/*  /!*  <SvgIcon>*!/*/}
-                  {/*  /!*    <CheckIcon />*!/*/}
-                  {/*  /!*  </SvgIcon>*!/*/}
-                  {/*  /!*</Avatar>*!/*/}
-                  {/*</TableCell>*/}
+                  <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    {/*<Avatar sx={{ backgroundColor: 'transparent' }}>*/}
+                    {/*  <Box*/}
+                    {/*    sx={{*/}
+                    {/*      animation: 'pulse ease 750ms infinite',*/}
+                    {/*      borderRadius: '50%',*/}
+                    {/*      p: 0.5,*/}
+                    {/*      '@keyframes pulse': {*/}
+                    {/*        '0%': {*/}
+                    {/*          boxShadow: 'none',*/}
+                    {/*        },*/}
+                    {/*        '100%': {*/}
+                    {/*          boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,*/}
+                    {/*        },*/}
+                    {/*      },*/}
+                    {/*    }}*/}
+                    {/*  >*/}
+                    {/*    <Box*/}
+                    {/*      sx={{*/}
+                    {/*        backgroundColor: 'success.main',*/}
+                    {/*        borderRadius: '50%',*/}
+                    {/*        height: 18,*/}
+                    {/*        width: 18,*/}
+                    {/*      }}*/}
+                    {/*    />*/}
+                    {/*  </Box>*/}
+                    {/*</Avatar>*/}
+                    {/*<IconButton*/}
+                    {/*  component={RouterLink}*/}
+                    {/*  href={paths.dashboard.personalListingsEdit}*/}
+                    {/*>*/}
+                    {/*  <SvgIcon>*/}
+                    {/*    <ArrowsUp />*/}
+                    {/*  </SvgIcon>*/}
+                    {/*</IconButton>*/}
+                    <SeverityPill color='success'>DA</SeverityPill>
+                    {/*<SeverityPill color='warning'>?</SeverityPill>*/}
+                    <SeverityPill color='error'>NU</SeverityPill>
+                    <WorkspacePremiumIcon
+                      sx={{
+                        color: '#FFC107',
+                        width: '2rem',
+                        height: '2rem',
+                      }}
+                    />
+
+                    {/*<Avatar*/}
+                    {/*  sx={{*/}
+                    {/*    backgroundColor: 'success.main',*/}
+                    {/*    color: 'success.contrastText',*/}
+                    {/*    height: 40,*/}
+                    {/*    width: 40,*/}
+                    {/*  }}*/}
+                    {/*>*/}
+                    {/*  <SvgIcon>*/}
+                    {/*    <CheckIcon />*/}
+                    {/*  </SvgIcon>*/}
+                    {/*</Avatar>*/}
+                  </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>
                     {/*<Button*/}
                     {/*  // startIcon={*/}
