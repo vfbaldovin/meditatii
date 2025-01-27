@@ -195,7 +195,7 @@ export const AccountAvatar = ({ avatar }) => {
             zIndex: 2,
           }}
         >
-          <CircularProgress size={50} thickness={5} style={{ opacity: 0.9 }} />
+          <CircularProgress size={35} thickness={5} style={{ opacity: 0.9 }} />
         </Box>
       )}
       <input
@@ -206,11 +206,12 @@ export const AccountAvatar = ({ avatar }) => {
         hidden
         onChange={handleFileChange}
       />
-      {errorMessage && (errorMessage !== 'No file') (
+      {errorMessage && errorMessage !== 'No file' && (
         <Typography color="error" variant="body2" sx={{ position: 'absolute', bottom: -20 }}>
           {errorMessage}
         </Typography>
       )}
+
     </Box>
   );
 };

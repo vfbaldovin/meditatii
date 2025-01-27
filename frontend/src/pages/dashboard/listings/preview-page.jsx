@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {useParams, useLocation} from 'react-router-dom';
+import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import EastIcon from '@mui/icons-material/East';
 import {Seo} from 'src/components/seo';
 import {useAuth} from 'src/hooks/use-auth';
 import {ListingCard} from "./steps/listing-card";
@@ -22,6 +21,7 @@ import {RouterLink} from "../../../components/router-link";
 import {paths} from "../../../paths";
 import ArrowLeftIcon from "@untitled-ui/icons-react/build/esm/ArrowLeft";
 import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
+import DeleteButtonWithConfirmation from "./delete-button-with-confirmation";
 
 const PreviewPage = () => {
   const {id} = useParams();
@@ -32,6 +32,7 @@ const PreviewPage = () => {
   const [error, setError] = useState(null);
   const [hovered, setHovered] = useState(false);
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const wallpapers = [
     // 'url(/assets/writing.webp)',
@@ -195,7 +196,7 @@ const PreviewPage = () => {
               {/*</Box>*/}
               <Grid container spacing={2}>
                 {/* First Card */}
-                <Grid item container alignItems="center">
+                <Grid container alignItems="center">
                   <Card
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
@@ -316,7 +317,7 @@ const PreviewPage = () => {
                           </Typography>
                         </Box>
                       </Box>
-                      <Grid item container alignItems="center" sx={{mt: 1}}>
+                      <Grid container alignItems="center" sx={{mt: 1}}>
                         <Box>
                           <Box display="flex" alignItems="center">
                             <CheckIcon sx={{ color: 'success.main', mr: 1 }} />
@@ -466,7 +467,7 @@ const PreviewPage = () => {
               </Typography>
 
 
-              <ListingCard listingId={listing.id} isHovered={hovered}/>
+              <ListingCard listingId={listing.id} isHovered={hovered} isHoverable={false}/>
 
               <Box
                 sx={{
@@ -478,24 +479,24 @@ const PreviewPage = () => {
               >
                 <Button
                   color="inherit"
+                  // variant="outlined"
                   variant="outlined"
-                  component={RouterLink}
                   startIcon={
                     <SvgIcon>
                       <Edit02Icon />
                     </SvgIcon>
                   }
-                  href={paths.dashboard.customers.edit}
+                  onClick={() => navigate(paths.dashboard.personalListingsEdit.replace(':id', listing.id))}
                 >
                   Modifică anunț
                 </Button>
 
-                <Button
-                  color="error"
-                  variant="outlined"
-                >
-                  Șterge anunț
-                </Button>
+                <DeleteButtonWithConfirmation
+                  listingId={listing.id}
+                  fetchWithAuth={fetchWithAuth}
+                  paths={paths}
+                />
+
 
               </Box>
 

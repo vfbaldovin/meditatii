@@ -37,7 +37,6 @@ StepIcon.propTypes = {
 
 export const ListingCreateForm = ({ onSubjectSelect }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -63,7 +62,7 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
         const data = await response.json();
         console.log('Listing created successfully:', data);
         setListingId(data.id); // Only store listing ID
-        setIsComplete(true);
+        // setIsComplete(true);
         confetti({
           particleCount: 400,   // Increase number of pieces
           spread: 120,          // Wider area
@@ -79,7 +78,6 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
           origin: { x: 0, y: 0.5 } // Center of screen
         });
         navigate(`/dashboard/listings/${data.id}?s=new`);
-
       } else {
         console.error('Failed to create listing:', response.statusText);
       }
@@ -109,7 +107,7 @@ export const ListingCreateForm = ({ onSubjectSelect }) => {
       label: 'Descriere',
       content: (
         <ChooseDescription
-          selectedSubject={selectedSubject}
+          selectedSubject={selectedSubject?.id}
           description={description}
           setDescription={setDescription}
           onBack={handleBack}

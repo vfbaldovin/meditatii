@@ -19,7 +19,7 @@ import { useAuth } from '../../../hooks/use-auth';
 import Typography from "@mui/material/Typography";
 
 export const CustomerBasicDetails = (props) => {
-  const { onCompletionPercentage, ...rest } = props; // Remove `onCompletionPercentage`
+  const { onCompletionPercentage, ...rest } = props;
 
   const { fetchWithAuth } = useAuth();
   const [personalInfo, setPersonalInfo] = useState({
@@ -91,16 +91,16 @@ export const CustomerBasicDetails = (props) => {
   };
 
   // Pass percentage to props callback if provided
-  // useEffect(() => {
-  //   if (props.onCompletionPercentage) {
-  //     props.onCompletionPercentage(calculateCompletionPercentage());
-  //   }
-  // }, [personalInfo, props]);
   useEffect(() => {
-    if (onCompletionPercentage) {
-      onCompletionPercentage(calculateCompletionPercentage());
+    if (props.onCompletionPercentage) {
+      props.onCompletionPercentage(calculateCompletionPercentage());
     }
-  }, [personalInfo, onCompletionPercentage]);
+  }, [personalInfo, props]);
+  // useEffect(() => {
+  //   if (onCompletionPercentage) {
+  //     onCompletionPercentage(calculateCompletionPercentage());
+  //   }
+  // }, [personalInfo, onCompletionPercentage]);
 
   const renderValue = (value) => (
     <Typography

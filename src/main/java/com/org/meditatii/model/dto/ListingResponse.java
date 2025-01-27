@@ -15,6 +15,7 @@ public class ListingResponse {
     private Integer price;
     private Boolean promoted;
     private String city;
+    private Long subjectId;
     private String subject;
     private Long tutorId;
     private String tutorName;

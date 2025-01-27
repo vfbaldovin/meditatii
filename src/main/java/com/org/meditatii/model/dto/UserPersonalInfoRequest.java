@@ -1,6 +1,6 @@
 package com.org.meditatii.model.dto;
 
-public record UserPersonalInfoResponse(
+public record UserPersonalInfoRequest(
         String firstName,
         String lastName,
         String occupation,

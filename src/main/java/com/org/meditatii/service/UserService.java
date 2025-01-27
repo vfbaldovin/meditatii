@@ -7,7 +7,8 @@ import com.org.meditatii.model.User;
 import com.org.meditatii.model.UserProfileImage;
 import com.org.meditatii.model.dto.AvailableUserSubjects;
 import com.org.meditatii.model.dto.PersonalListingRow;
-import com.org.meditatii.model.dto.UserPersonalInfoResponse;
+import com.org.meditatii.model.dto.UserPersonalInfoRequest;
+import com.org.meditatii.model.dto.UserPromotedInfoResponse;
 import com.org.meditatii.repository.ListingRepository;
 import com.org.meditatii.repository.SubjectRepository;
 import com.org.meditatii.repository.UserRepository;
@@ -158,9 +159,9 @@ public class UserService {
         return fileName.substring(0, fileName.lastIndexOf('.'));
     }
 
-    public UserPersonalInfoResponse getPersonalInfo() {
+    public UserPersonalInfoRequest getPersonalInfo() {
         User user = authService.getCurrentUser();
-        return new UserPersonalInfoResponse(
+        return new UserPersonalInfoRequest(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getOccupation(),
@@ -172,7 +173,7 @@ public class UserService {
         );
     }
 
-    public void savePersonalInfo(UserPersonalInfoResponse personalInfo) {
+    public void savePersonalInfo(UserPersonalInfoRequest personalInfo) {
         User user = authService.getCurrentUser();
         user.setFirstName(personalInfo.firstName());
         user.setLastName(personalInfo.lastName());
@@ -183,5 +184,13 @@ public class UserService {
         user.setCity(personalInfo.city());
         user.setDateOfBirth(personalInfo.dateOfBirth() != null ? ZonedDateTime.parse(personalInfo.dateOfBirth()).toLocalDate() : null);
         userRepository.save(user);
+    }
+
+    public UserPromotedInfoResponse getPromotedInfo() {
+        User user = authService.getCurrentUser();
+        return new UserPromotedInfoResponse(
+                user.getPromoted(),
+                user.getVerified()
+        );
     }
 }

@@ -1,9 +1,6 @@
 package com.org.meditatii.rest;
 
-import com.org.meditatii.model.dto.AvailableUserSubjects;
-import com.org.meditatii.model.dto.ListingCreateRequest;
-import com.org.meditatii.model.dto.PersonalListingRow;
-import com.org.meditatii.model.dto.UserPersonalInfoResponse;
+import com.org.meditatii.model.dto.*;
 import com.org.meditatii.schedulers.ListingPriceScheduler;
 import com.org.meditatii.service.AuthService;
 import com.org.meditatii.service.ListingService;
@@ -49,6 +46,18 @@ public class DashboardController {
         return ResponseEntity.ok(Map.of("id",listingService.createListing(listingRequest)));
     }
 
+    @PostMapping("/listings/save")
+    public ResponseEntity<?> saveListing(@RequestBody ListingUpdateRequest listingRequest) {
+        listingService.update(listingRequest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/listings/delete/{id}")
+    public ResponseEntity<?> deleteListing(@PathVariable Long id) {
+        listingService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/subjects/available")
     public ResponseEntity<List<AvailableUserSubjects>> getUserAvailableSubjects() {
         return ResponseEntity.ok(userService.findAvailableUserSubjects());
@@ -58,7 +67,6 @@ public class DashboardController {
     public void getListingDescription(@PathVariable Long subjectId, HttpServletResponse response) throws IOException {
         listingService.streamDescription(subjectId, response);
     }
-
 
     @GetMapping("/subjects/{subjectId}/price")
     public ResponseEntity<Map<String, Integer>> getListingDescription(@PathVariable Long subjectId) {
@@ -84,13 +92,18 @@ public class DashboardController {
     }
 
     @GetMapping("/profile/info")
-    public ResponseEntity<UserPersonalInfoResponse> getPersonalInfo() {
+    public ResponseEntity<UserPersonalInfoRequest> getPersonalInfo() {
         return ResponseEntity.ok(userService.getPersonalInfo());
     }
 
     @PostMapping("/profile/info/save")
-    public ResponseEntity<?> saveProfileInfo(@RequestBody UserPersonalInfoResponse personalInfo) {
+    public ResponseEntity<?> saveProfileInfo(@RequestBody UserPersonalInfoRequest personalInfo) {
         userService.savePersonalInfo(personalInfo);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/profile/info/promoted")
+    public ResponseEntity<UserPromotedInfoResponse> getPromotedInfo() {
+        return ResponseEntity.ok(userService.getPromotedInfo());
     }
 }

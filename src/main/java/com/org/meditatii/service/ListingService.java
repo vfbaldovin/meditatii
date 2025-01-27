@@ -1,11 +1,13 @@
 package com.org.meditatii.service;
 
+import com.org.meditatii.exception.AppException;
 import com.org.meditatii.exception.AppNotFoundException;
 import com.org.meditatii.model.Listing;
 import com.org.meditatii.model.User;
 import com.org.meditatii.model.dto.ListingCard;
 import com.org.meditatii.model.dto.ListingCreateRequest;
 import com.org.meditatii.model.dto.ListingResponse;
+import com.org.meditatii.model.dto.ListingUpdateRequest;
 import com.org.meditatii.repository.ListingDescriptionRepository;
 import com.org.meditatii.repository.ListingRepository;
 import com.org.meditatii.repository.SubjectRepository;
@@ -76,17 +78,13 @@ public class ListingService {
         return save(listing).getId();
     }
 
-    public Listing update(Long id, Listing listingDetails) {
-        Listing existingListing = repository.findById(id)
-                .orElseThrow(() -> new AppNotFoundException("Listing not found with id: " + id));
-        // Copy properties from details to existing
-        // ...
-        return repository.save(existingListing);
-    }
-
     public void deleteById(Long id) {
+        User user = authService.getCurrentUser();
         Listing existingListing = repository.findById(id)
                 .orElseThrow(() -> new AppNotFoundException("Listing not found with id: " + id));
+        if (!user.getId().equals(existingListing.getUser().getId())) {
+            throw new AppException("Access denied");
+        }
         repository.delete(existingListing);
     }
 
@@ -183,6 +181,7 @@ public class ListingService {
                     .online(listing.getOnline())
                     .studentHome(listing.getStudentHome())
                     .tutorHome(listing.getTutorHome())
+                    .subjectId(listing.getSubject().getId())
                     .subject(listing.getSubject().getName())
                     .tutorId(listing.getUser().getId())
                     .tutorName(listing.getUser().getTutorName())
@@ -198,4 +197,16 @@ public class ListingService {
             return ListingResponse.builder().build();
         }
     }
+
+    public void update(ListingUpdateRequest listingRequest) {
+        Listing listing = repository.findById(listingRequest.listingId()).orElseThrow(() -> new AppNotFoundException("Listing not found"));
+        User user = authService.getCurrentUser();
+        if (!user.getId().equals(listing.getUser().getId())) {
+            throw new AppException("Access denied");
+        }
+        listing.setDescription(listingRequest.description());
+        listing.setPrice(listingRequest.price());
+        repository.save(listing);
+    }
+
 }

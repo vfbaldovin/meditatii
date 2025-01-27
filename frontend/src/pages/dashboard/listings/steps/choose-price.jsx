@@ -13,7 +13,9 @@ import Tooltip from '@mui/material/Tooltip';
 import { InfoCircle } from '@untitled-ui/icons-react';
 import { useAuth } from '../../../../hooks/use-auth';
 
-export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, ...other }) => {
+export const ChoosePrice = (props) => {
+  const { onBack, onNext, selectedSubject, price, setPrice, showNavigationButtons = true,
+    ...other } = props;
   const [recommendedPrice, setRecommendedPrice] = useState(null); // State to store the recommended price
   const [error, setError] = useState(''); // State to store validation error message
   const { fetchWithAuth } = useAuth(); // Destructure fetchWithAuth from useAuth
@@ -34,12 +36,15 @@ export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, 
 
   // Fetch the recommended price whenever the selectedSubject changes
   useEffect(() => {
+    // Fetch the recommended price only if subjectId is valid and there's no existing fetch
     if (selectedSubject?.id) {
       fetchRecommendedPrice(selectedSubject.id);
     } else {
       setRecommendedPrice(''); // Clear recommended price if no subject is selected
     }
-  }, [selectedSubject]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSubject?.id]); // Trigger only when the ID changes
+
 
   const handleInputChange = (event) => {
     // Remove non-digits and limit to 3 digits
@@ -130,20 +135,23 @@ export const ChoosePrice = ({ onBack, onNext, selectedSubject, price, setPrice, 
           inputMode: 'numeric',
         }}
       />
+      {showNavigationButtons && (
 
       <Stack alignItems="center" direction="row" spacing={2}>
         <Button color="inherit" onClick={onBack}>
           Înapoi
         </Button>
         <Button
-          color="inherit"
-          variant="outlined"
+          // color="inherit"
+          variant="contained"
           endIcon={<SvgIcon><ArrowRightIcon /></SvgIcon>}
           onClick={handleNext} // Use the updated handleNext function
         >
           Finalizează
         </Button>
       </Stack>
+      )}
+
     </Stack>
   );
 };
@@ -154,4 +162,6 @@ ChoosePrice.propTypes = {
   selectedSubject: PropTypes.object,
   price: PropTypes.string.isRequired, // Ensure price is expected as a string
   setPrice: PropTypes.func.isRequired,
+  showNavigationButtons: PropTypes.bool, // Prop to control visibility of navigation buttons
+
 };

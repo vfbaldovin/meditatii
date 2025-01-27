@@ -11,8 +11,17 @@ import {useAuth} from "../../../../hooks/use-auth";
 import StopCircle from "@untitled-ui/icons-react/build/esm/StopCircle";
 
 export const ChooseDescription = (props) => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const { onBack, onNext, selectedSubject, description, setDescription, ...other } = props;
+  const {
+    onBack,
+    onNext,
+    selectedSubject,
+    description,
+    setDescription,
+    showNavigationButtons = true,
+    isFirst = false,
+    externalError = '', // Nou prop pentru eroare externă
+    ...other
+  } = props;
 
   const { fetchWithAuth } = useAuth(); // Destructure fetchWithAuth from useAuth
 
@@ -25,12 +34,10 @@ export const ChooseDescription = (props) => {
 
   // Maximum number of characters allowed
   const MAX_CHARACTERS = 5000;
-
-  // Function to generate description as a stream
   const generateDescription = async () => {
-    if (!selectedSubject || !selectedSubject.id) {
-      return; // Do nothing if no subject is selected
-    }
+    // if (!selectedSubject || !selectedSubject.id) {
+    //   return; // Do nothing if no subject is selected
+    // }
 
     // Clear the previous description before generating a new one
     setDescription('');  // Reset the description
@@ -44,7 +51,7 @@ export const ChooseDescription = (props) => {
 
     try {
       const response = await fetchWithAuth(
-        `/api/dashboard/subjects/${selectedSubject.id}/description`,
+        `/api/dashboard/subjects/${selectedSubject}/description`,
         {
           method: 'GET',
           signal, // Attach the signal to the request for cancellation
@@ -231,30 +238,34 @@ export const ChooseDescription = (props) => {
 
       </Stack>
 
-      <Stack
-        alignItems="center"
-        direction="row"
-        spacing={2}
-      >
-        <Button
-          color="inherit"
-          endIcon={
-            <SvgIcon>
-              <ArrowRightIcon />
-            </SvgIcon>
-          }
-          onClick={handleNext} // Use handleNext to abort and proceed
-          variant="outlined"
+      {showNavigationButtons && (
+        <Stack
+          alignItems="center"
+          direction="row"
+          spacing={2}
         >
-          Înainte
-        </Button>
-        <Button
-          color="inherit"
-          onClick={handleBack} // Use handleBack to abort and go back
-        >
-          Înapoi
-        </Button>
-      </Stack>
+          <Button
+            color="inherit"
+            endIcon={
+              <SvgIcon>
+                <ArrowRightIcon />
+              </SvgIcon>
+            }
+            onClick={handleNext} // Use handleNext to abort and proceed
+            variant="outlined"
+          >
+            Înainte
+          </Button>
+          {!isFirst && (
+          <Button
+            color="inherit"
+            onClick={handleBack} // Use handleBack to abort and go back
+          >
+            Înapoi
+          </Button>
+          )}
+        </Stack>
+      )}
     </Stack>
   );
 };
@@ -262,7 +273,9 @@ export const ChooseDescription = (props) => {
 ChooseDescription.propTypes = {
   onBack: PropTypes.func,
   onNext: PropTypes.func,
-  selectedSubject: PropTypes.object,
+  selectedSubject: PropTypes.string,
   description: PropTypes.string.isRequired, // Add prop type for description
   setDescription: PropTypes.func.isRequired, // Add prop type for setDescription
+  showNavigationButtons: PropTypes.bool, // Prop to control visibility of navigation buttons
+
 };

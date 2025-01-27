@@ -13,7 +13,7 @@ import { useAuth } from '../../../../hooks/use-auth';
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 import Tooltip from "@mui/material/Tooltip";
 
-export const ListingCard = ({ listingId, isHovered }) => {
+export const ListingCard = ({ listingId, isHovered, isHoverable = true  }) => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
   const { fetchWithAuth } = useAuth();
   const [listing, setListing] = useState(null);
@@ -48,10 +48,6 @@ export const ListingCard = ({ listingId, isHovered }) => {
     fetchListing();
   }, [fetchWithAuth, listingId, apiBaseUrl]);
 
-  const handleCardClick = (id) => {
-    console.log(`Card clicked with ID: ${id}`);
-  };
-
   if (loading) {
     // Render skeleton while loading
     return (
@@ -83,18 +79,19 @@ export const ListingCard = ({ listingId, isHovered }) => {
 
   return (
     <Card
-      onClick={() => handleCardClick(listing.id)}
       id={listing.id}
       sx={{
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
         borderRadius: '0.5rem',
-        cursor: 'pointer',
+        cursor: isHoverable ? 'pointer' : 'default',
         position: 'relative',
         border: (theme) => (theme.palette.mode === 'light' ? '1px solid whitesmoke' : '1px solid rgb(47, 79, 79)'),
-        '&:hover': {
-          border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
-          borderRadius: '0.5rem',
-        },
+        '&:hover': isHoverable
+          ? {
+            border: (theme) => (theme.palette.mode === 'light' ? '1px solid #6C737F' : '1px solid whitesmoke'),
+            borderRadius: '0.5rem',
+          }
+          : {},
       }}
     >
       {isHovered && (
@@ -162,7 +159,7 @@ export const ListingCard = ({ listingId, isHovered }) => {
               </Typography>
               <Box display="flex" alignItems="center" ml={1}>
 
-                <Tooltip title="Insignă meditator verificat (diponibilă permanent)" arrow open={isHovered} placement="top-start">
+                <Tooltip title="Insignă meditator verificat diponibilă permanent" arrow open={isHovered} placement="right-start">
                   <SvgIcon
                     sx={{
                       color: 'white',

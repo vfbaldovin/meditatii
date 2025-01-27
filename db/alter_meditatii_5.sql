@@ -101,3 +101,19 @@ UPDATE user u
     GROUP BY user_id
     ) l ON u.id = l.user_id
     SET u.county = COALESCE(l.county, 'București');
+
+
+ALTER TABLE user ADD COLUMN promoted TINYINT(1) DEFAULT 0;
+
+
+UPDATE user u
+SET u.promoted = (
+    SELECT CASE
+               WHEN COUNT(l.id) > 0 THEN 1
+               ELSE 0
+               END
+    FROM listing l
+    WHERE l.user_id = u.id AND l.promoted = 1
+);
+
+ALTER TABLE user ADD COLUMN verified TINYINT(1) DEFAULT 0;

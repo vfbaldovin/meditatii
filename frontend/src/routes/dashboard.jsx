@@ -43,6 +43,7 @@ const ProductCreatePage = lazy(() => import('src/pages/dashboard/products/create
 // Listings
 const ListingCreatePage = lazy(() => import('src/pages/dashboard/listings/create-page'));
 const ListingPreviewPage = lazy(() => import('src/pages/dashboard/listings/preview-page'));
+const ListingEditPage = lazy(() => import('src/pages/dashboard/listings/edit-page'));
 
 // Profile
 const PersonalProfileEditPage  = lazy(() => import('src/pages/dashboard/profile/personal-profile-edit'));
@@ -214,6 +215,10 @@ export const dashboardRoutes = [
           {
             path: ':id',
             element: <ListingPreviewPage />,
+          },
+          {
+            path: ':id/edit',
+            element: <ListingEditPage />,
           },
         ],
       },

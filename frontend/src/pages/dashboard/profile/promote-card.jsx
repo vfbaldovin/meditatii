@@ -11,16 +11,14 @@ import React, {useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import CardHeader from "@mui/material/CardHeader";
 
-export const PromoteCard = () => {
-  const [hovered, setHovered] = useState(false);
+export const PromoteCard = ({onHoverChange}) => {
   const theme = useTheme();
-
 
   return (
     <>
       <Card
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={() => onHoverChange(true)} // Notify parent of hover state
+        onMouseLeave={() => onHoverChange(false)}
         sx={{
           // borderColor: 'inherit',
           // borderWidth: 1,
@@ -138,7 +136,7 @@ export const PromoteCard = () => {
               </Typography>
             </Box>
           </Box>
-          <Grid item container alignItems="center" sx={{mt: 1}}>
+          <Grid container alignItems="center" sx={{mt: 1}}>
             <Box>
               <Box display="flex" alignItems="center">
                 <CheckIcon sx={{ color: 'success.main', mr: 1 }} />

@@ -42,13 +42,6 @@ public class ListingController {
         return new ResponseEntity<>(createdListing, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Listing> updateListing(@PathVariable Long id,
-                                                      @RequestBody Listing listing) {
-        Listing updatedListing = listingService.update(id, listing);
-        return ResponseEntity.ok(updatedListing);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteListing(@PathVariable Long id) {
         listingService.deleteById(id);

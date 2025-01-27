@@ -28,7 +28,7 @@ import React from "react";
 import ArrowRightIcon from "@untitled-ui/icons-react/build/esm/ArrowRight";
 import {useNavigate} from "react-router-dom";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-
+import ClearIcon from '@mui/icons-material/Clear';
 export const PersonalListingsTable = (props) => {
   const {
     count = 0,
@@ -37,6 +37,7 @@ export const PersonalListingsTable = (props) => {
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = 5,  // Default to 5 instead of 0 to avoid warning
+    isPromoted = false, // Add `isPromoted` with a default value
   } = props;
   const navigate = useNavigate();
 
@@ -48,6 +49,7 @@ export const PersonalListingsTable = (props) => {
             <TableRow>
               <TableCell sx={{ backgroundColor: 'transparent !important' }}>Materie</TableCell>
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Vizualizari</TableCell>
+              {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Accesări telefon</TableCell>*/}
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Promovat</TableCell>
               <TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Actualizare</TableCell>
               {/*<TableCell sx={{ textAlign: 'center', backgroundColor: 'transparent !important' }}>Modifica</TableCell>*/}
@@ -70,51 +72,23 @@ export const PersonalListingsTable = (props) => {
                     {listing.subject}
                   </TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>
-                  <TableCell sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {/*<Avatar sx={{ backgroundColor: 'transparent' }}>*/}
-                    {/*  <Box*/}
-                    {/*    sx={{*/}
-                    {/*      animation: 'pulse ease 750ms infinite',*/}
-                    {/*      borderRadius: '50%',*/}
-                    {/*      p: 0.5,*/}
-                    {/*      '@keyframes pulse': {*/}
-                    {/*        '0%': {*/}
-                    {/*          boxShadow: 'none',*/}
-                    {/*        },*/}
-                    {/*        '100%': {*/}
-                    {/*          boxShadow: (theme) => `0px 0px 0px 6px ${alpha(theme.palette.success.main, 0.1)}`,*/}
-                    {/*        },*/}
-                    {/*      },*/}
-                    {/*    }}*/}
-                    {/*  >*/}
-                    {/*    <Box*/}
-                    {/*      sx={{*/}
-                    {/*        backgroundColor: 'success.main',*/}
-                    {/*        borderRadius: '50%',*/}
-                    {/*        height: 18,*/}
-                    {/*        width: 18,*/}
-                    {/*      }}*/}
-                    {/*    />*/}
-                    {/*  </Box>*/}
-                    {/*</Avatar>*/}
-                    {/*<IconButton*/}
-                    {/*  component={RouterLink}*/}
-                    {/*  href={paths.dashboard.personalListingsEdit}*/}
-                    {/*>*/}
-                    {/*  <SvgIcon>*/}
-                    {/*    <ArrowsUp />*/}
-                    {/*  </SvgIcon>*/}
-                    {/*</IconButton>*/}
-                    <SeverityPill color='success'>DA</SeverityPill>
+                  {/*<TableCell sx={{ textAlign: 'center' }}>{listing.views}</TableCell>*/}
+                  <TableCell sx={{ textAlign: 'center' }}>
+
+                    {/*<ClearIcon color='error'/>*/}
+                    {isPromoted ? (
+                      <SeverityPill color="success">DA</SeverityPill>
+                    ) : (
+                      <SeverityPill color="error">NU</SeverityPill>
+                    )}
                     {/*<SeverityPill color='warning'>?</SeverityPill>*/}
-                    <SeverityPill color='error'>NU</SeverityPill>
-                    <WorkspacePremiumIcon
-                      sx={{
-                        color: '#FFC107',
-                        width: '2rem',
-                        height: '2rem',
-                      }}
-                    />
+                    {/*<WorkspacePremiumIcon*/}
+                    {/*  sx={{*/}
+                    {/*    color: '#FFC107',*/}
+                    {/*    width: '2rem',*/}
+                    {/*    height: '2rem',*/}
+                    {/*  }}*/}
+                    {/*/>*/}
 
                     {/*<Avatar*/}
                     {/*  sx={{*/}

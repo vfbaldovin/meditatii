@@ -19,14 +19,10 @@ import { Seo } from 'src/components/seo';
 import { getAuthenticatedUser } from 'src/app/hooks/get-authenticated-user';
 import { usePageView } from 'src/hooks/use-page-view';
 import { AccountBillingSettings } from 'src/sections/dashboard/account/account-billing-settings';
-import { AccountGeneralSettings } from 'src/sections/dashboard/account/account-general-settings';
 import { AccountNotificationsSettings } from 'src/sections/dashboard/account/account-notifications-settings';
 import { AccountTeamSettings } from 'src/sections/dashboard/account/account-team-settings';
 import { AccountSecuritySettings } from 'src/sections/dashboard/account/account-security-settings';
 import { PersonalListingsTable } from '../../sections/dashboard/listings/personal-listings-table';
-import { OverviewDoneTasks } from "../../sections/dashboard/overview/overview-done-tasks";
-import { OverviewPendingIssues } from "../../sections/dashboard/overview/overview-pending-issues";
-import { OverviewOpenTickets } from "../../sections/dashboard/overview/overview-open-tickets";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   PersonalListingsSkeletonTable
@@ -34,42 +30,15 @@ import {
 import {RouterLink} from "../../components/router-link";
 import {paths} from "../../paths";
 import {useAuth} from "../../hooks/use-auth";
-import Chip from "@mui/material/Chip";
 import {AccountAvatar} from "../../sections/dashboard/account/account-avatar";
-import {InvoiceListSidebar} from "../../sections/dashboard/invoice/invoice-list-sidebar";
-import {InvoiceListContainer} from "../../sections/dashboard/invoice/invoice-list-container";
-import FilterFunnel01Icon from "@untitled-ui/icons-react/build/esm/FilterFunnel01";
-import {InvoiceListSummary} from "../../sections/dashboard/invoice/invoice-list-summary";
-import {InvoiceListTable} from "../../sections/dashboard/invoice/invoice-list-table";
-import {customer as invoicesSearch} from "../../api/customers/data";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import {useMounted} from "../../hooks/use-mounted";
-import {invoicesApi} from "../../api/invoices";
-import IconButton from "@mui/material/IconButton";
-import XIcon from "@untitled-ui/icons-react/build/esm/X";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputAdornment from "@mui/material/InputAdornment";
-import SearchMdIcon from "@untitled-ui/icons-react/build/esm/SearchMd";
-import FormLabel from "@mui/material/FormLabel";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-import {Scrollbar} from "../../components/scrollbar";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Switch from "@mui/material/Switch";
-import * as filters from "../../api/customers/data";
 import {CustomerBasicDetails} from "../../sections/dashboard/customer/customer-basic-details";
-import {CustomerPayment} from "../../sections/dashboard/customer/customer-payment";
-import {CustomerEmailsSummary} from "../../sections/dashboard/customer/customer-emails-summary";
-import {CustomerDataManagement} from "../../sections/dashboard/customer/customer-data-management";
 import CardHeader from "@mui/material/CardHeader";
-import Avatar from "@mui/material/Avatar";
-import {getInitials} from "../../utils/get-initials";
-import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
-import ChevronDownIcon from "@untitled-ui/icons-react/build/esm/ChevronDown";
 import {ProfileCompleteProgress} from "../../sections/dashboard/academy/profile-complete-progress";
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 import {PromoteCard} from "./profile/promote-card";
+import Popover from "@mui/material/Popover";
+import Tooltip from "@mui/material/Tooltip";
 
 
 const tabs = [
@@ -92,39 +61,67 @@ const Page = () => {
   const [error, setError] = useState(null);  // Error state
   const isSmallScreen = useMediaQuery('(max-width:1200px)'); // Check if screen width is less than 1200px
   const [completionPercentage, setCompletionPercentage] = useState(0);
-
+  const [promoted, setPromoted] = useState(false);
+  const [verified, setVerified] = useState(false);
   // Bearer token from authentication (assuming it's stored in localStorage)
   const token = sessionStorage.getItem('accessToken');
   const { fetchWithAuth } = useAuth(); // Destructure fetchWithAuth from useAuth
 
-  usePageView();
+  const [isPromoteHovered, setIsPromoteHovered] = useState(false);
+  const isPromoted = promoted;
+
+
+  // usePageView();
 
   // Function to fetch personal listings from the backend
   useEffect(() => {
     const fetchPersonalListings = async () => {
       try {
         setLoading(true);
-        // Use fetchWithAuth instead of axios
-        const response = await fetchWithAuth(`/api/dashboard/listings`);
 
-        // Check if response is OK (status 200-299)
+        // Fetch listings
+        const response = await fetchWithAuth(`/api/dashboard/listings`);
         if (!response.ok) {
           throw new Error('Failed to fetch data from server');
         }
-
         const data = await response.json();
-        setPersonalListings(data); // Store fetched data in state
+        setPersonalListings(data);
       } catch (err) {
         console.error('Failed to fetch personal listings:', err);
         setError('Failed to fetch data from server');
+      }
+    };
+
+    const fetchPromotedInfo = async () => {
+      try {
+        // Fetch promoted info
+        const response = await fetchWithAuth(`/api/dashboard/profile/info/promoted`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch promoted info');
+        }
+        const data = await response.json();
+
+        // Update state with response data
+        setPromoted(data.promoted);
+        setVerified(data.verified);
+      } catch (err) {
+        console.error('Failed to fetch promoted info:', err);
+        setError('Failed to fetch promoted info');
+      }
+    };
+
+    // Fetch data from both endpoints
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([fetchPersonalListings(), fetchPromotedInfo()]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPersonalListings();
+    fetchData();
   }, [fetchWithAuth]);
-
 
   // Handle page change
   const handlePageChange = (event, newPage) => {
@@ -193,19 +190,59 @@ const Page = () => {
                       >
                         {user.email}
                       </Typography>
-                    <SvgIcon
-                      sx={{
-                        ml:1,
-                        color: 'white',
-                        '& path': {
-                          fill: 'none', // Remove inner color
-                          stroke: (theme) => theme.palette.primary.main, // Set the outline color
-                          strokeWidth: 2, // Adjust the thickness of the outline
-                        },
-                      }}
-                    >
-                       <CheckVerified01></CheckVerified01>
-                    </SvgIcon>
+                      {(verified || isPromoteHovered) && (
+                        verified ? (
+                          // Show the icon without Tooltip when verified is true
+                          <SvgIcon
+                            sx={{
+                              ml: 1,
+                              color: 'white',
+                              '& path': {
+                                fill: 'none',
+                                stroke: (theme) => theme.palette.primary.main,
+                                strokeWidth: 2,
+                              },
+                            }}
+                          >
+                            <CheckVerified01 />
+                          </SvgIcon>
+                        ) : (
+                          // Wrap the icon in Tooltip when isPromoteHovered is true and verified is false
+                          <Tooltip
+                            title="Insignă meditator verificat disponibilă permanent"
+                            arrow
+                            open={isPromoteHovered}
+                            placement="bottom-start"
+                            PopperProps={{
+                              modifiers: [
+                                {
+                                  name: 'zIndex',
+                                  enabled: true,
+                                  phase: 'afterWrite',
+                                  fn: ({ state }) => {
+                                    state.styles.popper.zIndex = 1099; // Adjust as needed to be below your header
+                                  },
+                                },
+                              ],
+                            }}
+                          >
+                            <SvgIcon
+                              sx={{
+                                ml: 1,
+                                color: 'white',
+                                '& path': {
+                                  fill: 'none',
+                                  stroke: (theme) => theme.palette.primary.main,
+                                  strokeWidth: 2,
+                                },
+                              }}
+                            >
+                              <CheckVerified01 />
+                            </SvgIcon>
+                          </Tooltip>
+                        )
+                      )}
+
                     </Box>
                     {/*<Stack*/}
                     {/*  alignItems="center"*/}
@@ -222,24 +259,6 @@ const Page = () => {
                 </Stack>
               </Stack>
 
-              {/*<Stack*/}
-              {/*  alignItems="center"*/}
-              {/*  direction="row"*/}
-              {/*  spacing={2}*/}
-              {/*>*/}
-              {/*  <Button*/}
-              {/*    component={RouterLink}*/}
-              {/*    href={paths.dashboard.listings.create}*/}
-              {/*    startIcon={*/}
-              {/*      <SvgIcon>*/}
-              {/*        <PlusIcon/>*/}
-              {/*      </SvgIcon>*/}
-              {/*    }*/}
-              {/*    variant="contained"*/}
-              {/*  >*/}
-              {/*    Adaugă anunț*/}
-              {/*  </Button>*/}
-              {/*</Stack>*/}
             </Stack>
 
             <Tabs
@@ -358,6 +377,7 @@ const Page = () => {
                                 rowsPerPage={rowsPerPage}
                                 onPageChange={handlePageChange}
                                 onRowsPerPageChange={handleRowsPerPageChange}
+                                isPromoted={isPromoted} // Pass computed value here
                               />
                             )}
                           </CardContent>
@@ -372,7 +392,7 @@ const Page = () => {
                             gap: 4, // Spațiu între elemente
                           }}
                         >
-                          <PromoteCard />
+                            <PromoteCard onHoverChange={(isHovered) => setIsPromoteHovered(isHovered)} />
 
                           <ProfileCompleteProgress
                             timeCurrent={completionPercentage}
@@ -396,7 +416,7 @@ const Page = () => {
                             timeCurrent={completionPercentage}
                             timeGoal={100}
                           />
-                          <PromoteCard />
+                          <PromoteCard onHoverChange={(isHovered) => setIsPromoteHovered(isHovered)} />
                         </Box>
 
                         <Card>
@@ -460,6 +480,7 @@ const Page = () => {
                                 rowsPerPage={rowsPerPage}
                                 onPageChange={handlePageChange}
                                 onRowsPerPageChange={handleRowsPerPageChange}
+                                isPromoted={isPromoted} // Pass computed value here
                               />
                             )}
                           </CardContent>

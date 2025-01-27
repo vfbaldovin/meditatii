@@ -63,6 +63,12 @@ public class  User {
     @Column(name = "enabled")
     private Boolean enabled;
 
+    @Column(name = "promoted")
+    private Boolean promoted;
+
+    @Column(name = "verified")
+    private Boolean verified;
+
     @OneToMany(mappedBy = "user")
     private List<Listing> listings;
 
