@@ -117,3 +117,10 @@ SET u.promoted = (
 );
 
 ALTER TABLE user ADD COLUMN verified TINYINT(1) DEFAULT 0;
+
+ALTER TABLE user
+    ADD COLUMN stripe_customer_id VARCHAR(255);
+
+ALTER TABLE user
+    ADD COLUMN promotion_date DATETIME;
+

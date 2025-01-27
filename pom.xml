@@ -77,6 +77,12 @@
             <artifactId>google-api-client</artifactId>
             <version>1.27.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>22.19.0</version> <!-- Use the latest version -->
+        </dependency>
+
     </dependencies>
 
     <build>

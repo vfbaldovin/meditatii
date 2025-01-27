@@ -22,6 +22,7 @@ import {paths} from "../../../paths";
 import ArrowLeftIcon from "@untitled-ui/icons-react/build/esm/ArrowLeft";
 import Edit02Icon from "@untitled-ui/icons-react/build/esm/Edit02";
 import DeleteButtonWithConfirmation from "./delete-button-with-confirmation";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const PreviewPage = () => {
   const {id} = useParams();
@@ -31,6 +32,8 @@ const PreviewPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hovered, setHovered] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -44,6 +47,28 @@ const PreviewPage = () => {
     setCurrentWallpaperIndex((prevIndex) =>
       (prevIndex + 1) % wallpapers.length
     );
+  };
+
+  const handlePayment = async () => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetchWithAuth('/api/dashboard/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({ priceId: 'price_1YOUR_PRICE_ID' }), // Replace with dynamic ID if needed
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        window.location.href = data.url; // Redirect to Stripe Checkout
+      } else {
+        console.error('Failed to create checkout session:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+    } finally {
+      setLoading(false); // End loading
+    }
   };
 
   useEffect(() => {
@@ -356,6 +381,7 @@ const PreviewPage = () => {
                           }
                           variant="outlined"
                           sx={{width: '100%'}}
+                          onClick={handlePayment}
                         >
                           Plată card&nbsp;
                           <svg
@@ -424,6 +450,27 @@ const PreviewPage = () => {
                         {/*<Typography variant="body1" sx={{ margin: 0 , width: '0%'}}>*/}
                         {/*  Apare pe prima pagină a site-ului și este vizibil înainte ca utilizatorii să înceapă căutarea.*/}
                         {/*</Typography>*/}
+                        {loading && (
+                          <Box
+                            sx={{
+                              position: 'fixed', // Ensures it covers the entire screen
+                              top: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '100%',
+                              zIndex: 1099, // Higher than other elements on the screen
+                              backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent white background
+                              backdropFilter: 'blur(5px)', // Apply blur effect
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <CircularProgress size={50} thickness={5} />
+                          </Box>
+
+                        )}
+
                       </Box>
                       <Box
                         sx={{
@@ -435,7 +482,7 @@ const PreviewPage = () => {
                           textAlign: 'center', // Asigură alinierea textului
                         }}
                       >
-                        <Typography variant="body1" sx={{margin: 0, maxWidth: '20rem'}}>
+                        <Typography variant="body1" sx={{margin: 0, maxWidth: '20rem', fontSize: '0.85rem'}}>
                           Plată securizată prin platforma&nbsp;
                           <a href="https://stripe.com" target="_blank" rel="noopener noreferrer">
                             <svg

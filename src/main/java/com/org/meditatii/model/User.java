@@ -66,11 +66,17 @@ public class  User {
     @Column(name = "promoted")
     private Boolean promoted;
 
+    @Column(name = "promotion_date")
+    private LocalDateTime promotionDate;
+
     @Column(name = "verified")
     private Boolean verified;
 
     @OneToMany(mappedBy = "user")
     private List<Listing> listings;
+
+    @Column(name = "stripe_customer_id", unique = true)
+    private String stripeCustomerId;
 
 //    @Column(name = "reset_token")
 //    private String resetToken;

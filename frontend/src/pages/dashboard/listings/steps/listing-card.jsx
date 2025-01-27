@@ -95,7 +95,20 @@ export const ListingCard = ({ listingId, isHovered, isHoverable = true  }) => {
       }}
     >
       {isHovered && (
-        <Tooltip title="Insignă anunț promovat" arrow open={isHovered} placement="bottom-end">
+        <Tooltip title="Insignă anunț promovat" arrow open={isHovered} placement="bottom-end"
+                 PopperProps={{
+                   modifiers: [
+                     {
+                       name: 'zIndex',
+                       enabled: true,
+                       phase: 'afterWrite',
+                       fn: ({ state }) => {
+                         state.styles.popper.zIndex = 1098; // Adjust as needed to be below your header
+                       },
+                     },
+                   ],
+                 }}
+        >
         <WorkspacePremiumIcon
           sx={{
             position: 'absolute',
@@ -159,7 +172,21 @@ export const ListingCard = ({ listingId, isHovered, isHoverable = true  }) => {
               </Typography>
               <Box display="flex" alignItems="center" ml={1}>
 
-                <Tooltip title="Insignă meditator verificat diponibilă permanent" arrow open={isHovered} placement="right-start">
+                <Tooltip title="Insignă meditator verificat diponibilă permanent" arrow open={isHovered}
+                         placement="right-start"
+                         PopperProps={{
+                           modifiers: [
+                             {
+                               name: 'zIndex',
+                               enabled: true,
+                               phase: 'afterWrite',
+                               fn: ({ state }) => {
+                                 state.styles.popper.zIndex = 1098; // Adjust as needed to be below your header
+                               },
+                             },
+                           ],
+                         }}
+                >
                   <SvgIcon
                     sx={{
                       color: 'white',

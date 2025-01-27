@@ -4,8 +4,10 @@ import com.org.meditatii.model.dto.*;
 import com.org.meditatii.schedulers.ListingPriceScheduler;
 import com.org.meditatii.service.AuthService;
 import com.org.meditatii.service.ListingService;
+import com.org.meditatii.service.StripeService;
 import com.org.meditatii.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,16 +22,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
+@AllArgsConstructor
 public class DashboardController {
     private final UserService userService;
     private final AuthService authService;
     private final ListingService listingService;
-
-    public DashboardController(UserService userService, AuthService authService, ListingService listingService) {
-        this.userService = userService;
-        this.authService = authService;
-        this.listingService = listingService;
-    }
+    private final StripeService stripeService;
 
     @GetMapping("/listings")
     public ResponseEntity<List<PersonalListingRow>> getPersonalListings() {
@@ -105,5 +103,10 @@ public class DashboardController {
     @GetMapping("/profile/info/promoted")
     public ResponseEntity<UserPromotedInfoResponse> getPromotedInfo() {
         return ResponseEntity.ok(userService.getPromotedInfo());
+    }
+
+    @PostMapping("/stripe/create-checkout-session")
+    public Map<String, String> createCheckoutSession() throws Exception {
+        return Map.of("url", stripeService.createCheckout().getUrl());
     }
 }

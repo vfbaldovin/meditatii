@@ -10,9 +10,35 @@ import ArrowRightIcon from "@untitled-ui/icons-react/build/esm/ArrowRight";
 import React, {useState} from "react";
 import {useTheme} from "@mui/material/styles";
 import CardHeader from "@mui/material/CardHeader";
+import {useAuth} from "../../../hooks/use-auth";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export const PromoteCard = ({onHoverChange}) => {
   const theme = useTheme();
+  const { fetchWithAuth } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handlePayment = async () => {
+    setLoading(true); // Start loading
+    try {
+      const response = await fetchWithAuth('/api/dashboard/stripe/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({ priceId: 'price_1YOUR_PRICE_ID' }), // Replace with dynamic ID if needed
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        window.location.href = data.url; // Redirect to Stripe Checkout
+      } else {
+        console.error('Failed to create checkout session:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+    } finally {
+      setLoading(false); // End loading
+    }
+  };
 
   return (
     <>
@@ -175,6 +201,7 @@ export const PromoteCard = ({onHoverChange}) => {
               }
               variant="outlined"
               sx={{width: '100%'}}
+              onClick={handlePayment} // Call payment function on click
 
             >
               Plată card&nbsp;
@@ -244,6 +271,26 @@ export const PromoteCard = ({onHoverChange}) => {
             {/*<Typography variant="body1" sx={{ margin: 0 , width: '0%'}}>*/}
             {/*  Apare pe prima pagină a site-ului și este vizibil înainte ca utilizatorii să înceapă căutarea.*/}
             {/*</Typography>*/}
+            {loading && (
+              <Box
+                sx={{
+                  position: 'fixed', // Ensures it covers the entire screen
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 1099, // Higher than other elements on the screen
+                  backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent white background
+                  backdropFilter: 'blur(5px)', // Apply blur effect
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <CircularProgress size={50} thickness={5} />
+              </Box>
+
+            )}
           </Box>
           <Box
             sx={{
@@ -256,7 +303,7 @@ export const PromoteCard = ({onHoverChange}) => {
             }}
           >
 
-            <Typography variant="body1" sx={{margin: 0, maxWidth: '20rem'}}>
+            <Typography variant="body1" sx={{margin: 0, maxWidth: '20rem', fontSize: '0.85rem'}}>
               Plată securizată prin platforma&nbsp;
               <a href="https://stripe.com" target="_blank" rel="noopener noreferrer">
                 <svg

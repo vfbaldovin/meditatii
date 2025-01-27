@@ -37,8 +37,8 @@ import CardHeader from "@mui/material/CardHeader";
 import {ProfileCompleteProgress} from "../../sections/dashboard/academy/profile-complete-progress";
 import CheckVerified01 from "@untitled-ui/icons-react/build/esm/CheckVerified01";
 import {PromoteCard} from "./profile/promote-card";
-import Popover from "@mui/material/Popover";
 import Tooltip from "@mui/material/Tooltip";
+import confetti from "canvas-confetti";
 
 
 const tabs = [
@@ -138,6 +138,30 @@ const Page = () => {
     setCurrentTab(value);
   }, []);
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 400,
+      spread: 120,
+      startVelocity: 80,
+      scalar: 1.5,
+      origin: {x: 1, y: 0.5}
+    });
+    confetti({
+      particleCount: 400,
+      spread: 120,
+      startVelocity: 80,
+      scalar: 1.5,
+      origin: {x: 0, y: 0.5}
+    });
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('p') === 'success') {
+      triggerConfetti();
+    }
+  }, []);
+
   return (
     <>
       <Seo title="Dashboard: Account" />
@@ -220,7 +244,7 @@ const Page = () => {
                                   enabled: true,
                                   phase: 'afterWrite',
                                   fn: ({ state }) => {
-                                    state.styles.popper.zIndex = 1099; // Adjust as needed to be below your header
+                                    state.styles.popper.zIndex = 1098; // Adjust as needed to be below your header
                                   },
                                 },
                               ],
